@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // src/assets/icons/Funnel.jsx
 const Funnel = () => (
   <svg
@@ -31,37 +30,3 @@ const Funnel = () => (
 );
 
 export default Funnel;
-=======
-// src/assets/icons/Funnel.jsx
-const Funnel = () => (
-  <svg
-    width="133"
-    height="133"
-    viewBox="0 0 133 133"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M21.0115 16.283C35.8028 13.7747 51.0007 12.469 66.5004 12.469C81.9997 12.469 97.1974 13.7747 111.988 16.2829C116.989 17.1309 120.531 21.4839 120.531 26.4563V32.2418C120.531 36.651 118.78 40.8796 115.662 43.9974L81.4034 78.2559C79.8445 79.8148 78.9687 81.9291 78.9687 84.1337V100.357C78.9687 106.654 75.411 112.41 69.7787 115.226L60.0462 120.093C58.7578 120.737 57.2278 120.668 56.0024 119.911C54.7771 119.153 54.0312 117.816 54.0312 116.375V84.1337C54.0312 81.9291 53.1555 79.8148 51.5966 78.2559L17.3381 43.9974C14.2203 40.8796 12.4688 36.651 12.4688 32.2418V26.4564C12.4688 21.4841 16.0108 17.131 21.0115 16.283Z"
-      fill="url(#paint0_linear_31_298)"
-    />
-    <defs>
-      <linearGradient
-        id="paint0_linear_31_298"
-        x1="66.5"
-        y1="12.469"
-        x2="66.5"
-        y2="120.531"
-        gradientUnits="userSpaceOnUse"
-      >
-        <stop stopColor="#14F195" />
-        <stop offset="1" stopColor="#9945FF" />
-      </linearGradient>
-    </defs>
-  </svg>
-);
-
-export default Funnel;
->>>>>>> 563e2be438a3ec5992c96ceeb453250da23265ab
