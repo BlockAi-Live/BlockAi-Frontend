@@ -94,7 +94,7 @@ export default function LevelBreakdown() {
                   </div>
                 </div>
 
-                <button className="w-full py-4 flex items-center justify-center gap-2 rounded-xl bg-[#0d0f18] border border-white/5 hover:bg-white/5 hover:border-white/10 transition-all text-sm font-bold text-white group-hover:shadow-lg">
+                <button className="w-full py-4 flex items-center justify-center gap-2 rounded-xl bg-[#0d0f18]/60 backdrop-blur-sm border border-white/5 hover:bg-[#0d0f18]/80 hover:border-white/10 transition-all text-sm font-bold text-white group-hover:shadow-lg">
                   View Details <ChevronRight size={16} className="text-gray-400 group-hover:text-white transition-colors" />
                 </button>
               </div>

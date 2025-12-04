@@ -44,8 +44,9 @@ export default function Leaderboard() {
               transition={{ delay: index * 0.1 }}
             >
               <ReferralCard 
+                gradientBorder
                 hoverEffect 
-                className={`p-8 flex flex-col gap-6 ${isTop3 ? `border ${borderColor}` : ""}`}
+                className={`p-8 flex flex-col gap-6`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -53,7 +54,7 @@ export default function Leaderboard() {
                       index === 0 ? "bg-yellow-500/10" :
                       index === 1 ? "bg-gray-300/10" :
                       index === 2 ? "bg-orange-700/10" :
-                      "bg-[#16181f]"
+                      "bg-[#0d0f18]/60 backdrop-blur-sm"
                     }`}>
                       {icon}
                     </div>

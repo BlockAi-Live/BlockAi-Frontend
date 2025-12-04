@@ -83,7 +83,7 @@ export default function HeroStats() {
           <ReferralCard gradientBorder className="h-full p-8 flex flex-col justify-center gap-6">
             <div>
               <p className="text-gray-400 text-sm font-medium uppercase tracking-wider mb-3">Your Referral Link</p>
-              <div className="flex items-center gap-2 bg-[#0d0f18] p-2 rounded-xl border border-white/10 group-hover:border-[#06B6D4]/30 transition-colors">
+              <div className="flex items-center gap-2 bg-[#0d0f18]/60 backdrop-blur-sm p-2 rounded-xl border border-white/10 group-hover:border-[#06B6D4]/30 transition-colors">
                 <code className="flex-1 font-mono text-sm text-white px-3 truncate">
                   {referralLink}
                 </code>

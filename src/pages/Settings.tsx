@@ -67,7 +67,7 @@ export function SettingsPage() {
         </div>
         <div className="space-y-3">
           <div className="flex gap-3">
-            <button className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-teal-500 text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
+            <button className="px-4 py-2 bg-[#9945FF] text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
               <Camera size={16} />
               Change Image
             </button>
@@ -83,26 +83,34 @@ export function SettingsPage() {
       {/* Display Name */}
       <div className="flex flex-col gap-2">
         <label className="text-sm text-gray-400 block">Display Name</label>
-        <input
-          type="text"
-          value={displayName}
-          onChange={(e) => setDisplayName(e.target.value)}
-          className="w-full max-w-md bg-[#16181f] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30 transition-all"
-        />
+        <div className="w-full max-w-md p-[1px] rounded-lg" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
+          <div className="bg-[#232838] rounded-lg">
+            <input
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              className="w-full bg-transparent rounded-lg px-4 py-3 text-white focus:outline-none transition-all"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Default Currency */}
       <div className="space-y-2">
         <label className="text-sm text-gray-400">Default Currency</label>
         <div className="relative w-fit">
-          <button
-            onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
-            className="px-4 py-2.5 bg-gradient-to-r from-cyan-500/20 to-teal-500/20 border border-cyan-500/30 text-cyan-400 text-sm font-medium rounded-lg hover:border-cyan-500/50 transition-all flex items-center gap-2"
-          >
-            <DollarSign size={16} />
-            {currency}
-            <ChevronRight size={16} className={`transition-transform ${showCurrencyDropdown ? "rotate-90" : ""}`} />
-          </button>
+          <div className="p-[1px] rounded-lg" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
+            <div className="bg-[#232838] rounded-lg">
+              <button
+                onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
+                className="px-4 py-2.5 bg-transparent text-cyan-400 text-sm font-medium rounded-lg hover:bg-white/5 transition-all flex items-center gap-2"
+              >
+              <DollarSign size={16} />
+              {currency}
+              <ChevronRight size={16} className={`transition-transform ${showCurrencyDropdown ? "rotate-90" : ""}`} />
+              </button>
+            </div>
+          </div>
           {showCurrencyDropdown && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
@@ -137,15 +145,23 @@ export function SettingsPage() {
         <div className="space-y-2 mb-6">
           <label className="text-sm text-gray-400">Email</label>
           <div className="flex items-center gap-4">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="flex-1 max-w-md bg-[#16181f] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30 transition-all"
-            />
-            <button className="px-5 py-3 bg-white/5 border border-white/10 text-gray-300 text-sm font-medium rounded-lg hover:bg-white/10 hover:border-white/20 transition-all">
-              Change email
-            </button>
+            <div className="flex-1 max-w-md p-[1px] rounded-lg" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
+              <div className="bg-[#232838] rounded-lg">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-transparent rounded-lg px-4 py-3 text-white focus:outline-none transition-all"
+                />
+              </div>
+            </div>
+            <div className="p-[1px] rounded-lg" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
+              <div className="bg-[#232838] rounded-lg">
+                <button className="px-5 py-3 bg-transparent text-gray-300 text-sm font-medium rounded-lg hover:bg-white/5 transition-all">
+                  Change email
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -153,15 +169,23 @@ export function SettingsPage() {
         <div className="space-y-2">
           <label className="text-sm text-gray-400">Password</label>
           <div className="flex items-center gap-4">
-            <input
-              type="password"
-              value="••••••••••"
-              readOnly
-              className="flex-1 max-w-md bg-[#16181f] border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none cursor-default"
-            />
-            <button className="px-5 py-3 bg-white/5 border border-white/10 text-gray-300 text-sm font-medium rounded-lg hover:bg-white/10 hover:border-white/20 transition-all">
-              Change password
-            </button>
+            <div className="flex-1 max-w-md p-[1px] rounded-lg" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
+              <div className="bg-[#232838] rounded-lg">
+                <input
+                  type="password"
+                  value="••••••••••"
+                  readOnly
+                  className="w-full bg-transparent rounded-lg px-4 py-3 text-white focus:outline-none cursor-default"
+                />
+              </div>
+            </div>
+            <div className="p-[1px] rounded-lg" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
+              <div className="bg-[#232838] rounded-lg">
+                <button className="px-5 py-3 bg-transparent text-gray-300 text-sm font-medium rounded-lg hover:bg-white/5 transition-all">
+                  Change password
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -443,7 +467,16 @@ export function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0d0f18] text-white p-6 lg:p-10">
+    <div className="min-h-screen bg-[#0d0f18] text-white relative">
+      {/* Background gradient overlay */}
+      <div 
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          background: "linear-gradient(135deg, rgba(155, 89, 182, 0.2) 0%, rgba(20, 241, 149, 0.2) 100%)"
+        }}
+      />
+      
+      <div className="p-6 lg:p-10 relative z-10">
       <motion.h1
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -466,9 +499,10 @@ export function SettingsPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
                   activeTab === tab.id
-                    ? "bg-gradient-to-r from-cyan-500/10 to-transparent text-cyan-400 border-l-2 border-cyan-400"
+                    ? "text-white"
                     : "text-gray-400 hover:text-white hover:bg-white/5"
                 }`}
+                style={activeTab === tab.id ? { background: "linear-gradient(90deg, rgba(20, 241, 149, 0.2) 0%, rgba(153, 69, 255, 0.2) 100%)" } : {}}
               >
                 <tab.icon size={18} />
                 <span className="font-medium">{tab.label}</span>
@@ -491,7 +525,7 @@ export function SettingsPage() {
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-70 flex items-center gap-2"
+              className="px-8 py-3 bg-[#14F195] text-black font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-70 flex items-center gap-2"
             >
               {isSaving ? (
                 <>
@@ -507,6 +541,7 @@ export function SettingsPage() {
             </button>
           </motion.div>
         </div>
+      </div>
       </div>
     </div>
   );

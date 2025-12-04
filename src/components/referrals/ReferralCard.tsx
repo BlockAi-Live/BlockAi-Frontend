@@ -24,7 +24,7 @@ export const ReferralCard = React.forwardRef<HTMLDivElement, ReferralCardProps>(
           <div
             ref={ref as React.Ref<HTMLDivElement>}
             className={cn(
-              "bg-[#16181f] relative overflow-hidden rounded-2xl h-full",
+              "bg-[#0d0f18]/80 backdrop-blur-md relative overflow-hidden rounded-2xl h-full",
               className
             )}
           >
@@ -38,7 +38,7 @@ export const ReferralCard = React.forwardRef<HTMLDivElement, ReferralCardProps>(
       <motion.div
         ref={ref}
         className={cn(
-          "bg-[#16181f] border border-white/10 relative overflow-hidden rounded-2xl transition-all duration-300",
+          "bg-[#0d0f18]/80 backdrop-blur-md border border-white/10 relative overflow-hidden rounded-2xl transition-all duration-300",
           hoverEffect && "hover:-translate-y-1",
           className
         )}

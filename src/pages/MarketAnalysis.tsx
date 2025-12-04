@@ -30,22 +30,34 @@ const trendingTokens = [
     symbol: "SUI",
     change: "+15%",
     signal: "High Smart Money Inflow",
-    color: "#10B981",
-    bgGradient: "from-emerald-500/20 to-emerald-500/5",
+    textColor: "#30E3FF",
+    changeColor: "#E9CE02",
+    borderColor: "#000000",
+    glowColor: "#FF8800",
+    buttonColor: "#14F195",
+    hasGradientBorder: false,
   },
   {
     symbol: "SOL",
     change: "+5.7%",
     signal: "High Smart Money Inflow",
-    color: "#06B6D4",
-    bgGradient: "from-cyan-500/20 to-cyan-500/5",
+    textColor: "#FFFFFF",
+    changeColor: "#14F195",
+    borderColor: "",
+    glowColor: "#FFFFFF",
+    buttonColor: "#14F195",
+    hasGradientBorder: true,
   },
   {
     symbol: "ETH",
     change: "+7%",
     signal: "High Smart Money Inflow",
-    color: "#6B7280",
-    bgGradient: "from-gray-500/20 to-gray-500/5",
+    textColor: "#D2FFFF",
+    changeColor: "#D2FFFF",
+    borderColor: "#D2FFFF",
+    glowColor: "#FFFFFF",
+    buttonColor: "#14F195",
+    hasGradientBorder: false,
   },
 ];
 
@@ -62,23 +74,35 @@ export function MarketAnalysisPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0d0f18] text-white">
-      {/* Gradient accent on left */}
-      <div className="fixed left-0 top-0 w-1 h-full bg-gradient-to-b from-emerald-500 via-cyan-500 to-emerald-500/50 opacity-50" />
+    <div className="min-h-screen bg-[#0d0f18] text-white relative">
+      {/* Background gradient overlay */}
+      <div 
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          background: "linear-gradient(135deg, rgba(155, 89, 182, 0.2) 0%, rgba(20, 241, 149, 0.2) 100%)"
+        }}
+      />
       
-      <div className="p-6 lg:p-10">
+      <div className="p-6 lg:p-10 relative z-10">
         {/* Top Bar */}
         <div className="flex items-center justify-between gap-6 mb-10">
           {/* Search Bar */}
-          <div className="relative flex-1 max-w-3xl">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#16181f] border border-cyan-500/30 rounded-lg pl-12 pr-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30 transition-all"
-            />
+          <div className="relative flex-1 max-w-4xl">
+            <div 
+              className="p-[1px] rounded-2xl"
+              style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}
+            >
+              <div className="relative bg-[#1a1d2e] rounded-2xl">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-transparent rounded-2xl pl-11 pr-4 py-2 text-sm text-white placeholder:text-gray-500 focus:outline-none transition-all"
+                />
+              </div>
+            </div>
           </div>
 
           {/* Profile Dropdown */}
@@ -90,7 +114,7 @@ export function MarketAnalysisPage() {
               >
                 <Avatar className="h-11 w-11">
                   <AvatarImage src="" />
-                  <AvatarFallback className="bg-[#16181f] text-gray-400">
+                  <AvatarFallback className="bg-[#16181f] text-white">
                     <User className="h-5 w-5" />
                   </AvatarFallback>
                 </Avatar>
@@ -123,40 +147,37 @@ export function MarketAnalysisPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="relative mb-6"
+            className="flex flex-col mb-6"
           >
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-400">
-              <Sparkles size={18} />
+            <div className="relative w-full max-w-2xl mb-4">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <Sparkles size={14} />
+              </div>
+              <input
+                type="text"
+                placeholder="Ask AI to generate a market report, analyze a trend, or find alpha..."
+                value={aiPrompt}
+                onChange={(e) => setAiPrompt(e.target.value)}
+                className="w-full bg-[#16181f]/50 border border-[#14F195] rounded-full pl-9 pr-4 py-2 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-[#14F195] focus:ring-1 focus:ring-[#14F195]/30 transition-all"
+              />
             </div>
-            <input
-              type="text"
-              placeholder="Ask AI to generate a market report, analyze a trend, or find alpha..."
-              value={aiPrompt}
-              onChange={(e) => setAiPrompt(e.target.value)}
-              className="w-full bg-[#16181f]/50 border border-white/10 rounded-xl pl-12 pr-4 py-4 text-white placeholder:text-gray-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30 transition-all"
-            />
-          </motion.div>
 
-          {/* Quick Action Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="flex flex-wrap gap-3"
-          >
-            {quickActions.map((action) => (
-              <button
-                key={action}
-                onClick={() => setActiveFilter(activeFilter === action ? null : action)}
-                className={`px-5 py-2.5 rounded-full text-sm font-medium border transition-all ${
-                  activeFilter === action
-                    ? "bg-white text-[#0d0f18] border-white"
-                    : "bg-transparent text-gray-300 border-white/20 hover:border-white/40 hover:text-white"
-                }`}
-              >
-                {action}
-              </button>
-            ))}
+            {/* Quick Action Buttons */}
+            <div className="flex gap-3 justify-center max-w-2xl">
+              {quickActions.map((action) => (
+                <button
+                  key={action}
+                  onClick={() => setActiveFilter(activeFilter === action ? null : action)}
+                  className={`px-4 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                    activeFilter === action
+                      ? "bg-white text-[#0d0f18] border-white"
+                      : "bg-transparent text-gray-300 border-[#7737C4] hover:border-[#9945FF] hover:text-white"
+                  }`}
+                >
+                  {action}
+                </button>
+              ))}
+            </div>
           </motion.div>
         </section>
 
@@ -171,48 +192,83 @@ export function MarketAnalysisPage() {
             Potential Alpha / Trending
           </motion.h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="flex flex-wrap gap-8">
             {trendingTokens.map((token, index) => (
               <motion.div
                 key={token.symbol}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.15 }}
-                whileHover={{ y: -6, scale: 1.03 }}
+                whileHover={{ y: -4, scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setSelectedToken(token)}
-                className={`relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br ${token.bgGradient} backdrop-blur-sm cursor-pointer hover:border-white/30 ${
-                  selectedToken.symbol === token.symbol ? "ring-2 ring-offset-2 ring-offset-[#0d0f18]" : ""
-                }`}
-                style={{ 
-                  borderLeftWidth: "3px", 
-                  borderLeftColor: token.color,
-                  boxShadow: selectedToken.symbol === token.symbol ? `0 0 20px ${token.color}40` : undefined
-                }}
+                className="relative cursor-pointer"
               >
-                <div className="p-6">
-                  {/* Token Header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-lg font-bold text-white">{token.symbol}</span>
-                    <span 
-                      className="text-sm font-bold px-2 py-1 rounded"
-                      style={{ color: token.color, backgroundColor: `${token.color}20` }}
-                    >
-                      {token.change}
-                    </span>
-                  </div>
-
-                  {/* Signal */}
-                  <p className="text-sm text-gray-400 mb-4">{token.signal}</p>
-
-                  {/* View Chart Button */}
-                  <button
-                    className="px-4 py-2 rounded-lg text-xs font-bold text-white transition-all hover:opacity-80"
-                    style={{ backgroundColor: token.color }}
+                {/* Gradient border wrapper for SOL */}
+                {token.hasGradientBorder ? (
+                  <div 
+                    className="p-[1px] rounded-lg w-32 h-32"
+                    style={{
+                      background: "linear-gradient(180deg, #14F195 0%, #9945FF 100%)",
+                      boxShadow: selectedToken.symbol === token.symbol ? `0 0 20px ${token.glowColor}50` : undefined
+                    }}
                   >
-                    View Chart
-                  </button>
-                </div>
+                    <div className="rounded-lg p-3 h-full flex flex-col justify-between bg-[#1a1d2e]"
+                    >
+                      {/* Token Header */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-bold" style={{ color: token.textColor }}>{token.symbol}</span>
+                        <span 
+                          className="text-[10px] font-bold px-1.5 py-0.5 rounded"
+                          style={{ color: token.changeColor, backgroundColor: `${token.changeColor}20` }}
+                        >
+                          {token.change}
+                        </span>
+                      </div>
+
+                      {/* Signal */}
+                      <p className="text-[10px] text-white text-center leading-tight">{token.signal}</p>
+
+                      {/* View Chart Button */}
+                      <button
+                        className="px-2 py-1 rounded text-[10px] font-bold text-black transition-all hover:opacity-80 self-center"
+                        style={{ backgroundColor: token.buttonColor }}
+                      >
+                        View Chart
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div 
+                    className="rounded-lg p-3 border w-32 h-32 flex flex-col justify-between bg-[#1a1d2e]"
+                    style={{ 
+                      borderColor: token.borderColor,
+                      boxShadow: selectedToken.symbol === token.symbol ? `0 0 20px ${token.glowColor}50` : `0 0 15px ${token.glowColor}20`
+                    }}
+                  >
+                    {/* Token Header */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-bold" style={{ color: token.textColor }}>{token.symbol}</span>
+                      <span 
+                        className="text-[10px] font-bold px-1.5 py-0.5 rounded"
+                        style={{ color: token.changeColor, backgroundColor: `${token.changeColor}20` }}
+                      >
+                        {token.change}
+                      </span>
+                    </div>
+
+                    {/* Signal */}
+                    <p className="text-[10px] text-white text-center leading-tight">{token.signal}</p>
+
+                    {/* View Chart Button */}
+                    <button
+                      className="px-2 py-1 rounded text-[10px] font-bold text-black transition-all hover:opacity-80 self-center"
+                      style={{ backgroundColor: token.buttonColor }}
+                    >
+                      View Chart
+                    </button>
+                  </div>
+                )}
               </motion.div>
             ))}
           </div>
@@ -233,7 +289,7 @@ export function MarketAnalysisPage() {
                 <div 
                   className="absolute inset-0 opacity-30 blur-3xl"
                   style={{ 
-                    background: `radial-gradient(ellipse at center, ${selectedToken.color}40 0%, transparent 70%)` 
+                    background: `radial-gradient(ellipse at center, ${selectedToken.buttonColor}40 0%, transparent 70%)` 
                   }}
                 />
                 
@@ -241,8 +297,8 @@ export function MarketAnalysisPage() {
                   <AreaChart data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
                     <defs>
                       <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor={selectedToken.color} stopOpacity={0.4} />
-                        <stop offset="100%" stopColor={selectedToken.color} stopOpacity={0} />
+                        <stop offset="0%" stopColor={selectedToken.buttonColor} stopOpacity={0.4} />
+                        <stop offset="100%" stopColor={selectedToken.buttonColor} stopOpacity={0} />
                       </linearGradient>
                       <filter id="glow">
                         <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
@@ -279,7 +335,7 @@ export function MarketAnalysisPage() {
                     <Area
                       type="monotone"
                       dataKey="price"
-                      stroke={selectedToken.color}
+                      stroke={selectedToken.buttonColor}
                       strokeWidth={3}
                       fill="url(#chartGradient)"
                       filter="url(#glow)"

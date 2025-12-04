@@ -8,8 +8,16 @@ import ReferralLink from "@/components/referrals/ReferralLink";
 
 export function ReferralsPage() {
   return (
-    <div className="min-h-screen bg-[#0d0f18] text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+    <div className="min-h-screen bg-[#0d0f18] text-white relative">
+      {/* Background gradient overlay */}
+      <div 
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          background: "linear-gradient(135deg, rgba(155, 89, 182, 0.2) 0%, rgba(20, 241, 149, 0.2) 100%)"
+        }}
+      />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 relative z-10">
         {/* Header */}
         <div className="py-6 border-b border-white/10 mb-6">
           <h1 className="text-3xl font-bold text-white tracking-tight">Referral Program</h1>

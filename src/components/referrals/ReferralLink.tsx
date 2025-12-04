@@ -1,13 +1,13 @@
 "use client";
 
 import { ReferralCard } from "./ReferralCard";
-import { Copy, Check, Twitter, Send, MessageCircle } from "lucide-react";
+import { Copy, Check, Twitter, Send, Globe } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 
 export default function ReferralLink() {
   const [copied, setCopied] = useState(false);
-  const referralLink = "https://blockai.io/ref/blockai_trader";
+  const referralLink = "block.ai/ref/User123";
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(referralLink);
@@ -22,61 +22,69 @@ export default function ReferralLink() {
         whileInView={{ scale: 1, opacity: 1 }}
         viewport={{ once: true }}
       >
-        <ReferralCard gradientBorder className="p-8 md:p-16 relative overflow-hidden">
-          {/* Background Gradient */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#9945FF]/5 via-[#14F195]/5 to-[#9945FF]/5 -z-10" />
-          <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#9945FF]/20 rounded-full blur-[100px]" />
-          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-[#14F195]/20 rounded-full blur-[100px]" />
-          
-          <div className="max-w-4xl mx-auto text-center space-y-10">
-            <div>
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">
-                Share & Earn
-              </h2>
-              <p className="text-gray-400 text-xl max-w-2xl mx-auto leading-relaxed">
-                Invite friends to <span className="text-white font-bold">BLOCK AI</span> and earn up to <span className="text-[#9945FF] font-bold">20% commission</span> across 3 levels of your network.
-              </p>
-            </div>
+        <div className="relative p-[1px] rounded-3xl bg-gradient-to-r from-[#9945FF] to-[#14F195]">
+          <div className="relative rounded-3xl overflow-hidden bg-[#0d0f18]">
+            {/* Gradient blobs on dark background */}
+            <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-[#9945FF]/40 rounded-full blur-[150px]" />
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#14F195]/30 rounded-full blur-[150px]" />
+            <div className="absolute bottom-0 left-1/3 w-[300px] h-[300px] bg-[#9945FF]/20 rounded-full blur-[120px]" />
+            
+            <div className="relative p-12 md:p-20">
+              <div className="max-w-4xl mx-auto text-center space-y-8">
+                <h2 className="text-5xl md:text-6xl font-light text-white tracking-tight italic">
+                  Share And Earn
+                </h2>
+                
+                <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+                  Invite friends to BLOCKAI and earn up to <span className="text-[#14F195] font-bold">15% commission</span> across 3 Levels of your network.
+                </p>
 
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-center max-w-2xl mx-auto">
-              <div className="relative w-full group">
-                <div className="absolute inset-0 bg-gradient-to-r from-[#9945FF] to-[#14F195] rounded-xl blur opacity-20 group-hover:opacity-40 transition-opacity" />
-                <div className="relative flex items-center bg-[#0d0f18] border border-white/10 rounded-xl p-2 transition-colors group-hover:border-white/20">
-                  <div className="pl-4 pr-2 text-gray-400 select-none">
-                    <span className="text-[#9945FF]">$</span>
+                {/* Referral Link Input */}
+                <div className="flex justify-center max-w-xl mx-auto">
+                  <div className="flex items-center w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-full p-1.5">
+                    <input 
+                      type="text" 
+                      readOnly 
+                      value={referralLink}
+                      className="flex-1 bg-transparent border-none py-3 px-6 text-white/70 font-mono text-sm focus:outline-none focus:ring-0"
+                    />
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={copyToClipboard}
+                      className="px-6 py-3 bg-[#14F195] text-black rounded-full font-bold flex items-center gap-2 hover:bg-[#14F195]/90 transition-colors"
+                    >
+                      {copied ? <Check size={18} /> : <Copy size={18} />}
+                      <span>Copy</span>
+                    </motion.button>
                   </div>
-                  <input 
-                    type="text" 
-                    readOnly 
-                    value={referralLink}
-                    className="w-full bg-transparent border-none py-3 px-2 text-white font-mono text-sm md:text-base focus:outline-none focus:ring-0"
-                  />
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={copyToClipboard}
-                    className="px-6 py-3 bg-white text-black rounded-lg font-bold flex items-center gap-2 hover:bg-gray-200 transition-colors shadow-lg shadow-white/10"
+                </div>
+
+                {/* Social Icons */}
+                <div className="flex justify-center gap-4 pt-2">
+                  <motion.button 
+                    whileHover={{ y: -2 }} 
+                    className="p-3 text-white/60 hover:text-white transition-colors"
                   >
-                    {copied ? <Check size={18} className="text-green-600" /> : <Copy size={18} />}
-                    <span className="hidden md:inline">Copy</span>
+                    <Twitter size={24} />
+                  </motion.button>
+                  <motion.button 
+                    whileHover={{ y: -2 }} 
+                    className="p-3 text-white/60 hover:text-white transition-colors"
+                  >
+                    <Send size={24} />
+                  </motion.button>
+                  <motion.button 
+                    whileHover={{ y: -2 }} 
+                    className="p-3 text-white/60 hover:text-white transition-colors"
+                  >
+                    <Globe size={24} />
                   </motion.button>
                 </div>
               </div>
             </div>
-
-            <div className="flex justify-center gap-6">
-              <motion.button whileHover={{ y: -4 }} className="p-4 bg-[#1DA1F2]/10 text-[#1DA1F2] rounded-2xl hover:bg-[#1DA1F2]/20 transition-all border border-[#1DA1F2]/20 hover:shadow-[0_0_20px_rgba(29,161,242,0.2)]">
-                <Twitter size={24} />
-              </motion.button>
-              <motion.button whileHover={{ y: -4 }} className="p-4 bg-[#0088cc]/10 text-[#0088cc] rounded-2xl hover:bg-[#0088cc]/20 transition-all border border-[#0088cc]/20 hover:shadow-[0_0_20px_rgba(0,136,204,0.2)]">
-                <Send size={24} />
-              </motion.button>
-              <motion.button whileHover={{ y: -4 }} className="p-4 bg-[#5865F2]/10 text-[#5865F2] rounded-2xl hover:bg-[#5865F2]/20 transition-all border border-[#5865F2]/20 hover:shadow-[0_0_20px_rgba(88,101,242,0.2)]">
-                <MessageCircle size={24} />
-              </motion.button>
-            </div>
           </div>
-        </ReferralCard>
+        </div>
       </motion.div>
     </section>
   );

@@ -38,7 +38,7 @@ export default function EarningsChart() {
                   className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
                     activeTab === tab 
                       ? "bg-white text-[#0d0f18] shadow-lg shadow-white/10" 
-                      : "bg-[#0d0f18] border border-white/5 text-gray-400 hover:bg-white/5 hover:text-white"
+                      : "bg-[#0d0f18]/60 backdrop-blur-sm border border-white/5 text-gray-400 hover:bg-[#0d0f18]/80 hover:text-white"
                   }`}
                 >
                   {tab}
@@ -119,7 +119,7 @@ export default function EarningsChart() {
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.2 + (i * 0.1) }}
             >
-              <ReferralCard className={`p-6 flex items-center justify-between hover:border-white/20 transition-all group`}>
+              <ReferralCard gradientBorder className={`p-6 flex items-center justify-between hover:border-white/20 transition-all group`}>
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <div className={`w-2 h-2 rounded-full ${stat.color.replace('text-', 'bg-')}`} />

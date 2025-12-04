@@ -44,13 +44,13 @@ export default function ReferralTree() {
     <section className="py-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-white tracking-tight">Network Visualization</h2>
-        <div className="flex gap-2 bg-[#16181f] p-1 rounded-lg border border-white/10">
+        <div className="flex gap-2 bg-[#0d0f18]/60 backdrop-blur-sm p-1 rounded-lg border border-white/10">
           <button onClick={() => setZoom(z => Math.max(0.5, z - 0.1))} className="p-2 hover:bg-white/10 rounded text-gray-400 hover:text-white transition-colors">-</button>
           <button onClick={() => setZoom(z => Math.min(2, z + 0.1))} className="p-2 hover:bg-white/10 rounded text-gray-400 hover:text-white transition-colors">+</button>
         </div>
       </div>
 
-      <ReferralCard className="h-[500px] w-full flex items-center justify-center bg-[#0d0f18] overflow-hidden relative border-white/5">
+      <ReferralCard gradientBorder className="h-[500px] w-full flex items-center justify-center overflow-hidden relative">
         <div className="absolute inset-0 grid grid-cols-[repeat(40,minmax(0,1fr))] grid-rows-[repeat(40,minmax(0,1fr))] opacity-[0.03] pointer-events-none">
           {Array.from({ length: 1600 }).map((_, i) => (
             <div key={i} className="border-[0.5px] border-white" />
@@ -90,7 +90,7 @@ export default function ReferralTree() {
           </g>
         </motion.svg>
         
-        <div className="absolute bottom-6 right-6 flex gap-6 text-xs font-mono bg-[#16181f]/80 backdrop-blur px-4 py-2 rounded-full border border-white/10">
+        <div className="absolute bottom-6 right-6 flex gap-6 text-xs font-mono bg-[#0d0f18]/80 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-[#6366F1] shadow-[0_0_10px_rgba(99,102,241,0.5)]" /> Level 1
           </div>

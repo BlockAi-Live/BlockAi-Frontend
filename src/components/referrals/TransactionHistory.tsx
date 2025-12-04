@@ -26,16 +26,16 @@ export default function TransactionHistory() {
             <input 
               type="text" 
               placeholder="Search username..." 
-              className="w-full bg-[#16181f] border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm text-white focus:outline-none focus:border-[#6366F1]/50 focus:ring-1 focus:ring-[#6366F1]/50 transition-all placeholder:text-gray-500"
+              className="w-full bg-[#0d0f18]/60 backdrop-blur-sm border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm text-white focus:outline-none focus:border-[#6366F1]/50 focus:ring-1 focus:ring-[#6366F1]/50 transition-all placeholder:text-gray-500"
             />
           </div>
-          <button className="p-3 bg-[#16181f] border border-white/10 rounded-xl text-white hover:bg-white/5 hover:border-white/20 transition-all">
+          <button className="p-3 bg-[#0d0f18]/60 backdrop-blur-sm border border-white/10 rounded-xl text-white hover:bg-[#0d0f18]/80 hover:border-white/20 transition-all">
             <Filter size={20} />
           </button>
         </div>
       </div>
 
-      <ReferralCard className="overflow-hidden border-white/5">
+      <ReferralCard gradientBorder className="overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
