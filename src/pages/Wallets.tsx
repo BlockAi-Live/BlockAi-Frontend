@@ -1,118 +1,103 @@
 import React from "react";
-import { Button } from "../components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../components/ui/dropdown-menu";
-import { User, LogOut } from "lucide-react";
+import { Plus, ArrowUpRight, ArrowDownRight, Wallet, MoreHorizontal } from "lucide-react";
 
 export function WalletsPage() {
-  const handleLogout = () => {
-    window.location.href = "/home";
-  };
-
   return (
-    <div className="flex h-screen bg-[#0d0f18] text-white font-inter">
-      {/* Main Area */}
-      <main className="flex-1 p-10 overflow-y-auto">
-        {/* Search + Profile */}
-        <div className="flex items-center justify-between mb-10">
-          <input
-            placeholder="Search..."
-            className="w-full max-w-xl bg-transparent border border-[#4c4b5f] rounded-lg px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-[#7647ff]"
-          />
+    <div className="min-h-screen bg-[#0d0f18] text-white relative font-sans overflow-hidden">
+      {/* Background gradient overlay */}
+      <div 
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          background: "linear-gradient(135deg, rgba(155, 89, 182, 0.2) 0%, rgba(20, 241, 149, 0.2) 100%)"
+        }}
+      />
 
-          {/* Profile Dropdown */}
-          <div className="ml-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="relative h-12 w-12 rounded-full p-0"
-                >
-                  <Avatar className="h-12 w-12 border-2 border-border">
-                    <AvatarImage src="" />
-                    <AvatarFallback className="bg-primary text-primary-foreground">
-                      <User className="h-6 w-6" />
-                    </AvatarFallback>
-                    <div className="absolute bottom-0 left-0 w-3 h-3 bg-green-500 border-2 border-background rounded-full z-0"></div>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-48 p-2" align="end">
-                <DropdownMenuItem
-                  onClick={handleLogout}
-                  className="cursor-pointer p-3 text-base flex items-center"
-                >
-                  <LogOut className="mr-3 h-5 w-5" />
-                  <span>Log Out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+      <main className="relative z-10 p-8 md:p-12 max-w-7xl mx-auto">
+        
+        {/* Header Section */}
+        <div className="flex items-center justify-between mb-12">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">Wallets</h1>
+            <p className="text-gray-400">Manage and track your connected portfolios.</p>
           </div>
-        </div>
-
-        {/* Header Row */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold">Tracked Wallets</h2>
-          <button className="bg-[#7647ff] px-4 py-2 rounded-md text-sm font-medium">
-            + Add Wallet
+          <button className="bg-[#14F195] text-black font-bold px-6 py-3 rounded-xl flex items-center gap-2 hover:opacity-90 transition-all shadow-[0_0_20px_rgba(20,241,149,0.3)]">
+            <Plus size={20} />
+            Add Wallet
           </button>
         </div>
 
         {/* Net Worth Card */}
-        <div className="bg-[#1c1f2b] rounded-xl p-6 flex items-center justify-between mb-10">
-          <div className="text-white/60">Total Net Worth</div>
-          <div className="text-4xl font-bold">$142,050.23</div>
-          <div className="text-green-400 text-xl font-semibold">+ 12.5%</div>
+        <div className="bg-[#16181f] rounded-[32px] p-8 border border-white/5 relative overflow-hidden mb-12 group">
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+              <p className="text-gray-400 mb-2 font-medium">Total Net Worth</p>
+              <h2 className="text-5xl font-bold text-white tracking-tight">$142,050.23</h2>
+            </div>
+            <div className="flex items-center gap-3 bg-[#14F195]/10 px-4 py-2 rounded-full border border-[#14F195]/20">
+              <div className="w-8 h-8 rounded-full bg-[#14F195] flex items-center justify-center text-black">
+                <ArrowUpRight size={18} />
+              </div>
+              <span className="text-[#14F195] font-bold text-lg">+12.5%</span>
+              <span className="text-gray-400 text-sm">vs last month</span>
+            </div>
+          </div>
+          {/* Background Glow */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[#14F195]/5 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/3 pointer-events-none" />
         </div>
 
-        {/* Wallet Table */}
-        <table className="w-full text-sm">
-          <thead className="text-white/60">
-            <tr className="text-left">
-              <th className="pb-4">Wallet Name</th>
-              <th className="pb-4">Address</th>
-              <th className="pb-4">Balance</th>
-              <th className="pb-4">24h Change</th>
-              <th className="pb-4">Status</th>
-            </tr>
-          </thead>
+        {/* Wallets List */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between px-6 text-sm text-gray-500 font-medium uppercase tracking-wider mb-2">
+            <div className="w-1/3">Wallet Name</div>
+            <div className="w-1/4">Balance</div>
+            <div className="w-1/4">24h Change</div>
+            <div className="w-1/6 text-right">Status</div>
+          </div>
 
-          <tbody className="space-y-4">
-            {walletRows.map((w, i) => (
-              <tr
-                key={i}
-                className="bg-[#1a1d27] rounded-lg overflow-hidden h-14"
-              >
-                <td className="px-4">{w.name}</td>
-                <td className="px-4 text-white/60">{w.address}</td>
-                <td className="px-4">{w.balance}</td>
-                <td
-                  className={`px-4 ${
-                    w.change.startsWith("-") ? "text-red-400" : "text-green-400"
+          {walletRows.map((w, i) => (
+            <div
+              key={i}
+              className="bg-[#16181f]/50 backdrop-blur-sm border border-white/5 rounded-2xl p-6 flex items-center justify-between hover:bg-[#16181f] hover:border-white/10 transition-all group cursor-pointer"
+            >
+              <div className="w-1/3 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-gray-400 group-hover:text-white group-hover:bg-white/10 transition-colors">
+                  <Wallet size={20} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-white text-lg">{w.name}</h3>
+                  <p className="text-sm text-gray-500 font-mono">{w.address}</p>
+                </div>
+              </div>
+
+              <div className="w-1/4">
+                <div className="font-bold text-white text-xl">{w.balance}</div>
+              </div>
+
+              <div className="w-1/4">
+                <div className={`flex items-center gap-2 font-medium ${w.change.startsWith("-") ? "text-red-400" : "text-[#14F195]"}`}>
+                  {w.change.startsWith("-") ? <ArrowDownRight size={16} /> : <ArrowUpRight size={16} />}
+                  {w.change}
+                </div>
+              </div>
+
+              <div className="w-1/6 flex justify-end items-center gap-4">
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
+                    w.status === "ACTIVE"
+                      ? "bg-[#14F195]/10 text-[#14F195] border border-[#14F195]/20"
+                      : "bg-gray-500/10 text-gray-400 border border-gray-500/20"
                   }`}
                 >
-                  {w.change}
-                </td>
-                <td className="px-4 text-right">
-                  <span
-                    className={`px-4 py-1 rounded-full text-xs font-medium ${
-                      w.status === "ACTIVE"
-                        ? "bg-[#2a4] text-black"
-                        : "bg-gray-600 text-white"
-                    }`}
-                  >
-                    {w.status}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  {w.status}
+                </span>
+                <button className="text-gray-500 hover:text-white transition-colors">
+                  <MoreHorizontal size={20} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
       </main>
     </div>
   );
@@ -120,30 +105,30 @@ export function WalletsPage() {
 
 const walletRows = [
   {
-    name: "Portfolio A",
+    name: "Main Portfolio",
     address: "0x4d...b29",
-    balance: "$45,200",
+    balance: "$45,200.00",
     change: "+5.2%",
     status: "ACTIVE",
   },
   {
-    name: "Portfolio B",
+    name: "Trading Wallet",
     address: "0xac...0ad",
     balance: "$5,073.20",
     change: "+15.9%",
     status: "ACTIVE",
   },
   {
-    name: "Portfolio C",
+    name: "Cold Storage",
     address: "0xf6...16b",
-    balance: "$270",
+    balance: "$270.00",
     change: "-2.02%",
     status: "INACTIVE",
   },
   {
-    name: "Portfolio D",
+    name: "Degen Plays",
     address: "0x04...a71",
-    balance: "$16,404",
+    balance: "$16,404.50",
     change: "+33.7%",
     status: "ACTIVE",
   },
