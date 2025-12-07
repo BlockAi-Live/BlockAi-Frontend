@@ -34,7 +34,7 @@ export default function AppSidebar() {
       
       {/* Header with Logo */}
       <SidebarHeader className="p-6 pb-2">
-        <NavLink to="/dashboard" className="flex items-center gap-2">
+        <NavLink to="/" className="flex items-center gap-2">
           <img src="/blockai.svg" alt="BlockAI" className="w-10 h-10" />
           <div className="text-white font-bold text-xl">BLOCKAI</div>
         </NavLink>
