@@ -1,8 +1,16 @@
-import { motion } from "framer-motion";
+import { StaggerContainer, StaggerItem } from "../ScrollReveal";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from "@/components/ui/carousel";
+import { useEffect, useState } from "react";
+import { Hand } from "lucide-react";
 
 function StepCircle({ title, number }: { title: string; number: string }) {
   return (
-    <div className="relative group">
+    <div className="relative group mx-auto">
       {/* Glow Effect */}
       <div className="absolute inset-0 bg-[#10e291] blur-[40px] opacity-0 group-hover:opacity-20 transition-opacity duration-500 rounded-full" />
       
@@ -45,19 +53,82 @@ function Arrow() {
 }
 
 export default function ThreeSteps() {
+  const [isMobile, setIsMobile] = useState(false);
+  const [api, setApi] = useState<CarouselApi>();
+
+  const steps = [
+    { number: "01", title: "Connect Wallet" },
+    { number: "02", title: "AI scans chains in real-time" },
+    { number: "03", title: "Get Instant Alpha" },
+  ];
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768); // md breakpoint
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (!api) return;
+
+    const interval = setInterval(() => {
+      api.scrollNext();
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, [api]);
+
   return (
     <section className="mt-32 px-6 md:px-0 text-center relative z-10">
       <h3 className="text-[#10e291] text-3xl md:text-4xl lg:text-5xl font-bold mb-24 tracking-wide">
         3 Steps to Alpha
       </h3>
 
-      <div className="flex flex-col md:flex-row items-center justify-center gap-8 lg:gap-4 max-w-7xl mx-auto">
-        <StepCircle number="01" title="Connect Wallet" />
-        <Arrow />
-        <StepCircle number="02" title="AI scans chains in real-time" />
-        <Arrow />
-        <StepCircle number="03" title="Get Instant Alpha" />
-      </div>
+      {isMobile ? (
+        <div className="w-full max-w-sm mx-auto">
+          <Carousel
+            setApi={setApi}
+            opts={{
+              align: "center",
+              loop: true,
+            }}
+            className="w-full"
+          >
+            <CarouselContent>
+              {steps.map((step, i) => (
+                <CarouselItem key={i} className="basis-full flex justify-center py-4">
+                  <StepCircle number={step.number} title={step.title} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="flex justify-center mt-8">
+               <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm animate-pulse">
+                  <Hand className="w-4 h-4 text-[#10e291]" />
+                  <span className="text-xs font-medium text-gray-300">Swipe to explore</span>
+               </div>
+            </div>
+          </Carousel>
+        </div>
+      ) : (
+        <StaggerContainer className="flex flex-col md:flex-row items-center justify-center gap-8 lg:gap-4 max-w-7xl mx-auto">
+          <StaggerItem>
+            <StepCircle number="01" title="Connect Wallet" />
+          </StaggerItem>
+          <StaggerItem className="hidden md:block">
+            <Arrow />
+          </StaggerItem>
+          <StaggerItem>
+            <StepCircle number="02" title="AI scans chains in real-time" />
+          </StaggerItem>
+          <StaggerItem className="hidden md:block">
+            <Arrow />
+          </StaggerItem>
+          <StaggerItem>
+            <StepCircle number="03" title="Get Instant Alpha" />
+          </StaggerItem>
+        </StaggerContainer>
+      )}
     </section>
   );
 }

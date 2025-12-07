@@ -5,6 +5,7 @@ import NotisIcon from "../assets/icons/Notis";
 import SearchIcon from "../assets/icons/Search";
 import TrendIcon from "../assets/icons/Trend";
 import FunnelIcon from "../assets/icons/Funnel";
+import { ScrollReveal } from "@/components/ScrollReveal";
 
 import {
   Navbar,
@@ -56,7 +57,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen w-full bg-[#0B0E1A] text-white font-inter relative">
+    <div className="min-h-screen w-full bg-[#0B0E1A] text-white font-inter relative overflow-x-hidden">
       {/* Background gradient overlay - absolute positioning so it scrolls with content */}
       <div 
         className="absolute inset-0 pointer-events-none w-full"
@@ -69,17 +70,36 @@ export default function Home() {
       <div className="relative z-10">
         <Navbar launch={launch} />
         <main className="max-w-[1200px] mx-auto">
-        <Hero launch={launch} />
+        <ScrollReveal>
+          <Hero launch={launch} />
+        </ScrollReveal>
+        
         <section className="mt-20 px-6 md:px-0">
-          <h3 className="text-[#10e291] font-bold text-3xl md:text-4xl lg:text-5xl text-center tracking-wide mb-24">The Full Power of BlockAI</h3>
+          <ScrollReveal>
+            <h3 className="text-[#10e291] font-bold text-3xl md:text-4xl lg:text-5xl text-center tracking-wide mb-24">The Full Power of BlockAI</h3>
+          </ScrollReveal>
           <FeaturesGrid features={features} />
         </section>
 
-        <SeeItLive />
-        <ThreeSteps />
-        <DashboardWidgets />
-        <Community />
-        <FAQ />
+        <ScrollReveal>
+          <SeeItLive />
+        </ScrollReveal>
+        
+        <ScrollReveal>
+          <ThreeSteps />
+        </ScrollReveal>
+        
+        <ScrollReveal>
+          <DashboardWidgets />
+        </ScrollReveal>
+        
+        <ScrollReveal>
+          <Community />
+        </ScrollReveal>
+        
+        <ScrollReveal>
+          <FAQ />
+        </ScrollReveal>
       </main>
       <Footer />
       </div>

@@ -36,7 +36,8 @@ export default function TransactionHistory() {
       </div>
 
       <ReferralCard gradientBorder className="overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-white/5 bg-white/[0.02]">
@@ -93,6 +94,49 @@ export default function TransactionHistory() {
             </tbody>
           </table>
         </div>
+
+        {/* Mobile Card View */}
+        <div className="md:hidden space-y-4 p-4">
+          {transactions.map((tx) => (
+            <div key={tx.id} className="bg-white/[0.02] rounded-xl p-4 border border-white/5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center text-xs font-bold text-white">
+                    {tx.user.substring(0, 2).toUpperCase()}
+                  </div>
+                  <div>
+                    <span className="font-medium text-white block">{tx.user}</span>
+                    <span className="text-xs text-gray-400 font-mono">{tx.date}</span>
+                  </div>
+                </div>
+                <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase border ${
+                  tx.level === 1 ? "bg-[#6366F1]/10 text-[#6366F1] border-[#6366F1]/20" :
+                  tx.level === 2 ? "bg-[#8B5CF6]/10 text-[#8B5CF6] border-[#8B5CF6]/20" :
+                  "bg-[#06B6D4]/10 text-[#06B6D4] border-[#06B6D4]/20"
+                }`}>
+                  L{tx.level}
+                </span>
+              </div>
+              
+              <div className="flex items-center justify-between border-t border-white/5 pt-3">
+                <div>
+                  <p className="text-xs text-gray-400 uppercase mb-1">Commission</p>
+                  <p className="font-mono font-bold text-white text-lg">${tx.amount.toFixed(2)}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-gray-400 uppercase mb-1">Status</p>
+                  <div className={`flex items-center gap-1.5 text-xs font-bold uppercase ${
+                    tx.status === "paid" ? "text-emerald-400" : "text-amber-400"
+                  }`}>
+                    {tx.status === "paid" ? <ArrowUpRight size={12} /> : <Clock size={12} />}
+                    <span>{tx.status}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
         <div className="p-6 border-t border-white/5 flex justify-center bg-white/[0.02]">
           <button className="text-sm font-medium text-gray-400 hover:text-white transition-colors flex items-center gap-2">
             Load More Transactions <ArrowUpRight size={14} />

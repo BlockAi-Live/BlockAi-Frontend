@@ -50,7 +50,7 @@ export default function ReferralTree() {
         </div>
       </div>
 
-      <ReferralCard gradientBorder className="h-[500px] w-full flex items-center justify-center overflow-hidden relative">
+      <ReferralCard gradientBorder className="h-[300px] md:h-[500px] w-full flex items-center justify-center overflow-hidden relative">
         <div className="absolute inset-0 grid grid-cols-[repeat(40,minmax(0,1fr))] grid-rows-[repeat(40,minmax(0,1fr))] opacity-[0.03] pointer-events-none">
           {Array.from({ length: 1600 }).map((_, i) => (
             <div key={i} className="border-[0.5px] border-white" />
@@ -61,6 +61,7 @@ export default function ReferralTree() {
           width="100%"
           height="100%"
           viewBox="0 0 800 500"
+          preserveAspectRatio="xMidYMid meet"
           animate={{ scale: zoom }}
           className="w-full h-full"
         >

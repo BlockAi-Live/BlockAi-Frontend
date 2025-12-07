@@ -12,28 +12,28 @@ export function WalletsPage() {
         }}
       />
 
-      <main className="relative z-10 p-8 md:p-12 max-w-7xl mx-auto">
+      <main className="relative z-10 p-4 md:p-12 max-w-7xl mx-auto pb-24 md:pb-12">
         
         {/* Header Section */}
-        <div className="flex items-center justify-between mb-12">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 md:mb-12 gap-4 md:gap-0">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">Wallets</h1>
             <p className="text-gray-400">Manage and track your connected portfolios.</p>
           </div>
-          <button className="bg-[#14F195] text-black font-bold px-6 py-3 rounded-xl flex items-center gap-2 hover:opacity-90 transition-all shadow-[0_0_20px_rgba(20,241,149,0.3)]">
+          <button className="w-full md:w-auto bg-[#14F195] text-black font-bold px-6 py-3 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-[0_0_20px_rgba(20,241,149,0.3)]">
             <Plus size={20} />
             Add Wallet
           </button>
         </div>
 
         {/* Net Worth Card */}
-        <div className="bg-[#16181f] rounded-[32px] p-8 border border-white/5 relative overflow-hidden mb-12 group">
+        <div className="bg-[#16181f] rounded-[32px] p-6 md:p-8 border border-white/5 relative overflow-hidden mb-8 md:mb-12 group">
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
               <p className="text-gray-400 mb-2 font-medium">Total Net Worth</p>
-              <h2 className="text-5xl font-bold text-white tracking-tight">$142,050.23</h2>
+              <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight">$142,050.23</h2>
             </div>
-            <div className="flex items-center gap-3 bg-[#14F195]/10 px-4 py-2 rounded-full border border-[#14F195]/20">
+            <div className="flex items-center gap-3 bg-[#14F195]/10 px-4 py-2 rounded-full border border-[#14F195]/20 w-fit">
               <div className="w-8 h-8 rounded-full bg-[#14F195] flex items-center justify-center text-black">
                 <ArrowUpRight size={18} />
               </div>
@@ -47,7 +47,7 @@ export function WalletsPage() {
 
         {/* Wallets List */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between px-6 text-sm text-gray-500 font-medium uppercase tracking-wider mb-2">
+          <div className="hidden md:flex items-center justify-between px-6 text-sm text-gray-500 font-medium uppercase tracking-wider mb-2">
             <div className="w-1/3">Wallet Name</div>
             <div className="w-1/4">Balance</div>
             <div className="w-1/4">24h Change</div>
@@ -57,30 +57,44 @@ export function WalletsPage() {
           {walletRows.map((w, i) => (
             <div
               key={i}
-              className="bg-[#16181f]/50 backdrop-blur-sm border border-white/5 rounded-2xl p-6 flex items-center justify-between hover:bg-[#16181f] hover:border-white/10 transition-all group cursor-pointer"
+              className="bg-[#16181f]/50 backdrop-blur-sm border border-white/5 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between hover:bg-[#16181f] hover:border-white/10 transition-all group cursor-pointer gap-4 md:gap-0"
             >
-              <div className="w-1/3 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-gray-400 group-hover:text-white group-hover:bg-white/10 transition-colors">
+              <div className="w-full md:w-1/3 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-gray-400 group-hover:text-white group-hover:bg-white/10 transition-colors shrink-0">
                   <Wallet size={20} />
                 </div>
-                <div>
-                  <h3 className="font-bold text-white text-lg">{w.name}</h3>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between md:block">
+                    <h3 className="font-bold text-white text-lg">{w.name}</h3>
+                    {/* Mobile Status Badge (Visible only on mobile) */}
+                    <span
+                      className={`md:hidden px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${
+                        w.status === "ACTIVE"
+                          ? "bg-[#14F195]/10 text-[#14F195] border border-[#14F195]/20"
+                          : "bg-gray-500/10 text-gray-400 border border-gray-500/20"
+                      }`}
+                    >
+                      {w.status}
+                    </span>
+                  </div>
                   <p className="text-sm text-gray-500 font-mono">{w.address}</p>
                 </div>
               </div>
 
-              <div className="w-1/4">
+              <div className="w-full md:w-1/4 flex justify-between md:block border-t border-white/5 md:border-none pt-4 md:pt-0">
+                <span className="md:hidden text-gray-400 text-sm">Balance</span>
                 <div className="font-bold text-white text-xl">{w.balance}</div>
               </div>
 
-              <div className="w-1/4">
+              <div className="w-full md:w-1/4 flex justify-between md:block">
+                <span className="md:hidden text-gray-400 text-sm">24h Change</span>
                 <div className={`flex items-center gap-2 font-medium ${w.change.startsWith("-") ? "text-red-400" : "text-[#14F195]"}`}>
                   {w.change.startsWith("-") ? <ArrowDownRight size={16} /> : <ArrowUpRight size={16} />}
                   {w.change}
                 </div>
               </div>
 
-              <div className="w-1/6 flex justify-end items-center gap-4">
+              <div className="w-full md:w-1/6 flex justify-between md:justify-end items-center gap-4 hidden md:flex">
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
                     w.status === "ACTIVE"

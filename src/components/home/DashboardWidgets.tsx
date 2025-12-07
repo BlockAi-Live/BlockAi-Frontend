@@ -1,11 +1,32 @@
 import { ArrowUpRight, TrendingUp, MessageSquare, Wallet, Activity } from "lucide-react";
+import { StaggerContainer, StaggerItem } from "../ScrollReveal";
+import { motion, useMotionValue, useTransform, animate, useInView } from "framer-motion";
+import { useEffect, useRef } from "react";
+
+function Counter({ value, prefix = "", suffix = "", decimals = 0 }: { value: number, prefix?: string, suffix?: string, decimals?: number }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-20px" });
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (latest) => {
+    return prefix + latest.toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + suffix;
+  });
+
+  useEffect(() => {
+    if (isInView) {
+      const controls = animate(count, value, { duration: 2, ease: "easeOut" });
+      return controls.stop;
+    }
+  }, [value, isInView]);
+
+  return <motion.span ref={ref}>{rounded}</motion.span>;
+}
 
 export default function DashboardWidgets() {
   return (
-    <div className="flex flex-col lg:flex-row gap-8 items-center justify-center mt-32 px-6 max-w-7xl mx-auto">
+    <StaggerContainer className="flex flex-col lg:flex-row gap-8 items-center justify-center mt-32 px-6 max-w-7xl mx-auto">
       
       {/* Card 1: Portfolio Growth */}
-      <div className="relative group w-full max-w-md">
+      <StaggerItem className="relative group w-full max-w-md">
         <div className="absolute -inset-0.5 bg-gradient-to-r from-[#10e291] to-[#9b59b6] rounded-3xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
         <div className="relative bg-[#0B0E1A]/90 backdrop-blur-xl p-8 rounded-3xl border border-white/10 h-[320px] flex flex-col justify-between">
           <div>
@@ -14,15 +35,21 @@ export default function DashboardWidgets() {
                 <Wallet className="w-6 h-6 text-[#10e291]" />
               </div>
               <span className="text-xs font-medium text-[#10e291] bg-[#10e291]/10 px-3 py-1 rounded-full border border-[#10e291]/20">
-                +12.4% today
+                <Counter value={12.4} prefix="+" suffix="% today" decimals={1} />
               </span>
             </div>
             <div className="space-y-1">
               <p className="text-gray-400 text-sm font-medium">Wallet Portfolio</p>
-              <h3 className="text-4xl font-bold text-white">$428,420</h3>
+              <h3 className="text-4xl font-bold text-white">
+                <Counter value={428420} prefix="$" />
+              </h3>
               <div className="flex items-center gap-2 text-[#10e291] text-sm font-bold mt-2">
-                <span className="bg-[#10e291]/10 px-2 py-0.5 rounded text-xs">+12.4%</span>
-                <span>+$47,290.10</span>
+                <span className="bg-[#10e291]/10 px-2 py-0.5 rounded text-xs">
+                  <Counter value={12.4} prefix="+" suffix="%" decimals={1} />
+                </span>
+                <span>
+                  <Counter value={47290.10} prefix="+$" decimals={2} />
+                </span>
               </div>
             </div>
           </div>
@@ -30,18 +57,21 @@ export default function DashboardWidgets() {
           {/* Simplified Chart Visualization */}
           <div className="h-24 w-full flex items-end gap-1">
             {[40, 65, 50, 80, 60, 90, 75, 95, 85, 100].map((h, i) => (
-              <div 
+              <motion.div 
                 key={i} 
-                className="flex-1 bg-gradient-to-t from-[#10e291]/20 to-[#10e291] rounded-t-sm hover:opacity-80 transition-opacity"
-                style={{ height: `${h}%` }}
+                initial={{ height: 0 }}
+                whileInView={{ height: `${h}%` }}
+                viewport={{ once: true }}
+                transition={{ duration: 1, delay: i * 0.1, ease: "easeOut" }}
+                className="flex-1 bg-gradient-to-t from-[#10e291]/20 to-[#10e291] rounded-t-sm hover:opacity-80"
               />
             ))}
           </div>
         </div>
-      </div>
+      </StaggerItem>
 
       {/* Card 2: Trending Tokens (Elevated) */}
-      <div className="relative group w-full max-w-md lg:-mt-12">
+      <StaggerItem className="relative group w-full max-w-md lg:-mt-12">
         <div className="absolute -inset-0.5 bg-gradient-to-r from-[#9b59b6] to-[#10e291] rounded-3xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
         <div className="relative bg-[#0B0E1A]/90 backdrop-blur-xl p-8 rounded-3xl border border-white/10 h-[320px] flex flex-col">
           <div className="flex items-center justify-between mb-6">
@@ -56,9 +86,9 @@ export default function DashboardWidgets() {
 
           <div className="space-y-4">
             {[
-              { name: "BONK", price: "$0.000024", change: "+42%", color: "text-[#10e291]" },
-              { name: "WIF", price: "$3.45", change: "+28%", color: "text-[#10e291]" },
-              { name: "POPCAT", price: "$0.45", change: "+19%", color: "text-[#10e291]" },
+              { name: "BONK", price: "$0.000024", change: 42, color: "text-[#10e291]" },
+              { name: "WIF", price: "$3.45", change: 28, color: "text-[#10e291]" },
+              { name: "POPCAT", price: "$0.45", change: 19, color: "text-[#10e291]" },
             ].map((token, i) => (
               <div key={i} className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer group/item">
                 <div className="flex items-center gap-3">
@@ -68,16 +98,18 @@ export default function DashboardWidgets() {
                   <span className="font-bold text-gray-200">${token.name}</span>
                 </div>
                 <div className="text-right">
-                  <p className={`text-lg font-bold ${token.color}`}>{token.change}</p>
+                  <p className={`text-lg font-bold ${token.color}`}>
+                    <Counter value={token.change} prefix="+" suffix="%" />
+                  </p>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </StaggerItem>
 
       {/* Card 3: AI Chat */}
-      <div className="relative group w-full max-w-md">
+      <StaggerItem className="relative group w-full max-w-md">
         <div className="absolute -inset-0.5 bg-gradient-to-r from-[#10e291] to-[#9b59b6] rounded-3xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
         <div className="relative bg-[#0B0E1A]/90 backdrop-blur-xl p-6 rounded-3xl border border-white/10 h-[320px] flex flex-col">
           {/* Header */}
@@ -113,6 +145,15 @@ export default function DashboardWidgets() {
                 </div>
                 <span className="text-[10px] text-gray-500 self-end ml-2 mb-1">2h ago</span>
              </div>
+
+             {/* AI Typing Indicator */}
+             <div className="flex justify-start">
+                <div className="bg-white/10 text-white text-sm font-medium py-3 px-4 rounded-2xl rounded-tl-sm shadow-lg flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></span>
+                </div>
+             </div>
           </div>
 
           {/* Input Area */}
@@ -133,8 +174,8 @@ export default function DashboardWidgets() {
             </div>
           </div>
         </div>
-      </div>
+      </StaggerItem>
 
-    </div>
+    </StaggerContainer>
   );
 }

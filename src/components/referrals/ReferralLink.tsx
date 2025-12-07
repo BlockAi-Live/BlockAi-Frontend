@@ -29,13 +29,13 @@ export default function ReferralLink() {
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#14F195]/30 rounded-full blur-[150px]" />
             <div className="absolute bottom-0 left-1/3 w-[300px] h-[300px] bg-[#9945FF]/20 rounded-full blur-[120px]" />
             
-            <div className="relative p-12 md:p-20">
+            <div className="relative p-8 md:p-20">
               <div className="max-w-4xl mx-auto text-center space-y-8">
-                <h2 className="text-5xl md:text-6xl font-light text-white tracking-tight italic">
+                <h2 className="text-4xl md:text-6xl font-light text-white tracking-tight italic">
                   Share And Earn
                 </h2>
                 
-                <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+                <p className="text-white/80 text-base md:text-xl max-w-2xl mx-auto leading-relaxed">
                   Invite friends to BLOCKAI and earn up to <span className="text-[#14F195] font-bold">15% commission</span> across 3 Levels of your network.
                 </p>
 
@@ -46,13 +46,13 @@ export default function ReferralLink() {
                       type="text" 
                       readOnly 
                       value={referralLink}
-                      className="flex-1 bg-transparent border-none py-3 px-6 text-white/70 font-mono text-sm focus:outline-none focus:ring-0"
+                      className="flex-1 bg-transparent border-none py-3 px-4 md:px-6 text-white/70 font-mono text-xs md:text-sm focus:outline-none focus:ring-0 min-w-0"
                     />
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={copyToClipboard}
-                      className="px-6 py-3 bg-[#14F195] text-black rounded-full font-bold flex items-center gap-2 hover:bg-[#14F195]/90 transition-colors"
+                      className="px-4 md:px-6 py-3 bg-[#14F195] text-black rounded-full font-bold flex items-center gap-2 hover:bg-[#14F195]/90 transition-colors shrink-0 text-sm md:text-base"
                     >
                       {copied ? <Check size={18} /> : <Copy size={18} />}
                       <span>Copy</span>

@@ -4,6 +4,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { StaggerContainer, StaggerItem } from "../ScrollReveal";
 
 export default function FAQ() {
   const faqs = [
@@ -35,21 +36,24 @@ export default function FAQ() {
         {/* Background Glow */}
         <div className="absolute -inset-1 bg-gradient-to-r from-[#10e291] to-[#9b59b6] rounded-2xl opacity-10 blur-xl pointer-events-none"></div>
         
-        <Accordion type="single" collapsible className="w-full space-y-4">
-          {faqs.map((f, i) => (
-            <AccordionItem 
-              key={i} 
-              value={`item-${i}`} 
-              className="border border-white/10 bg-[#0B0E1A]/80 backdrop-blur-md rounded-xl px-6 overflow-hidden data-[state=open]:border-[#10e291]/50 transition-colors duration-300"
-            >
-              <AccordionTrigger className="text-left text-white hover:text-[#10e291] hover:no-underline py-6 text-lg font-medium transition-colors">
-                {f.q}
-              </AccordionTrigger>
-              <AccordionContent className="text-gray-400 text-base leading-relaxed pb-6">
-                {f.a}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
+        <Accordion type="single" collapsible className="w-full">
+          <StaggerContainer className="space-y-4">
+            {faqs.map((f, i) => (
+              <StaggerItem key={i}>
+                <AccordionItem 
+                  value={`item-${i}`} 
+                  className="border border-white/10 bg-[#0B0E1A]/80 backdrop-blur-md rounded-xl px-6 overflow-hidden data-[state=open]:border-[#10e291]/50 transition-colors duration-300"
+                >
+                  <AccordionTrigger className="text-left text-white hover:text-[#10e291] hover:no-underline py-6 text-lg font-medium transition-colors">
+                    {f.q}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-gray-400 text-base leading-relaxed pb-6">
+                    {f.a}
+                  </AccordionContent>
+                </AccordionItem>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
         </Accordion>
       </div>
     </section>

@@ -1,5 +1,6 @@
 import { FaTelegram, FaDiscord, FaTwitter } from "react-icons/fa";
 import { LayoutDashboard, ArrowRight } from "lucide-react";
+import { StaggerContainer, StaggerItem } from "../ScrollReveal";
 
 export default function Community() {
   return (
@@ -22,8 +23,9 @@ export default function Community() {
             Be part of the fastest-growing community of alpha hunters. Get real-time alerts, share insights, and stay ahead of the market.
           </p>
 
-          <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6">
+          <StaggerContainer className="flex flex-wrap justify-center items-center gap-4 md:gap-6">
             {/* Telegram */}
+            <StaggerItem>
             <a
               href="https://t.me/yourtelegram"
               target="_blank"
@@ -33,8 +35,10 @@ export default function Community() {
               <FaTelegram className="w-6 h-6 text-[#229ED9] group-hover/btn:text-white transition-colors" />
               <span className="font-bold text-white text-lg">Telegram</span>
             </a>
+            </StaggerItem>
 
             {/* Discord */}
+            <StaggerItem>
             <a
               href="https://discord.com/invite/yourdiscord"
               target="_blank"
@@ -44,8 +48,10 @@ export default function Community() {
               <FaDiscord className="w-6 h-6 text-[#5865F2] group-hover/btn:text-white transition-colors" />
               <span className="font-bold text-white text-lg">Discord</span>
             </a>
+            </StaggerItem>
 
             {/* Twitter/X */}
+            <StaggerItem>
             <a
               href="https://twitter.com/yourtwitter"
               target="_blank"
@@ -55,8 +61,10 @@ export default function Community() {
               <FaTwitter className="w-6 h-6 text-white transition-colors" />
               <span className="font-bold text-white text-lg">Twitter</span>
             </a>
+            </StaggerItem>
 
             {/* Web App CTA */}
+            <StaggerItem>
             <a
               href="/dashboard"
               className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#14F195] to-[#9B59B6] rounded-full hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 group/btn hover:-translate-y-1 hover:scale-105"
@@ -65,7 +73,8 @@ export default function Community() {
               <span className="font-bold text-white text-lg">Launch App</span>
               <ArrowRight className="w-5 h-5 text-white group-hover/btn:translate-x-1 transition-transform" />
             </a>
-          </div>
+            </StaggerItem>
+          </StaggerContainer>
         </div>
       </div>
     </section>
