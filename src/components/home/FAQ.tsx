@@ -14,7 +14,7 @@ export default function FAQ() {
     },
     {
       q: "What blockchains are supported?",
-      a: "We currently support Solana, Ethereum, and Base. We are continuously expanding our coverage to include more L1s and L2s based on community demand.",
+      a: "We currently support Base. We are continuously expanding our coverage to include more L1s and L2s based on community demand.",
     },
     {
       q: "Is the BlockAI Token required for access?",
