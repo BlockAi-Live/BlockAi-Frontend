@@ -1,8 +1,12 @@
+import { useNavigate } from "react-router-dom";
+
 interface HeroProps {
   launch: () => void;
 }
 
 export default function Hero({ launch }: HeroProps) {
+  const navigate = useNavigate();
+
   return (
     <section className="relative overflow-visible pt-32 md:pt-48 pb-12">
       <video
@@ -49,6 +53,7 @@ export default function Hero({ launch }: HeroProps) {
 
         <div className="mt-12 flex justify-center gap-4">
           <button 
+            onClick={() => navigate("/signup")}
             className="px-10 py-2.5 rounded-full text-sm font-bold text-white border border-white relative overflow-hidden shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
             style={{
               background: 'linear-gradient(90deg, rgba(20, 241, 149, 0.1) 0%, rgba(155, 89, 182, 0.1) 100%)',
