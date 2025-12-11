@@ -4,7 +4,7 @@ import { StaggerContainer, StaggerItem } from "../ScrollReveal";
 
 export default function Community() {
   return (
-    <section className="mt-32 px-6 md:px-0 relative z-10 max-w-6xl mx-auto">
+    <section id="community" className="mt-32 px-6 md:px-0 relative z-10 max-w-6xl mx-auto">
       <div className="relative rounded-[2.5rem] overflow-hidden border border-white/10 bg-[#0B0E1A]/50 backdrop-blur-xl p-12 md:p-20 text-center group">
         
         {/* Background Effects */}

@@ -5,6 +5,7 @@ import AppSidebar from "./components/Sidebar"; // your new sidebar
 // import ProfileBar from "./components/ProfileBar";
 
 import Home from "./pages/Home";
+import About from "./pages/About";
 import { DashboardPage } from "./pages/Dashboard";
 import Chat from "./pages/Chat";
 import { WalletsPage } from "./pages/Wallets";
@@ -44,6 +45,7 @@ function App() {
         {/* Home */}
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Navigate to="/" replace />} />
+        <Route path="/about" element={<About />} />
 
         {/* Auth Pages */}
         <Route path="/signup" element={<SignUpPage />} />

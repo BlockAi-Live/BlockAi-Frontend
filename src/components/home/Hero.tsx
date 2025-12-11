@@ -4,7 +4,7 @@ interface HeroProps {
 
 export default function Hero({ launch }: HeroProps) {
   return (
-    <section className="relative overflow-visible pt-20 md:pt-32 pb-12">
+    <section className="relative overflow-visible pt-32 md:pt-48 pb-12">
       <video
         autoPlay
         loop

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Menu } from "lucide-react";
 import {
   Sheet,
@@ -25,15 +26,15 @@ export default function Navbar({ launch }: NavbarProps) {
   }, []);
 
   const navLinks = [
-    { name: "Home", href: "#" },
-    { name: "Features", href: "#" },
-    { name: "About", href: "#" },
-    { name: "Community", href: "#" },
+    { name: "Home", href: "/" },
+    { name: "Features", href: "/#features" },
+    { name: "About", href: "/about" },
+    { name: "Community", href: "/#community" },
   ];
 
   return (
     <nav 
-      className="w-full sticky top-0 z-50 flex items-center justify-between py-4 px-6 md:px-12 lg:px-20"
+      className="w-full fixed top-0 left-0 right-0 z-50 flex items-center justify-between py-4 px-6 md:px-12 lg:px-20"
       style={{
         backdropFilter: isScrolled ? 'blur(16px)' : 'blur(0px)',
         backgroundColor: isScrolled ? 'rgba(11, 14, 26, 0.7)' : 'rgba(11, 14, 26, 0)',
@@ -41,10 +42,10 @@ export default function Navbar({ launch }: NavbarProps) {
         transition: 'backdrop-filter 0.6s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), border-bottom 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
       }}
     >
-      <div className="flex items-center gap-2">
+      <Link to="/" className="flex items-center gap-2 cursor-pointer">
         <img src="/blockai.svg" alt="BlockAI" className="w-10 h-10" />
         <div className="text-white font-bold text-xl">BLOCKAI</div>
-      </div>
+      </Link>
 
       {/* Desktop Navigation */}
       <div className="hidden md:flex gap-8 text-sm text-gray-300">
