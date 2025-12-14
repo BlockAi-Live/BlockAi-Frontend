@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import Head from "@/assets/icons/Head";
+
 
 export default function IntelligenceNetwork() {
   return (
@@ -20,7 +20,7 @@ export default function IntelligenceNetwork() {
           className="relative z-10"
         >
            <div className="scale-125">
-             <Head />
+             
            </div>
         </motion.div>
         

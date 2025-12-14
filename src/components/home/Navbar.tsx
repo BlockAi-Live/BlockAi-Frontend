@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Menu } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Menu, LogOut } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 import {
   Sheet,
   SheetContent,
@@ -15,6 +16,8 @@ interface NavbarProps {
 
 export default function Navbar({ launch }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,6 +27,15 @@ export default function Navbar({ launch }: NavbarProps) {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleAuthAction = () => {
+    if (isAuthenticated) {
+      logout();
+      navigate("/");
+    } else {
+      navigate("/signup");
+    }
+  };
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -58,10 +70,17 @@ export default function Navbar({ launch }: NavbarProps) {
 
       <div className="flex items-center gap-4">
         <button
-          onClick={launch}
-          className="hidden md:block px-6 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-[#14F195] to-[#9B59B6] shadow-md hover:opacity-90 transition-opacity"
+          onClick={handleAuthAction}
+          className="hidden md:flex items-center gap-2 px-6 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-[#14F195] to-[#9B59B6] shadow-md hover:opacity-90 transition-opacity"
         >
-          Launch App
+          {isAuthenticated ? (
+            <>
+              <span>Sign Out</span>
+              <LogOut size={16} />
+            </>
+          ) : (
+            "Sign Up"
+          )}
         </button>
 
         {/* Mobile Menu */}
@@ -96,10 +115,17 @@ export default function Navbar({ launch }: NavbarProps) {
                 <div className="h-px bg-white/10 w-full my-2" />
 
                 <button
-                  onClick={launch}
-                  className="w-full px-6 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-[#14F195] to-[#9B59B6] shadow-lg hover:opacity-90 transition-opacity text-center"
+                  onClick={handleAuthAction}
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-[#14F195] to-[#9B59B6] shadow-lg hover:opacity-90 transition-opacity text-center"
                 >
-                  Launch App
+                  {isAuthenticated ? (
+                    <>
+                      <span>Sign Out</span>
+                      <LogOut size={16} />
+                    </>
+                  ) : (
+                    "Sign Up"
+                  )}
                 </button>
               </div>
             </SheetContent>

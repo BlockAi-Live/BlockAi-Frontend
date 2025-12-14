@@ -1,22 +1,46 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { User, Mail, Lock, ArrowRight, Wallet, Github, ChevronRight } from "lucide-react";
+import { User, Mail, Lock, ArrowRight, Wallet, Github, ChevronRight, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { api } from "../lib/api";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../hooks/use-toast";
 
 export function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: ""
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    
+    try {
+      const response = await api.register(formData);
+      login(response.token, response.user);
+      toast({
+        title: "Account created",
+        description: "Welcome to Block AI!",
+      });
       navigate("/dashboard");
-    }, 2000);
+    } catch (error) {
+      toast({
+        title: "Registration failed",
+        description: error instanceof Error ? error.message : "Something went wrong",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -61,6 +85,8 @@ export function SignUpPage() {
                       placeholder="Victor Linkie"
                       className="w-full bg-[#0d0f18] border-0 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none transition-all"
                       required
+                      value={formData.fullName}
+                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                     />
                   </div>
                 </div>
@@ -76,6 +102,8 @@ export function SignUpPage() {
                       placeholder="victorlinkie@example.com"
                       className="w-full bg-[#0d0f18] border-0 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none transition-all"
                       required
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     />
                   </div>
                 </div>
@@ -87,12 +115,21 @@ export function SignUpPage() {
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#6366F1] transition-colors" size={18} />
                   <div className="p-[1px] rounded-xl bg-gradient-to-r from-[#9945FF]/50 to-[#14F195]/50">
                     <input 
-                      type="password" 
+                      type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
-                      className="w-full bg-[#0d0f18] border-0 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none transition-all"
+                      className="w-full bg-[#0d0f18] border-0 rounded-xl py-3 pl-12 pr-12 text-white placeholder:text-gray-500 focus:outline-none transition-all"
                       required
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     />
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
               </div>
             </div>

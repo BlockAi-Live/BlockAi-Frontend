@@ -14,6 +14,7 @@ import { SignUpPage } from "./pages/SignUp";
 import { SignInPage } from "./pages/SignIn";
 import { MarketAnalysisPage } from "./pages/MarketAnalysis";
 import { SettingsPage } from "./pages/Settings";
+import { Toaster } from "@/components/ui/toaster";
 
 // Layout with toggleable sidebar
 function MainLayout({ children }: { children: React.ReactNode }) {
@@ -41,6 +42,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
 function App() {
   return (
     <BrowserRouter>
+      <Toaster />
       <Routes>
         {/* Home */}
         <Route path="/" element={<Home />} />

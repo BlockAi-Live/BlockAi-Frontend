@@ -1,4 +1,6 @@
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { ArrowRight } from "lucide-react";
 
 interface HeroProps {
   launch: () => void;
@@ -6,6 +8,7 @@ interface HeroProps {
 
 export default function Hero({ launch }: HeroProps) {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   return (
     <section className="relative overflow-visible pt-32 md:pt-48 pb-12">
@@ -51,22 +54,16 @@ export default function Hero({ launch }: HeroProps) {
           Real-time on-chain analytics, alpha discovery & wallet alerts – all decentralized.
         </p>
 
-        <div className="mt-12 flex justify-center gap-4">
+        <div className="mt-12 flex justify-center">
           <button 
-            onClick={() => navigate("/signup")}
-            className="px-10 py-2.5 rounded-full text-sm font-bold text-white border border-white relative overflow-hidden shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
-            style={{
-              background: 'linear-gradient(90deg, rgba(20, 241, 149, 0.1) 0%, rgba(155, 89, 182, 0.1) 100%)',
-              backdropFilter: 'blur(10px)'
-            }}
+            onClick={() => navigate(isAuthenticated ? "/dashboard" : "/signup")}
+            className="group relative px-8 py-4 rounded-full text-base font-bold text-white shadow-lg hover:shadow-[#9945FF]/25 hover:scale-105 transition-all duration-300 flex items-center gap-2 overflow-hidden"
           >
-            Sign Up
-          </button>
-          <button
-            onClick={launch}
-            className="px-10 py-2.5 rounded-full text-sm font-semibold bg-gradient-to-r from-[#14F195] to-[#9B59B6] shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
-          >
-            Launch App
+            <div className="absolute inset-0 bg-gradient-to-r from-[#9945FF] to-[#14F195] opacity-90 group-hover:opacity-100 transition-opacity" />
+            <span className="relative z-10 flex items-center gap-2">
+              {isAuthenticated ? "Go to Dashboard" : "Start Your Journey"} 
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </span>
           </button>
         </div>
       </div>
