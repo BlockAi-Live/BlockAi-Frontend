@@ -21,19 +21,20 @@ import { Toaster } from "@/components/ui/toaster";
 function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <div className="flex h-screen w-full bg-black text-white">
+      <div className="flex h-screen w-full bg-[#0d0f18] text-white overflow-hidden">
         {/* Sidebar */}
         <AppSidebar />
 
         {/* Main content */}
-        <div className="flex flex-col flex-1">
-          <header className="flex items-center justify-between p-3 border-b border-white/10">
-            {/* Sidebar toggle button */}
-            <SidebarTrigger className="text-white" />
-            {/* <ProfileBar /> */}
-          </header>
+        <div className="flex-1 flex flex-col relative h-full overflow-hidden">
+          {/* Floating Sidebar Toggle - Positioned absolutely to not take layout space */}
+          <div className="absolute top-4 left-4 z-50">
+             <SidebarTrigger className="text-gray-400 hover:text-white bg-[#13151C]/50 hover:bg-[#13151C] backdrop-blur-md border border-white/5 rounded-full w-8 h-8 transition-all duration-200" />
+          </div>
 
-          <main className="flex-1 overflow-y-auto">{children}</main>
+          <main className="flex-1 h-full overflow-y-auto custom-scrollbar relative">
+             {children}
+          </main>
         </div>
       </div>
     </SidebarProvider>
