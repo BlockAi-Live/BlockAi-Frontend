@@ -28,7 +28,7 @@ export default function Footer() {
               <h4 className="font-bold text-gray-400 tracking-wider">COMMUNITY</h4>
               <div className="flex flex-col gap-4 text-sm font-medium text-gray-500">
                 <a href="#" className="hover:text-[#10e291] transition-colors">X (TWITTER)</a>
-                <a href="#" className="hover:text-[#10e291] transition-colors">DISCORD</a>
+                <a href="https://discord.gg/7XR2kafsAT" target="_blank" rel="noopener noreferrer" className="hover:text-[#10e291] transition-colors">DISCORD</a>
                 <a href="#" className="hover:text-[#10e291] transition-colors">TELEGRAM</a>
               </div>
             </div>
