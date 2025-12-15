@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Mail, Lock, ArrowRight, Wallet, Github, ChevronRight, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, ArrowRight, Wallet, Github, ChevronRight, Eye, EyeOff, Star } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { api } from "../lib/api";
@@ -63,9 +63,7 @@ export function SignInPage() {
             transition={{ delay: 0.2, type: "spring" }}
             className="inline-flex items-center gap-2 mb-4"
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] rounded-xl shadow-lg shadow-[#6366F1]/20 flex items-center justify-center">
-              <div className="w-4 h-4 bg-white rounded-sm" />
-            </div>
+            <img src="/blockai.svg" alt="BlockAI" className="w-12 h-12" />
             <h1 className="text-3xl font-bold text-white tracking-tight">BLOCK AI</h1>
           </motion.div>
           <p className="text-gray-400">Welcome back to the network</p>
@@ -166,10 +164,20 @@ export function SignInPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <button type="button" className="col-span-2 flex items-center justify-center gap-2 py-3 border border-yellow-500/50 rounded-xl text-white transition-all hover:-translate-y-0.5 group relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-orange-500/10" />
-                <Wallet size={18} className="text-yellow-500 relative z-10" />
-                <span className="text-sm font-medium relative z-10">Connect Wallet</span>
+              <button type="button" className="col-span-2 relative group overflow-hidden rounded-xl p-[1px]">
+                <div className="absolute inset-0 bg-gradient-to-r from-[#FFD700] to-[#FFA500] opacity-80 group-hover:opacity-100 transition-opacity" />
+                <div className="relative bg-[#0d0f18] group-hover:bg-opacity-90 transition-all h-full rounded-xl flex items-center justify-center gap-3 py-3.5">
+                  <Star size={20} className="text-[#FFD700] fill-[#FFD700]" />
+                  <span className="font-bold bg-gradient-to-r from-[#FFD700] to-[#FFA500] bg-clip-text text-transparent">Genesis Pass</span>
+                </div>
+              </button>
+
+              <button type="button" className="col-span-2 relative group overflow-hidden rounded-xl p-[1px]">
+                <div className="absolute inset-0 bg-gradient-to-r from-[#3B82F6] to-[#8B5CF6] opacity-80 group-hover:opacity-100 transition-opacity" />
+                <div className="relative bg-[#0d0f18] group-hover:bg-opacity-90 transition-all h-full rounded-xl flex items-center justify-center gap-3 py-3.5">
+                  <Wallet size={20} className="text-[#3B82F6]" />
+                  <span className="font-bold text-white group-hover:text-[#3B82F6] transition-colors">Connect Wallet</span>
+                </div>
               </button>
               
               <button type="button" className="flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white transition-all hover:-translate-y-0.5">
