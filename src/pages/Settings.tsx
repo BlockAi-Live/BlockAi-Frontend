@@ -1,6 +1,8 @@
-"use client";
-
-import { useState } from "react";
+import { api } from "@/lib/api";
+import { useEffect, useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 import { motion } from "framer-motion";
 import { 
   User, Bell, Puzzle, CreditCard, Shield, Camera, Trash2, 
@@ -21,12 +23,52 @@ const tabs = [
 const currencies = ["USD ($)", "EUR (€)", "GBP (£)", "JPY (¥)", "BTC (₿)", "ETH (Ξ)"];
 
 export function SettingsPage() {
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const { token, isAuthenticated } = useAuth();
+  
   const [activeTab, setActiveTab] = useState<TabType>("general");
-  const [displayName, setDisplayName] = useState("CryptoKing123");
-  const [email, setEmail] = useState("user@blockai.com");
+  const [displayName, setDisplayName] = useState("");
+  const [email, setEmail] = useState("");
   const [currency, setCurrency] = useState("USD ($)");
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Password Change State
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [isPasswordExpanded, setIsPasswordExpanded] = useState(false);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      // Small delay to ensure auth state is settled if reloaded
+      if (!token) {
+        // Only redirect if genuinely not authenticated
+        // but we rely on token presence mostly
+         if (!token && !localStorage.getItem('auth_token')) {
+            navigate("/signin");
+         }
+         return;
+      }
+      try {
+        const data = await api.getMe(token);
+        setDisplayName(data.user.fullName || "");
+        setEmail(data.user.email || "");
+      } catch (error) {
+        console.error("Failed to fetch profile", error);
+        toast({
+          title: "Error",
+          description: "Failed to load profile. Please login again.",
+          variant: "destructive",
+        });
+        // If API rejects token, force logout potentially?
+        // navigate("/signin");
+      }
+    };
+    fetchProfile();
+  }, [navigate, toast, token]);
   
   // Notification settings
   const [notifications, setNotifications] = useState({
@@ -41,11 +83,67 @@ export function SettingsPage() {
   // Security settings
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
-    setTimeout(() => {
-      setIsSaving(false);
-    }, 1500);
+    if (!token) {
+        navigate("/signin");
+        return;
+    }
+
+    try {
+        await api.updateProfile(token, { fullName: displayName, email });
+        toast({
+            title: "Success",
+            description: "Profile updated successfully",
+        });
+    } catch (error) {
+        toast({
+            title: "Error",
+            description: error instanceof Error ? error.message : "Failed to update profile",
+            variant: "destructive",
+        });
+    } finally {
+        setIsSaving(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (newPassword !== confirmPassword) {
+      toast({
+        title: "Error",
+        description: "New passwords do not match",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!token) {
+      navigate("/signin");
+      return;
+    }
+
+    setIsChangingPassword(true);
+    try {
+      await api.updatePassword(token, { currentPassword, newPassword });
+      toast({
+        title: "Success",
+        description: "Password updated successfully",
+      });
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setIsPasswordExpanded(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to update password",
+        variant: "destructive",
+      });
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
 
   const renderGeneralTab = () => (
@@ -155,38 +253,88 @@ export function SettingsPage() {
                 />
               </div>
             </div>
-            <div className="p-[1px] rounded-lg" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
-              <div className="bg-[#232838] rounded-lg">
-                <button className="px-5 py-3 bg-transparent text-gray-300 text-sm font-medium rounded-lg hover:bg-white/5 transition-all">
-                  Change email
-                </button>
-              </div>
-            </div>
+            {/* Removed the Change button as we save via the main Save button */}
           </div>
         </div>
 
         {/* Password */}
-        <div className="space-y-2">
+        <div className="space-y-4">
           <label className="text-sm text-gray-400">Password</label>
-          <div className="flex items-center gap-4">
-            <div className="flex-1 max-w-md p-[1px] rounded-lg" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
+          
+          {!isPasswordExpanded ? (
+             <div className="p-[1px] rounded-lg w-fit" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
               <div className="bg-[#232838] rounded-lg">
-                <input
-                  type="password"
-                  value="••••••••••"
-                  readOnly
-                  className="w-full bg-transparent rounded-lg px-4 py-3 text-white focus:outline-none cursor-default"
-                />
-              </div>
-            </div>
-            <div className="p-[1px] rounded-lg" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
-              <div className="bg-[#232838] rounded-lg">
-                <button className="px-5 py-3 bg-transparent text-gray-300 text-sm font-medium rounded-lg hover:bg-white/5 transition-all">
-                  Change password
+                <button 
+                  onClick={() => setIsPasswordExpanded(true)}
+                  className="px-5 py-3 bg-transparent text-white text-sm font-medium rounded-lg hover:bg-white/5 transition-all flex items-center gap-2"
+                >
+                  <Lock size={16} />
+                  Change Password
                 </button>
               </div>
             </div>
-          </div>
+          ) : (
+            <motion.div 
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-3 overflow-hidden"
+            >
+              <div className="p-[1px] rounded-lg" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
+                <div className="bg-[#232838] rounded-lg">
+                  <input
+                    type="password"
+                    placeholder="Current Password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    className="w-full bg-transparent rounded-lg px-4 py-3 text-white focus:outline-none transition-all"
+                  />
+                </div>
+              </div>
+              <div className="p-[1px] rounded-lg" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
+                <div className="bg-[#232838] rounded-lg">
+                  <input
+                    type="password"
+                    placeholder="New Password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full bg-transparent rounded-lg px-4 py-3 text-white focus:outline-none transition-all"
+                  />
+                </div>
+              </div>
+              <div className="p-[1px] rounded-lg" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
+                <div className="bg-[#232838] rounded-lg">
+                  <input
+                    type="password"
+                    placeholder="Confirm New Password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full bg-transparent rounded-lg px-4 py-3 text-white focus:outline-none transition-all"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-2">
+                <div className="p-[1px] rounded-lg flex-1" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
+                  <div className="bg-[#232838] rounded-lg h-full">
+                    <button 
+                      onClick={handleChangePassword}
+                      disabled={isChangingPassword}
+                      className="w-full h-full px-5 py-3 bg-transparent text-white text-sm font-medium rounded-lg hover:bg-white/5 transition-all disabled:opacity-50"
+                    >
+                      {isChangingPassword ? "Updating..." : "Update Password"}
+                    </button>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setIsPasswordExpanded(false)}
+                  className="px-5 py-3 bg-white/5 text-gray-300 text-sm font-medium rounded-lg hover:bg-white/10 transition-all border border-white/10"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          )}
         </div>
       </div>
     </motion.div>

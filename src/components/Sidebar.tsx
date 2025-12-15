@@ -16,8 +16,9 @@ import { MdDashboard } from "react-icons/md";
 import { RiWallet3Line } from "react-icons/ri";
 import { TbChartBar } from "react-icons/tb";
 import { FiUsers } from "react-icons/fi";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Sparkles } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const menuItems = [
   { title: "Dashboard", icon: MdDashboard, path: "/dashboard" },
@@ -29,6 +30,14 @@ const menuItems = [
 ];
 
 export default function AppSidebar() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/signin");
+  };
+
   return (
     <Sidebar className="border-r border-white/5 bg-[#0B0E1A]/95 backdrop-blur-xl transition-all duration-300">
       
@@ -80,7 +89,10 @@ export default function AppSidebar() {
 
       {/* Footer */}
       <SidebarFooter className="p-4">
-        <button className="mt-4 flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-red-400 transition-colors w-full rounded-xl hover:bg-red-500/10 group">
+        <button 
+          onClick={handleLogout}
+          className="mt-4 flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-red-400 transition-colors w-full rounded-xl hover:bg-red-500/10 group"
+        >
           <FiLogOut className="w-5 h-5" />
           <span className="text-sm font-medium">Log Out</span>
         </button>

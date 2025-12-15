@@ -48,5 +48,41 @@ export const api = {
     }
 
     return response.json();
-  }
+  },
+
+  updateProfile: async (token: string, data: { fullName?: string; email?: string }) => {
+    const response = await fetch(`${API_URL}/profile`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Update failed");
+    }
+
+    return response.json();
+  },
+
+  updatePassword: async (token: string, data: { currentPassword: string; newPassword: string }) => {
+    const response = await fetch(`${API_URL}/password`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Password update failed");
+    }
+
+    return response.json();
+  },
 };

@@ -2,6 +2,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppSidebar from "./components/Sidebar"; // your new sidebar
+import ProtectedRoute from "./components/ProtectedRoute";
 // import ProfileBar from "./components/ProfileBar";
 
 import Home from "./pages/Home";
@@ -58,49 +59,61 @@ function App() {
         <Route
           path="/dashboard"
           element={
-            <MainLayout>
-              <DashboardPage />
-            </MainLayout>
+            <ProtectedRoute>
+              <MainLayout>
+                <DashboardPage />
+              </MainLayout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/chat"
           element={
-            <MainLayout>
-              <Chat />
-            </MainLayout>
+            <ProtectedRoute>
+              <MainLayout>
+                <Chat />
+              </MainLayout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/wallets"
           element={
-            <MainLayout>
-              <WalletsPage />
-            </MainLayout>
+            <ProtectedRoute>
+              <MainLayout>
+                <WalletsPage />
+              </MainLayout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/referrals"
           element={
-            <MainLayout>
-              <ReferralsPage />
-            </MainLayout>
+            <ProtectedRoute>
+              <MainLayout>
+                <ReferralsPage />
+              </MainLayout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/market"
           element={
-            <MainLayout>
-              <MarketAnalysisPage />
-            </MainLayout>
+            <ProtectedRoute>
+              <MainLayout>
+                <MarketAnalysisPage />
+              </MainLayout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/settings"
           element={
-            <MainLayout>
-              <SettingsPage />
-            </MainLayout>
+            <ProtectedRoute>
+              <MainLayout>
+                <SettingsPage />
+              </MainLayout>
+            </ProtectedRoute>
           }
         />
       </Routes>

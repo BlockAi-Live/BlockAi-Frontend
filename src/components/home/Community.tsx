@@ -63,17 +63,6 @@ export default function Community() {
             </a>
             </StaggerItem>
 
-            {/* Web App CTA */}
-            <StaggerItem>
-            <a
-              href="/dashboard"
-              className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#14F195] to-[#9B59B6] rounded-full hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 group/btn hover:-translate-y-1 hover:scale-105"
-            >
-              <LayoutDashboard className="w-6 h-6 text-white" />
-              <span className="font-bold text-white text-lg">Launch App</span>
-              <ArrowRight className="w-5 h-5 text-white group-hover/btn:translate-x-1 transition-transform" />
-            </a>
-            </StaggerItem>
           </StaggerContainer>
         </div>
       </div>
