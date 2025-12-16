@@ -25,7 +25,7 @@ const currencies = ["USD ($)", "EUR (€)", "GBP (£)", "JPY (¥)", "BTC (₿)",
 export function SettingsPage() {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { token, isAuthenticated } = useAuth();
+  const { token, isAuthenticated, updateUser } = useAuth();
   
   const [activeTab, setActiveTab] = useState<TabType>("general");
   const [displayName, setDisplayName] = useState("");
@@ -92,6 +92,9 @@ export function SettingsPage() {
 
     try {
         await api.updateProfile(token, { fullName: displayName, email });
+        // Update local context
+        updateUser({ fullName: displayName, email });
+        
         toast({
             title: "Success",
             description: "Profile updated successfully",
