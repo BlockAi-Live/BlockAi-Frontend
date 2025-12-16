@@ -66,20 +66,20 @@ export default function ChatEmptyState({ userName = "Trader", onSuggestionClick 
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4, duration: 0.5 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-5xl"
+        className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 w-full max-w-5xl"
       >
         {suggestions.map((item, index) => (
           <button
             key={index}
             onClick={() => onSuggestionClick(item.prompt)}
-            className="flex flex-col items-start gap-4 p-6 rounded-[32px] bg-[#13151C] border border-white/5 hover:border-white/10 hover:bg-[#1E222B] transition-all text-left group h-full shadow-lg hover:shadow-xl hover:-translate-y-1 duration-300"
+            className="flex flex-col items-start gap-3 p-3 md:p-6 rounded-[24px] md:rounded-[32px] bg-[#13151C] border border-white/5 hover:border-white/10 hover:bg-[#1E222B] transition-all text-left group h-full shadow-lg hover:shadow-xl hover:-translate-y-1 duration-300"
           >
-            <div className={`p-3 rounded-2xl ${item.bg} group-hover:scale-110 transition-transform duration-300`}>
+            <div className={`p-2 md:p-3 rounded-2xl ${item.bg} group-hover:scale-110 transition-transform duration-300`}>
                 {item.icon}
             </div>
             <div>
-                 <span className="block text-gray-200 font-semibold text-sm mb-1 group-hover:text-white transition-colors">{item.title}</span>
-                 <span className="block text-xs text-gray-500 leading-relaxed font-light">{item.prompt}</span>
+                 <span className="block text-gray-200 font-semibold text-xs md:text-sm mb-1 group-hover:text-white transition-colors">{item.title}</span>
+                 <span className="block text-[10px] md:text-xs text-gray-500 leading-relaxed font-light line-clamp-2 md:line-clamp-none">{item.prompt}</span>
             </div>
           </button>
         ))}
