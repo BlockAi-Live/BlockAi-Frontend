@@ -3,9 +3,9 @@ import { useAuth } from "../context/AuthContext";
 import ChatEmptyState from "../components/chat/ChatEmptyState";
 import ChatInput from "../components/chat/ChatInput";
 import ChatMessage, { Message } from "../components/chat/ChatMessage";
+import { api } from "@/lib/api";
 
 export default function ChatPage() {
-  // Force HMR Update
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -20,6 +20,8 @@ export default function ChatPage() {
   }, [messages]);
 
   const handleSendMessage = async (content: string) => {
+    if (!content.trim()) return;
+
     const newUserMessage: Message = {
       id: Date.now().toString(),
       role: "user",
@@ -30,24 +32,30 @@ export default function ChatPage() {
     setMessages((prev) => [...prev, newUserMessage]);
     setIsLoading(true);
 
-    // Simulate AI Delay
-    setTimeout(() => {
-      const aiResponse: Message = {
+    try {
+      // Call Gemini AI directly from frontend
+      const response = await api.chatQuestion({ content });
+      const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: generateMockResponse(content),
+        content: response.answer,
         timestamp: new Date(),
       };
-      setMessages((prev) => [...prev, aiResponse]);
-      setIsLoading(false);
-    }, 1500);
-  };
 
-  const generateMockResponse = (input: string) => {
-    if (input.toLowerCase().includes("solana")) {
-      return "Solana (SOL) is currently showing bullish momentum with a 24h volume increase of 15%. \n\nKey support levels: $142.50\nResistance: $155.00\n\nThe on-chain metrics suggest high daily active user activity.";
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error: any) {
+      console.error("Gemini AI Error:", error);
+      // Optional: show error as a message
+      const errorMsg: Message = {
+        id: (Date.now() + 2).toString(),
+        role: "assistant",
+        content: "Sorry, I couldn't process your request.",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMsg]);
+    } finally {
+      setIsLoading(false);
     }
-    return `I've processed your request: "${input}". \n\nScanning the blockchain for relevant data...\n\nNo anomalies found. The market sentiment appears neutral in this sector. Would you like a deeper analysis?`;
   };
 
   return (
@@ -57,8 +65,8 @@ export default function ChatPage() {
         {messages.length === 0 ? (
           <div className="h-full flex flex-col justify-center">
             <ChatEmptyState 
-                userName={user?.fullName?.split(" ")[0]} 
-                onSuggestionClick={handleSendMessage} 
+              userName={user?.fullName?.split(" ")[0]} 
+              onSuggestionClick={handleSendMessage} 
             />
           </div>
         ) : (
@@ -67,12 +75,12 @@ export default function ChatPage() {
               <ChatMessage key={msg.id} message={msg} />
             ))}
             {isLoading && (
-               <div className="flex items-start gap-4 mb-6 animate-pulse">
-                  <div className="w-8 h-8 rounded-full bg-[#3B3F4E] flex items-center justify-center shrink-0">
-                     <img src="/blockai.svg" alt="Thinking" className="w-5 h-5 animate-spin-slow" />
-                  </div>
-                  <div className="text-sm text-gray-400 pt-2">Thinking...</div>
-               </div>
+              <div className="flex items-start gap-4 mb-6 animate-pulse">
+                <div className="w-8 h-8 rounded-full bg-[#3B3F4E] flex items-center justify-center shrink-0">
+                  <img src="/blockai.svg" alt="Thinking" className="w-5 h-5 animate-spin-slow" />
+                </div>
+                <div className="text-sm text-gray-400 pt-2">Thinking...</div>
+              </div>
             )}
             <div ref={messagesEndRef} />
           </div>
@@ -83,7 +91,6 @@ export default function ChatPage() {
       <div className="relative z-20 pb-6 px-4">
         <ChatInput onSend={handleSendMessage} isLoading={isLoading} />
       </div>
-
     </div>
   );
 }

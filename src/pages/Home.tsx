@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import Head from "../assets/icons/Head.jsx";
-import LightningIcon from "../assets/icons/Lightning";
-import NotisIcon from "../assets/icons/Notis";
-import SearchIcon from "../assets/icons/Search";
-import TrendIcon from "../assets/icons/Trend";
-import FunnelIcon from "../assets/icons/Funnel";
+import LightningIcon from "../assets/icons/Lightning.jsx";
+import NotisIcon from "../assets/icons/Notis.jsx";
+import SearchIcon from "../assets/icons/Search.jsx";
+import TrendIcon from "../assets/icons/Trend.jsx";
+import FunnelIcon from "../assets/icons/Funnel.jsx";
 import { ScrollReveal } from "@/components/ScrollReveal";
 
 import {
