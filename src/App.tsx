@@ -13,7 +13,7 @@ import { WalletsPage } from "./pages/Wallets";
 import { ReferralsPage } from "./pages/Referrals";
 import { SignUpPage } from "./pages/SignUp";
 import { SignInPage } from "./pages/SignIn";
-import { MarketAnalysisPage } from "./pages/MarketAnalysis";
+import MarketAnalysisPage from "./pages/MarketAnalysis";
 import { SettingsPage } from "./pages/Settings";
 import { Toaster } from "@/components/ui/toaster";
 
