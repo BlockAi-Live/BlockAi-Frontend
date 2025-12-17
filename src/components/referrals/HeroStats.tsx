@@ -99,7 +99,7 @@ export default function HeroStats() {
             </div>
             <div className="flex gap-2 text-xs text-gray-400 items-center">
               <div className="w-1.5 h-1.5 rounded-full bg-[#14F195] animate-pulse" />
-              <span>Share to earn <span className="text-[#14F195] font-bold">9% commission</span></span>
+              <span>Share to earn <span className="text-[#14F195] font-bold">7% commission</span></span>
             </div>
           </ReferralCard>
         </motion.div>
