@@ -4,7 +4,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
-const ai = new GoogleGenAI({apiKey:'AIzaSyDqgJ1NGwunjX09eVyoJyA9eImKeYxVlDY'});
+const ai = new GoogleGenAI({apiKey:GEMINI_API_KEY});
 
 export const api = {
   register: async (data: any) => {
@@ -73,7 +73,7 @@ chatQuestion: async (data: { content: string }) => {
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-2.5-flash-lite",
       contents: data.content,
     });
 
