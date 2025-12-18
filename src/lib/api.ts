@@ -72,22 +72,36 @@ chatQuestion: async (data: { content: string }) => {
   if (!GEMINI_API_KEY) throw new Error("Gemini API key not set in .env");
 
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
-      contents: data.content,
-    });
+const response = await ai.models.generateContent({
+  model: "gemini-2.5-flash",
+  contents: [
+    {
+      role: "user",
+      parts: [
+        { text: "INSTRUCTION: Only respond if the following message is about economics, crypto and AI. Otherwise, say you can only help with economics, crypto and AI related question." },
+        { text: data.content }
+      ]
+    }
+  ],
+});
 
+    
     let aiAnswer = "No response from AI";
 
     if (response?.candidates?.[0]?.content?.parts?.[0]?.text) {
       aiAnswer = response.candidates[0].content.parts[0].text;
-    } else if (typeof response === "string") {
-      aiAnswer = response;
-    } else if (Array.isArray(response) && response[0]?.content) {
-      aiAnswer = response[0].content;
     }
 
-    console.log("Gemini response:", aiAnswer);
+    await fetch(`${API_URL}/ai/log`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        question: data.content,
+        answer: aiAnswer,
+      }),
+    });
 
     return {
       question: data.content,
@@ -97,6 +111,6 @@ chatQuestion: async (data: { content: string }) => {
     console.error("Gemini API Error:", error);
     throw new Error(error.message || "AI chat failed");
   }
-},
+}
 
 };

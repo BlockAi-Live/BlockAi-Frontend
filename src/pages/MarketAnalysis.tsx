@@ -25,7 +25,6 @@ import {
   CartesianGrid 
 } from "recharts";
 
-// -- Real Icons (SVGs) --
 import btcIcon from "cryptocurrency-icons/svg/color/btc.svg";
 import ethIcon from "cryptocurrency-icons/svg/color/eth.svg";
 import solIcon from "cryptocurrency-icons/svg/color/sol.svg";
