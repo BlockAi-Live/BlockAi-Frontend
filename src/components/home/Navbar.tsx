@@ -41,6 +41,7 @@ export default function Navbar({ launch }: NavbarProps) {
     { name: "Home", href: "/" },
     { name: "Features", href: "/#features" },
     { name: "About", href: "/about" },
+    { name: "Team", href: "/team" },
     { name: "Community", href: "/#community" },
   ];
 

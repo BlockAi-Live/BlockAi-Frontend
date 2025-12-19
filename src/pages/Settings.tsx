@@ -1,31 +1,76 @@
+"use client";
+
 import { api } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
-  User, Bell, Puzzle, CreditCard, Shield, Camera, Trash2, 
-  Mail, Lock, ChevronRight, Check, Globe, DollarSign,
-  Smartphone, Key, AlertTriangle
-} from "lucide-react";
+  User, Bell, PuzzlePiece, CreditCard, Shield, Camera, Trash, 
+  Envelope, LockKey, CaretRight, Check, Globe, CurrencyDollar,
+  DeviceMobile, Key, Warning, CaretDown, CheckCircle
+} from "@phosphor-icons/react";
 
 type TabType = "general" | "notifications" | "plugins" | "subscription" | "security";
 
 const tabs = [
   { id: "general" as TabType, label: "General", icon: User },
   { id: "notifications" as TabType, label: "Notifications", icon: Bell },
-  { id: "plugins" as TabType, label: "Plugins & Integrations", icon: Puzzle },
-  { id: "subscription" as TabType, label: "Subscription / XToken", icon: CreditCard },
+  { id: "plugins" as TabType, label: "Integrations", icon: PuzzlePiece },
+  { id: "subscription" as TabType, label: "Subscription", icon: CreditCard },
   { id: "security" as TabType, label: "Security", icon: Shield },
 ];
 
 const currencies = ["USD ($)", "EUR (€)", "GBP (£)", "JPY (¥)", "BTC (₿)", "ETH (Ξ)"];
 
+// --- REUSABLE COMPONENTS ---
+
+const GlassCard = ({ children, className = "" }: { children: React.ReactNode, className?: string }) => (
+    <div className={`bg-[#13151C] border border-white/5 rounded-[24px] overflow-hidden ${className}`}>
+        {children}
+    </div>
+);
+
+const Toggle = ({ checked, onChange }: { checked: boolean, onChange: () => void }) => (
+    <button
+        onClick={onChange}
+        className={`relative w-12 h-6 rounded-full transition-all duration-300 ${
+            checked ? "bg-[#14F195] shadow-[0_0_10px_rgba(20,241,149,0.3)]" : "bg-white/10"
+        }`}
+    >
+        <div 
+            className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 shadow-sm ${
+                checked ? "left-7" : "left-1"
+            }`} 
+        />
+    </button>
+);
+
+const InputGroup = ({ label, type = "text", value, onChange, placeholder, icon, disabled }: any) => (
+    <div className="space-y-2">
+        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">{label}</label>
+        <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#14F195] to-[#9945FF] rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 -z-10 blur-[2px]" />
+            <div className="relative flex items-center bg-[#0d0f18] border border-white/10 rounded-xl overflow-hidden focus-within:border-transparent transition-colors">
+                {icon && <div className="pl-4 text-gray-400">{icon}</div>}
+                <input
+                    type={type}
+                    value={value}
+                    onChange={onChange}
+                    placeholder={placeholder}
+                    disabled={disabled}
+                    className="w-full bg-transparent px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none text-sm font-medium"
+                />
+            </div>
+        </div>
+    </div>
+);
+
 export function SettingsPage() {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { token, isAuthenticated, updateUser } = useAuth();
+  const { token, updateUser } = useAuth();
   
   const [activeTab, setActiveTab] = useState<TabType>("general");
   const [displayName, setDisplayName] = useState("");
@@ -39,45 +84,29 @@ export function SettingsPage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [isPasswordExpanded, setIsPasswordExpanded] = useState(false);
 
+  // Loading Profile
   useEffect(() => {
     const fetchProfile = async () => {
-      // Small delay to ensure auth state is settled if reloaded
-      if (!token) {
-        // Only redirect if genuinely not authenticated
-        // but we rely on token presence mostly
-         if (!token && !localStorage.getItem('auth_token')) {
-            navigate("/signin");
-         }
+      if (!token && !localStorage.getItem('auth_token')) {
+         navigate("/signin");
          return;
       }
       try {
-        const data = await api.getMe(token);
+        const data = await api.getMe(token || localStorage.getItem('auth_token') || "");
         setDisplayName(data.user.fullName || "");
         setEmail(data.user.email || "");
       } catch (error) {
         console.error("Failed to fetch profile", error);
-        toast({
-          title: "Error",
-          description: "Failed to load profile. Please login again.",
-          variant: "destructive",
-        });
-        // If API rejects token, force logout potentially?
-        // navigate("/signin");
       }
     };
     fetchProfile();
-  }, [navigate, toast, token]);
+  }, [navigate, token]);
   
   // Notification settings
   const [notifications, setNotifications] = useState({
-    emailAlerts: true,
-    priceAlerts: true,
-    newsUpdates: false,
-    weeklyReport: true,
-    pushNotifications: true,
-    marketingEmails: false,
+    emailAlerts: true, priceAlerts: true, newsUpdates: false,
+    weeklyReport: true, pushNotifications: true, marketingEmails: false,
   });
 
   // Security settings
@@ -85,26 +114,14 @@ export function SettingsPage() {
 
   const handleSave = async () => {
     setIsSaving(true);
-    if (!token) {
-        navigate("/signin");
-        return;
-    }
+    if (!token) return;
 
     try {
         await api.updateProfile(token, { fullName: displayName, email });
-        // Update local context
         updateUser({ fullName: displayName, email });
-        
-        toast({
-            title: "Success",
-            description: "Profile updated successfully",
-        });
-    } catch (error) {
-        toast({
-            title: "Error",
-            description: error instanceof Error ? error.message : "Failed to update profile",
-            variant: "destructive",
-        });
+        toast({ title: "Success", description: "Profile updated successfully" });
+    } catch (error: any) {
+        toast({ title: "Error", description: error.message || "Failed to update", variant: "destructive" });
     } finally {
         setIsSaving(false);
     }
@@ -112,587 +129,286 @@ export function SettingsPage() {
 
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
-      toast({
-        title: "Error",
-        description: "New passwords do not match",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Passwords do not match", variant: "destructive" });
       return;
     }
-
-    if (!token) {
-      navigate("/signin");
-      return;
-    }
-
     setIsChangingPassword(true);
     try {
+      if (!token) return;
       await api.updatePassword(token, { currentPassword, newPassword });
-      toast({
-        title: "Success",
-        description: "Password updated successfully",
-      });
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setIsPasswordExpanded(false);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to update password",
-        variant: "destructive",
-      });
+      toast({ title: "Success", description: "Password updated successfully" });
+      setCurrentPassword(""); setNewPassword(""); setConfirmPassword("");
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message || "Failed to update password", variant: "destructive" });
     } finally {
       setIsChangingPassword(false);
     }
   };
 
+  // --- RENDERERS ---
+
   const renderGeneralTab = () => (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.2 }}
-      className="space-y-8"
-    >
-      {/* Profile Picture */}
-      <div className="flex items-start gap-6">
-        <div className="relative">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center border-2 border-white/10">
-            <User size={32} className="text-gray-400" />
-          </div>
-          <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-[#10B981] rounded-full flex items-center justify-center border-2 border-[#0d0f18]">
-            <Camera size={14} className="text-white" />
-          </div>
-        </div>
-        <div className="space-y-3">
-          <div className="flex gap-3">
-            <button className="px-4 py-2 bg-[#9945FF] text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
-              <Camera size={16} />
-              Change Image
-            </button>
-            <button className="px-4 py-2 bg-white/5 border border-white/10 text-gray-300 text-sm font-medium rounded-lg hover:bg-white/10 transition-all flex items-center gap-2">
-              <Trash2 size={16} />
-              Remove Image
-            </button>
-          </div>
-          <p className="text-xs text-gray-500">We support PNGs, JPEGs and GIFs under 2MB</p>
-        </div>
-      </div>
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
+      
+      {/* Avatar Section */}
+      <GlassCard className="p-8 flex flex-col sm:flex-row items-center gap-8">
+         <div className="relative group cursor-pointer">
+             <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#14F195] to-[#9945FF] p-[2px]">
+                 <div className="w-full h-full rounded-full bg-[#0d0f18] flex items-center justify-center overflow-hidden">
+                     <User size={48} weight="duotone" className="text-gray-400" />
+                 </div>
+             </div>
+             <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                 <Camera size={24} className="text-white" />
+             </div>
+         </div>
+         <div className="flex-1 text-center sm:text-left space-y-4">
+             <div>
+                 <h3 className="text-lg font-bold text-white">Profile Photo</h3>
+                 <p className="text-gray-500 text-sm">We support PNGs, JPEGs and GIFs under 2MB</p>
+             </div>
+             <div className="flex gap-3 justify-center sm:justify-start">
+                 <button className="px-4 py-2 bg-[#9945FF]/10 text-[#9945FF] border border-[#9945FF]/20 rounded-xl text-xs font-bold hover:bg-[#9945FF]/20 transition-all flex items-center gap-2">
+                     <Camera weight="bold" /> Upload New
+                 </button>
+                 <button className="px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl text-xs font-bold hover:bg-red-500/20 transition-all flex items-center gap-2">
+                     <Trash weight="bold" /> Remove
+                 </button>
+             </div>
+         </div>
+      </GlassCard>
 
-      {/* Display Name */}
-      <div className="flex flex-col gap-2">
-        <label className="text-sm text-gray-400 block">Display Name</label>
-        <div className="w-full max-w-md p-[1px] rounded-lg" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
-          <div className="bg-[#232838] rounded-lg">
-            <input
-              type="text"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              className="w-full bg-transparent rounded-lg px-4 py-3 text-white focus:outline-none transition-all"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Default Currency */}
-      <div className="space-y-2">
-        <label className="text-sm text-gray-400">Default Currency</label>
-        <div className="relative w-fit">
-          <div className="p-[1px] rounded-lg" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
-            <div className="bg-[#232838] rounded-lg">
-              <button
-                onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
-                className="px-4 py-2.5 bg-transparent text-cyan-400 text-sm font-medium rounded-lg hover:bg-white/5 transition-all flex items-center gap-2"
-              >
-              <DollarSign size={16} />
-              {currency}
-              <ChevronRight size={16} className={`transition-transform ${showCurrencyDropdown ? "rotate-90" : ""}`} />
-              </button>
-            </div>
-          </div>
-          {showCurrencyDropdown && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="absolute top-full left-0 mt-2 bg-[#16181f] border border-white/10 rounded-lg overflow-hidden z-10 min-w-[150px]"
-            >
-              {currencies.map((curr) => (
-                <button
-                  key={curr}
-                  onClick={() => {
-                    setCurrency(curr);
-                    setShowCurrencyDropdown(false);
-                  }}
-                  className={`w-full px-4 py-2.5 text-left text-sm hover:bg-white/5 transition-colors flex items-center justify-between ${
-                    currency === curr ? "text-cyan-400 bg-cyan-500/10" : "text-gray-300"
-                  }`}
-                >
-                  {curr}
-                  {currency === curr && <Check size={14} />}
-                </button>
-              ))}
-            </motion.div>
-          )}
-        </div>
-      </div>
-
-      {/* Account Section */}
-      <div className="pt-6 border-t border-white/10">
-        <h3 className="text-lg font-semibold text-white mb-6">Account</h3>
-        
-        {/* Email */}
-        <div className="space-y-2 mb-6">
-          <label className="text-sm text-gray-400">Email</label>
-          <div className="flex items-center gap-4">
-            <div className="flex-1 max-w-md p-[1px] rounded-lg" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
-              <div className="bg-[#232838] rounded-lg">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-transparent rounded-lg px-4 py-3 text-white focus:outline-none transition-all"
-                />
-              </div>
-            </div>
-            {/* Removed the Change button as we save via the main Save button */}
-          </div>
-        </div>
-
-        {/* Password */}
-        <div className="space-y-4">
-          <label className="text-sm text-gray-400">Password</label>
+      {/* Form Section */}
+      <GlassCard className="p-8 space-y-6">
+          <InputGroup label="Display Name" value={displayName} onChange={(e: any) => setDisplayName(e.target.value)} icon={<User />} />
+          <InputGroup label="Email Address" value={email} onChange={(e: any) => setEmail(e.target.value)} icon={<Envelope />} />
           
-          {!isPasswordExpanded ? (
-             <div className="p-[1px] rounded-lg w-fit" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
-              <div className="bg-[#232838] rounded-lg">
-                <button 
-                  onClick={() => setIsPasswordExpanded(true)}
-                  className="px-5 py-3 bg-transparent text-white text-sm font-medium rounded-lg hover:bg-white/5 transition-all flex items-center gap-2"
-                >
-                  <Lock size={16} />
-                  Change Password
-                </button>
+          <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Default Currency</label>
+              <div className="relative">
+                  <button 
+                    onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)} 
+                    className="w-full bg-[#0d0f18] border border-white/10 rounded-xl px-4 py-3 text-white text-left text-sm font-medium flex items-center justify-between hover:border-white/20 transition-colors"
+                  >
+                      <div className="flex items-center gap-2">
+                          <CurrencyDollar className="text-[#14F195]" size={18} />
+                          {currency}
+                      </div>
+                      <CaretDown className={`transition-transform ${showCurrencyDropdown ? 'rotate-180' : ''}`} size={16} />
+                  </button>
+                  
+                  <AnimatePresence>
+                    {showCurrencyDropdown && (
+                        <motion.div 
+                            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                            className="absolute mt-2 w-full bg-[#0d0f18] border border-white/10 rounded-xl overflow-hidden z-20 shadow-2xl"
+                        >
+                            {currencies.map(c => (
+                                <button 
+                                    key={c}
+                                    onClick={() => { setCurrency(c); setShowCurrencyDropdown(false); }}
+                                    className="w-full px-4 py-3 text-left hover:bg-white/5 transition-colors text-sm text-gray-300 hover:text-white flex justify-between"
+                                >
+                                    {c}
+                                    {currency === c && <Check className="text-[#14F195]" />}
+                                </button>
+                            ))}
+                        </motion.div>
+                    )}
+                  </AnimatePresence>
               </div>
-            </div>
-          ) : (
-            <motion.div 
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-3 overflow-hidden"
-            >
-              <div className="p-[1px] rounded-lg" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
-                <div className="bg-[#232838] rounded-lg">
-                  <input
-                    type="password"
-                    placeholder="Current Password"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    className="w-full bg-transparent rounded-lg px-4 py-3 text-white focus:outline-none transition-all"
-                  />
-                </div>
-              </div>
-              <div className="p-[1px] rounded-lg" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
-                <div className="bg-[#232838] rounded-lg">
-                  <input
-                    type="password"
-                    placeholder="New Password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full bg-transparent rounded-lg px-4 py-3 text-white focus:outline-none transition-all"
-                  />
-                </div>
-              </div>
-              <div className="p-[1px] rounded-lg" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
-                <div className="bg-[#232838] rounded-lg">
-                  <input
-                    type="password"
-                    placeholder="Confirm New Password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full bg-transparent rounded-lg px-4 py-3 text-white focus:outline-none transition-all"
-                  />
-                </div>
-              </div>
-              
-              <div className="flex gap-2">
-                <div className="p-[1px] rounded-lg flex-1" style={{ background: "linear-gradient(90deg, #14F195 0%, #9945FF 100%)" }}>
-                  <div className="bg-[#232838] rounded-lg h-full">
-                    <button 
-                      onClick={handleChangePassword}
-                      disabled={isChangingPassword}
-                      className="w-full h-full px-5 py-3 bg-transparent text-white text-sm font-medium rounded-lg hover:bg-white/5 transition-all disabled:opacity-50"
-                    >
-                      {isChangingPassword ? "Updating..." : "Update Password"}
-                    </button>
-                  </div>
-                </div>
-                <button 
-                  onClick={() => setIsPasswordExpanded(false)}
-                  className="px-5 py-3 bg-white/5 text-gray-300 text-sm font-medium rounded-lg hover:bg-white/10 transition-all border border-white/10"
-                >
-                  Cancel
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </div>
-      </div>
-    </motion.div>
-  );
-
-  const renderNotificationsTab = () => (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.2 }}
-      className="space-y-6"
-    >
-      <div className="space-y-1">
-        <h3 className="text-lg font-semibold text-white">Email Notifications</h3>
-        <p className="text-sm text-gray-500">Manage what emails you receive</p>
-      </div>
-
-      <div className="space-y-4">
-        {[
-          { key: "emailAlerts", label: "Email Alerts", desc: "Get notified about important account activity" },
-          { key: "priceAlerts", label: "Price Alerts", desc: "Receive alerts when tokens hit your target price" },
-          { key: "newsUpdates", label: "News Updates", desc: "Stay updated with crypto news and trends" },
-          { key: "weeklyReport", label: "Weekly Report", desc: "Get a weekly summary of your portfolio" },
-        ].map((item) => (
-          <div key={item.key} className="flex items-center justify-between p-4 bg-[#16181f] rounded-xl border border-white/5">
-            <div>
-              <p className="text-white font-medium">{item.label}</p>
-              <p className="text-sm text-gray-500">{item.desc}</p>
-            </div>
-            <button
-              onClick={() => setNotifications({ ...notifications, [item.key]: !notifications[item.key as keyof typeof notifications] })}
-              className={`relative w-12 h-6 rounded-full transition-colors ${
-                notifications[item.key as keyof typeof notifications] ? "bg-emerald-500" : "bg-gray-600"
-              }`}
-            >
-              <div
-                className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                  notifications[item.key as keyof typeof notifications] ? "translate-x-7" : "translate-x-1"
-                }`}
-              />
-            </button>
           </div>
-        ))}
-      </div>
-
-      <div className="pt-6 border-t border-white/10 space-y-4">
-        <div className="space-y-1">
-          <h3 className="text-lg font-semibold text-white">Push Notifications</h3>
-          <p className="text-sm text-gray-500">Control notifications on your devices</p>
-        </div>
-
-        {[
-          { key: "pushNotifications", label: "Push Notifications", desc: "Receive push notifications on mobile", icon: Smartphone },
-          { key: "marketingEmails", label: "Marketing Emails", desc: "Receive promotional content and offers", icon: Mail },
-        ].map((item) => (
-          <div key={item.key} className="flex items-center justify-between p-4 bg-[#16181f] rounded-xl border border-white/5">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-white/5">
-                <item.icon size={18} className="text-gray-400" />
-              </div>
-              <div>
-                <p className="text-white font-medium">{item.label}</p>
-                <p className="text-sm text-gray-500">{item.desc}</p>
-              </div>
-            </div>
-            <button
-              onClick={() => setNotifications({ ...notifications, [item.key]: !notifications[item.key as keyof typeof notifications] })}
-              className={`relative w-12 h-6 rounded-full transition-colors ${
-                notifications[item.key as keyof typeof notifications] ? "bg-emerald-500" : "bg-gray-600"
-              }`}
-            >
-              <div
-                className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                  notifications[item.key as keyof typeof notifications] ? "translate-x-7" : "translate-x-1"
-                }`}
-              />
-            </button>
-          </div>
-        ))}
-      </div>
-    </motion.div>
-  );
-
-  const renderPluginsTab = () => (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.2 }}
-      className="space-y-6"
-    >
-      <div className="space-y-1">
-        <h3 className="text-lg font-semibold text-white">Connected Apps</h3>
-        <p className="text-sm text-gray-500">Manage your connected applications and integrations</p>
-      </div>
-
-      <div className="grid gap-4">
-        {[
-          { name: "MetaMask", desc: "Wallet connected", connected: true, icon: "🦊" },
-          { name: "Discord", desc: "Receive alerts in Discord", connected: true, icon: "💬" },
-          { name: "Telegram", desc: "Connect your Telegram", connected: false, icon: "✈️" },
-          { name: "Twitter/X", desc: "Share your trades", connected: false, icon: "𝕏" },
-        ].map((app) => (
-          <div key={app.name} className="flex items-center justify-between p-4 bg-[#16181f] rounded-xl border border-white/5">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-2xl">
-                {app.icon}
-              </div>
-              <div>
-                <p className="text-white font-medium">{app.name}</p>
-                <p className="text-sm text-gray-500">{app.desc}</p>
-              </div>
-            </div>
-            <button
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                app.connected
-                  ? "bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20"
-                  : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20"
-              }`}
-            >
-              {app.connected ? "Disconnect" : "Connect"}
-            </button>
-          </div>
-        ))}
-      </div>
-    </motion.div>
-  );
-
-  const renderSubscriptionTab = () => (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.2 }}
-      className="space-y-6"
-    >
-      <div className="space-y-1">
-        <h3 className="text-lg font-semibold text-white">Current Plan</h3>
-        <p className="text-sm text-gray-500">Manage your subscription and XToken balance</p>
-      </div>
-
-      {/* Current Plan Card */}
-      <div className="p-6 bg-gradient-to-br from-cyan-500/10 to-emerald-500/10 rounded-2xl border border-cyan-500/20">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <span className="px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs font-bold rounded-full uppercase">Pro Plan</span>
-            <h4 className="text-2xl font-bold text-white mt-2">$29/month</h4>
-          </div>
-          <div className="text-right">
-            <p className="text-sm text-gray-400">Next billing date</p>
-            <p className="text-white font-medium">January 4, 2025</p>
-          </div>
-        </div>
-        <div className="flex gap-3">
-          <button className="px-4 py-2 bg-white/10 text-white text-sm font-medium rounded-lg hover:bg-white/20 transition-all">
-            Change Plan
-          </button>
-          <button className="px-4 py-2 text-red-400 text-sm font-medium hover:text-red-300 transition-colors">
-            Cancel Subscription
-          </button>
-        </div>
-      </div>
-
-      {/* XToken Balance */}
-      <div className="p-6 bg-[#16181f] rounded-2xl border border-white/5">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-gray-400 mb-1">XToken Balance</p>
-            <p className="text-3xl font-bold text-white">1,250 <span className="text-lg text-cyan-400">XTK</span></p>
-          </div>
-          <button className="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white text-sm font-bold rounded-lg hover:opacity-90 transition-opacity">
-            Buy XTokens
-          </button>
-        </div>
-      </div>
+      </GlassCard>
     </motion.div>
   );
 
   const renderSecurityTab = () => (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.2 }}
-      className="space-y-6"
-    >
-      <div className="space-y-1">
-        <h3 className="text-lg font-semibold text-white">Security Settings</h3>
-        <p className="text-sm text-gray-500">Keep your account safe and secure</p>
-      </div>
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
+        
+        {/* Two Factor */}
+        <GlassCard className="p-6 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-[#14F195]/20 flex items-center justify-center text-[#14F195]">
+                    <Shield size={24} weight="duotone" />
+                </div>
+                <div>
+                    <h3 className="font-bold text-white">Two-Factor Authentication</h3>
+                    <p className="text-gray-500 text-xs">Add an extra layer of security.</p>
+                </div>
+            </div>
+            <Toggle checked={twoFactorEnabled} onChange={() => setTwoFactorEnabled(!twoFactorEnabled)} />
+        </GlassCard>
 
-      {/* Two-Factor Auth */}
-      <div className="p-6 bg-[#16181f] rounded-2xl border border-white/5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-400">
-              <Key size={24} />
+        {/* Change Password */}
+        <GlassCard className="p-8 space-y-6">
+            <h3 className="font-bold text-white text-lg mb-4">Change Password</h3>
+            <InputGroup type="password" label="Current Password" value={currentPassword} onChange={(e: any) => setCurrentPassword(e.target.value)} icon={<LockKey />} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <InputGroup type="password" label="New Password" value={newPassword} onChange={(e: any) => setNewPassword(e.target.value)} icon={<Key />} />
+                <InputGroup type="password" label="Confirm Password" value={confirmPassword} onChange={(e: any) => setConfirmPassword(e.target.value)} icon={<Key />} />
             </div>
-            <div>
-              <p className="text-white font-medium">Two-Factor Authentication</p>
-              <p className="text-sm text-gray-500">Add an extra layer of security to your account</p>
+            <div className="flex justify-end pt-2">
+                <button 
+                    onClick={handleChangePassword}
+                    disabled={isChangingPassword}
+                    className="px-6 py-2 bg-[#6366F1] hover:bg-[#6366F1]/80 text-white rounded-xl text-sm font-bold transition-all disabled:opacity-50"
+                >
+                    {isChangingPassword ? "Updating..." : "Update Password"}
+                </button>
             </div>
-          </div>
-          <button
-            onClick={() => setTwoFactorEnabled(!twoFactorEnabled)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              twoFactorEnabled
-                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                : "bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10"
-            }`}
-          >
-            {twoFactorEnabled ? "Enabled" : "Enable"}
-          </button>
+        </GlassCard>
+
+        {/* Danger Zone */}
+        <div className="p-6 rounded-[24px] border border-red-500/20 bg-red-500/5">
+            <div className="flex items-start gap-4">
+                <Warning className="text-red-400 mt-1" size={24} />
+                <div>
+                    <h4 className="text-red-400 font-bold">Danger Zone</h4>
+                    <p className="text-red-400/60 text-sm mt-1 mb-4">Irreversible action. Your data will be wiped.</p>
+                    <button className="px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg text-xs font-bold hover:bg-red-500/20 transition-all">
+                        Delete Account
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
-
-      {/* Active Sessions */}
-      <div className="space-y-4">
-        <h4 className="text-white font-medium">Active Sessions</h4>
-        {[
-          { device: "Chrome on MacOS", location: "San Francisco, US", current: true },
-          { device: "Safari on iPhone", location: "San Francisco, US", current: false },
-        ].map((session, i) => (
-          <div key={i} className="flex items-center justify-between p-4 bg-[#16181f] rounded-xl border border-white/5">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-white/5">
-                <Globe size={18} className="text-gray-400" />
-              </div>
-              <div>
-                <p className="text-white font-medium flex items-center gap-2">
-                  {session.device}
-                  {session.current && <span className="text-xs text-emerald-400">(Current)</span>}
-                </p>
-                <p className="text-sm text-gray-500">{session.location}</p>
-              </div>
-            </div>
-            {!session.current && (
-              <button className="text-sm text-red-400 hover:text-red-300 transition-colors">
-                Revoke
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Danger Zone */}
-      <div className="pt-6 border-t border-white/10">
-        <div className="p-6 bg-red-500/5 rounded-2xl border border-red-500/20">
-          <div className="flex items-start gap-4">
-            <div className="p-3 rounded-xl bg-red-500/10 text-red-400">
-              <AlertTriangle size={24} />
-            </div>
-            <div className="flex-1">
-              <h4 className="text-red-400 font-medium mb-1">Danger Zone</h4>
-              <p className="text-sm text-gray-500 mb-4">Once you delete your account, there is no going back. Please be certain.</p>
-              <button className="px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg text-sm font-medium hover:bg-red-500/20 transition-all">
-                Delete Account
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
     </motion.div>
   );
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case "general":
-        return renderGeneralTab();
-      case "notifications":
-        return renderNotificationsTab();
-      case "plugins":
-        return renderPluginsTab();
-      case "subscription":
-        return renderSubscriptionTab();
-      case "security":
-        return renderSecurityTab();
-      default:
-        return renderGeneralTab();
-    }
-  };
+  const renderNotificationsTab = () => (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+        <GlassCard className="divide-y divide-white/5">
+            {[
+                { k: "emailAlerts", l: "Email Alerts", d: "Get notified about important account activity" },
+                { k: "priceAlerts", l: "Price Alerts", d: "When tokens hit your target price" },
+                { k: "newsUpdates", l: "News Updates", d: "Crypto news and trends" },
+                { k: "pushNotifications", l: "Push Notifications", d: "Receive push notifications on mobile" },
+            ].map((item: any) => (
+                <div key={item.k} className="p-6 flex items-center justify-between hover:bg-white/[0.02] transition-colors">
+                    <div>
+                        <h4 className="font-bold text-white text-sm">{item.l}</h4>
+                        <p className="text-gray-500 text-xs mt-1">{item.d}</p>
+                    </div>
+                    {/* @ts-ignore */}
+                    <Toggle checked={notifications[item.k]} onChange={() => setNotifications({ ...notifications, [item.k]: !notifications[item.k] })} />
+                </div>
+            ))}
+        </GlassCard>
+    </motion.div>
+  );
+
+  const renderSubscriptionTab = () => (
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
+           {/* Plan Card */}
+           <div className="rounded-[32px] p-8 bg-gradient-to-br from-[#14F195]/10 to-[#9945FF]/10 border border-white/10 relative overflow-hidden">
+               <div className="relative z-10 flex justify-between items-start">
+                   <div>
+                       <span className="px-3 py-1 bg-white/10 text-white text-[10px] font-bold uppercase tracking-wider rounded-full border border-white/10">Pro Plan</span>
+                       <h2 className="text-4xl font-bold text-white mt-4">$29<span className="text-lg text-gray-400 font-normal">/mo</span></h2>
+                       <p className="text-gray-400 text-sm mt-2">Next billing: Jan 4, 2025</p>
+                   </div>
+                   <CreditCard size={48} className="text-white opacity-20" />
+               </div>
+               <div className="relative z-10 mt-8 flex gap-4">
+                   <button className="px-6 py-2.5 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-colors text-sm">Upgrade Plan</button>
+                   <button className="px-6 py-2.5 bg-transparent border border-white/20 text-white font-bold rounded-xl hover:bg-white/5 transition-colors text-sm">Cancel</button>
+               </div>
+           </div>
+            
+           {/* XTokens */}
+           <GlassCard className="p-8 flex items-center justify-between">
+                <div>
+                    <h3 className="font-bold text-white text-lg">XToken Balance</h3>
+                    <p className="text-gray-500 text-sm">Used for AI Credits & Premium Features</p>
+                </div>
+                <div className="text-right">
+                    <h2 className="text-3xl font-bold text-[#14F195]">1,250 <span className="text-sm text-gray-500">XTK</span></h2>
+                    <button className="text-[#14F195] text-xs font-bold hover:underline mt-1">Buy More</button>
+                </div>
+           </GlassCard>
+      </motion.div>
+  );
+  
+  const renderPluginsTab = () => (
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="grid gap-4">
+          {[
+              { n: "MetaMask", d: "Wallet connected", c: true, i: "🦊" },
+              { n: "Discord", d: "Receive alerts in Discord", c: true, i: "💬" },
+              { n: "Twitter/X", d: "Share your trades", c: false, i: "🐦" },
+          ].map((app) => (
+              <GlassCard key={app.n} className="p-6 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                      <div className="text-2xl w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center">{app.i}</div>
+                      <div>
+                          <h4 className="font-bold text-white">{app.n}</h4>
+                          <p className="text-xs text-gray-500">{app.d}</p>
+                      </div>
+                  </div>
+                  <button className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all ${app.c ? "bg-red-500/10 text-red-400 border-red-500/20" : "bg-[#14F195]/10 text-[#14F195] border-[#14F195]/20"}`}>
+                      {app.c ? "Disconnect" : "Connect"}
+                  </button>
+              </GlassCard>
+          ))}
+      </motion.div>
+  )
 
   return (
-    <div className="min-h-screen bg-[#0d0f18] text-white relative">
-      {/* Background gradient overlay */}
-      <div 
-        className="fixed inset-0 pointer-events-none"
-        style={{
-          background: "linear-gradient(135deg, rgba(155, 89, 182, 0.2) 0%, rgba(20, 241, 149, 0.2) 100%)"
-        }}
-      />
+    <div className="min-h-screen bg-[#0d0f18] text-white overflow-hidden relative pb-20">
+      <div className="fixed inset-0 pointer-events-none" style={{ background: "radial-gradient(circle at 0% 0%, rgba(153, 69, 255, 0.05) 0%, rgba(13, 15, 24, 0) 50%)" }} />
       
-      <div className="p-6 lg:p-10 relative z-10">
-      <motion.h1
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-3xl lg:text-4xl font-bold text-white mb-8"
-      >
-        Account Settings
-      </motion.h1>
-
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Sidebar Tabs */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="lg:w-64 flex-shrink-0"
-        >
-          <div className="space-y-1">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
-                  activeTab === tab.id
-                    ? "text-white"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
-                }`}
-                style={activeTab === tab.id ? { background: "linear-gradient(90deg, rgba(20, 241, 149, 0.2) 0%, rgba(153, 69, 255, 0.2) 100%)" } : {}}
-              >
-                <tab.icon size={18} />
-                <span className="font-medium">{tab.label}</span>
-              </button>
-            ))}
+      <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-10 relative z-10">
+          <div className="mb-6 md:mb-10">
+              <h1 className="text-2xl md:text-3xl font-bold text-white">Settings</h1>
+              <p className="text-gray-500 text-sm md:text-base">Manage your account preferences and security.</p>
           </div>
-        </motion.div>
 
-        {/* Main Content */}
-        <div className="flex-1 max-w-3xl">
-          {renderTabContent()}
+          <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
+              {/* SIDEBAR / MOBILE TABS */}
+              <div className="lg:w-64 flex-shrink-0">
+                  <div className="flex lg:flex-col overflow-x-auto pb-4 lg:pb-0 gap-2 no-scrollbar -mx-4 px-4 lg:mx-0 lg:px-0">
+                      {tabs.map((tab) => {
+                          const isActive = activeTab === tab.id;
+                          return (
+                              <button
+                                  key={tab.id}
+                                  onClick={() => setActiveTab(tab.id as TabType)}
+                                  className={`flex-shrink-0 flex items-center gap-2 md:gap-3 px-4 py-2 md:py-3 rounded-xl text-sm font-bold transition-all duration-300 relative overflow-hidden group whitespace-nowrap ${
+                                      isActive ? "text-white" : "text-gray-400 hover:text-white"
+                                  }`}
+                              >
+                                  {isActive && (
+                                      <motion.div layoutId="activeTab" className="absolute inset-0 bg-[#232838] border border-white/5 rounded-xl -z-10" />
+                                  )}
+                                  <tab.icon size={18} weight={isActive ? "fill" : "regular"} className={isActive ? "text-[#14F195]" : "text-gray-500 group-hover:text-white"} />
+                                  {tab.label}
+                              </button>
+                          )
+                      })}
+                  </div>
+              </div>
 
-          {/* Save Button */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mt-10 flex justify-end"
-          >
-            <button
-              onClick={handleSave}
-              disabled={isSaving}
-              className="px-8 py-3 bg-[#14F195] text-black font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-70 flex items-center gap-2"
-            >
-              {isSaving ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Check size={18} />
-                  Save Changes
-                </>
-              )}
-            </button>
-          </motion.div>
-        </div>
-      </div>
+              {/* CONTENT */}
+              <div className="flex-1 min-w-0">
+                  <div className="relative">
+                       {activeTab === 'general' && renderGeneralTab()}
+                       {activeTab === 'notifications' && renderNotificationsTab()}
+                       {activeTab === 'subscription' && renderSubscriptionTab()}
+                       {activeTab === 'security' && renderSecurityTab()}
+                       {activeTab === 'plugins' && renderPluginsTab()}
+
+                       {activeTab === 'general' && (
+                           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-8 flex justify-end pb-8 lg:pb-0">
+                               <button 
+                                   onClick={handleSave} 
+                                   disabled={isSaving}
+                                   className="w-full md:w-auto px-8 py-3 bg-[#14F195] text-black font-bold rounded-xl hover:bg-[#14F195]/90 transition-all shadow-[0_0_20px_rgba(20,241,149,0.2)] disabled:opacity-50 flex items-center justify-center gap-2"
+                               >
+                                   {isSaving ? "Saving..." : <><CheckCircle weight="fill" size={20} /> Save Changes</>}
+                               </button>
+                           </motion.div>
+                       )}
+                  </div>
+              </div>
+          </div>
       </div>
     </div>
   );
