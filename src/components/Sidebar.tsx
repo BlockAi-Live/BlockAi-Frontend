@@ -34,7 +34,7 @@ const menuItems = [
 export default function AppSidebar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const { state, isMobile } = useSidebar();
+  const { state, isMobile, setOpenMobile } = useSidebar();
   const location = useLocation();
   const isCollapsed = state === "collapsed" && !isMobile;
 
@@ -66,6 +66,7 @@ export default function AppSidebar() {
                 <NavLink
                   key={item.path}
                   to={item.path}
+                  onClick={() => isMobile && setOpenMobile(false)}
                   className={({ isActive }) => `
                     relative flex items-center h-[48px] rounded-lg transition-all duration-200 group
                     ${isCollapsed ? "justify-center px-0" : "px-4 gap-3"}
