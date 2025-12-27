@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { 
@@ -24,122 +24,55 @@ import {
   Tooltip,
   CartesianGrid 
 } from "recharts";
-
-import btcIcon from "cryptocurrency-icons/svg/color/btc.svg";
-import ethIcon from "cryptocurrency-icons/svg/color/eth.svg";
-import solIcon from "cryptocurrency-icons/svg/color/sol.svg";
-import usdtIcon from "cryptocurrency-icons/svg/color/usdt.svg";
-import xrpIcon from "cryptocurrency-icons/svg/color/xrp.svg";
-import adaIcon from "cryptocurrency-icons/svg/color/ada.svg";
-import dotIcon from "cryptocurrency-icons/svg/color/dot.svg";
-import maticIcon from "cryptocurrency-icons/svg/color/matic.svg";
-
-// -- Mock Data Generation --
-const generateData = (basePrice: number, volatility: number) => {
-  let price = basePrice;
-  return Array.from({ length: 24 }, (_, i) => {
-    price = price * (1 + (Math.random() * volatility - volatility / 2));
-    return {
-      time: `${i}:00`,
-      price: price
-    };
-  });
-};
-
-const coins = [
-  { 
-    id: "bitcoin", 
-    symbol: "BTC", 
-    name: "Bitcoin", 
-    price: 44105.20, 
-    change: 5.2, 
-    icon: btcIcon, 
-    color: "#F7931A", 
-    data: generateData(44000, 0.02) 
-  },
-  { 
-    id: "ethereum", 
-    symbol: "ETH", 
-    name: "Ethereum", 
-    price: 2250.80, 
-    change: 3.1, 
-    icon: ethIcon, 
-    color: "#627EEA", 
-    data: generateData(2200, 0.03) 
-  },
-  { 
-    id: "solana", 
-    symbol: "SOL", 
-    name: "Solana", 
-    price: 98.50, 
-    change: 12.4, 
-    icon: solIcon, 
-    color: "#14F195", 
-    data: generateData(92, 0.05) 
-  },
-  { 
-    id: "tether", 
-    symbol: "USDT", 
-    name: "Tether", 
-    price: 1.00, 
-    change: 0.01, 
-    icon: usdtIcon, 
-    color: "#26A17B", 
-    data: generateData(1, 0.001) 
-  },
-  { 
-    id: "xrp", 
-    symbol: "XRP", 
-    name: "XRP", 
-    price: 0.62, 
-    change: -1.2, 
-    icon: xrpIcon, 
-    color: "#23292F", 
-    data: generateData(0.63, 0.04) 
-  },
-  { 
-    id: "cardano", 
-    symbol: "ADA", 
-    name: "Cardano", 
-    price: 0.58, 
-    change: 2.5, 
-    icon: adaIcon, 
-    color: "#0033AD", 
-    data: generateData(0.55, 0.03) 
-  },
-  { 
-    id: "polkadot", 
-    symbol: "DOT", 
-    name: "Polkadot", 
-    price: 7.20, 
-    change: -0.5, 
-    icon: dotIcon, 
-    color: "#E6007A", 
-    data: generateData(7.30, 0.04) 
-  },
-  { 
-    id: "matic", 
-    symbol: "MATIC", 
-    name: "Polygon", 
-    price: 0.85, 
-    change: 4.1, 
-    icon: maticIcon, 
-    color: "#8247E5", 
-    data: generateData(0.82, 0.05) 
-  }
-];
+import { coingecko } from "@/lib/coingecko";
 
 export default function MarketAnalysisPage() {
-  const [selectedCoin, setSelectedCoin] = useState(coins[0]);
-  const [activeTab, setActiveTab] = useState("1D");
+  const [coins, setCoins] = useState<any[]>([]);
+  const [selectedCoin, setSelectedCoin] = useState<any>(null);
+  const [chartData, setChartData] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState("1"); // 1 Day default
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   // -- AI State --
   const [viewMode, setViewMode] = useState<'chart' | 'ai'>('chart');
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiAction, setAiAction] = useState("");
   const [aiResponse, setAiResponse] = useState("");
+
+  // Fetch Markets on Mount
+  useEffect(() => {
+    const fetchMarkets = async () => {
+        setIsLoading(true);
+        const data = await coingecko.getMarkets();
+        if (data.length > 0) {
+            // Map API data to our UI needs (add colors)
+            const processed = data.map((coin: any) => ({
+                ...coin,
+                color: coingecko.getColor(coin.symbol),
+                price: coin.current_price,
+                change: coin.price_change_percentage_24h
+            }));
+            setCoins(processed);
+            setSelectedCoin(processed[0]); // Default to first
+        }
+        setIsLoading(false);
+    };
+    fetchMarkets();
+  }, []);
+
+  // Fetch Chart when Coin or Tab changes
+  useEffect(() => {
+      if (!selectedCoin) return;
+      const fetchChart = async () => {
+          const days = activeTab === "ALL" ? "max" : activeTab; 
+          const data = await coingecko.getMarketChart(selectedCoin.id, days);
+          setChartData(data);
+      };
+      fetchChart();
+  }, [selectedCoin, activeTab]);
+
 
   const handleAiAction = (action: string) => {
     setAiAction(action);
@@ -150,14 +83,13 @@ export default function MarketAnalysisPage() {
     // Simulate AI generation with variable speed
     setTimeout(() => {
         setIsAiLoading(false);
-        const report = `## ${action} for ${selectedCoin.name}\n\n**Analysis:** Strong accumulation detected in the **$${(selectedCoin.price * 0.95).toFixed(0)}** zone. RSI is resetting on the 4H timeframe, suggesting pending volatility.\n\n**Outlook:** Bullish divergence on OBV confirms institute buying. Target: **$${(selectedCoin.price * 1.1).toFixed(2)}**.\n\n> *Market sentiment is shifting rapidly. Recommended to set tight stop-losses.*`;
+        const report = `## ${action} for ${selectedCoin.name}\n\n**Analysis:** Strong accumulation detected in the **$${(selectedCoin.price * 0.95).toFixed(2)}** zone. RSI is resetting on the 4H timeframe, suggesting pending volatility.\n\n**Outlook:** Bullish divergence on OBV confirms institute buying. Target: **$${(selectedCoin.price * 1.1).toFixed(2)}**.\n\n> *Market sentiment is shifting rapidly. Recommended to set tight stop-losses.*`;
         
         let i = 0;
         const typeChar = () => {
             if (i < report.length) {
                 setAiResponse(report.slice(0, i + 1));
                 i++;
-                // Natural typing variance: faster for letters, punctuation pauses
                 const char = report[i];
                 let delay = 20; 
                 if (char === '.' || char === '?' || char === '!') delay = 400; // Pause at sentences
@@ -170,6 +102,17 @@ export default function MarketAnalysisPage() {
         typeChar();
     }, 1500);
   };
+
+  if (isLoading) {
+      return (
+          <div className="min-h-screen bg-[#0d0f18] flex items-center justify-center">
+              <div className="flex flex-col items-center gap-4">
+                  <div className="w-12 h-12 border-4 border-[#14F195] border-t-transparent rounded-full animate-spin" />
+                  <p className="text-[#14F195] font-mono animate-pulse">Initializing Market Data...</p>
+              </div>
+          </div>
+      );
+  }
 
   return (
     <div className="min-h-screen bg-[#0d0f18] text-white font-sans overflow-x-hidden relative flex flex-col">
@@ -250,16 +193,16 @@ export default function MarketAnalysisPage() {
                                            className="w-full flex items-center justify-between p-3 hover:bg-white/5 rounded-xl transition-colors group/item"
                                        >
                                            <div className="flex items-center gap-3">
-                                               <img src={coin.icon} alt={coin.name} className="w-8 h-8 rounded-full" />
+                                               <img src={coin.image} alt={coin.name} className="w-8 h-8 rounded-full" />
                                                <div className="text-left">
                                                    <p className="text-white font-bold text-sm">{coin.name}</p>
-                                                   <p className="text-gray-500 text-xs">{coin.symbol}</p>
+                                                   <p className="text-gray-500 text-xs uppercase">{coin.symbol}</p>
                                                </div>
                                            </div>
                                            <div className="flex flex-col items-end">
-                                               <span className="text-white font-mono text-sm">${coin.price.toLocaleString()}</span>
-                                               <span className={`text-xs ${coin.change >= 0 ? "text-[#14F195]" : "text-red-400"}`}>
-                                                   {coin.change >= 0 ? "+" : ""}{coin.change}%
+                                               <span className="text-white font-mono text-sm">${coin.current_price.toLocaleString()}</span>
+                                               <span className={`text-xs ${coin.price_change_percentage_24h >= 0 ? "text-[#14F195]" : "text-red-400"}`}>
+                                                   {coin.price_change_percentage_24h >= 0 ? "+" : ""}{coin.price_change_percentage_24h.toFixed(2)}%
                                                </span>
                                            </div>
                                        </button>
@@ -317,24 +260,24 @@ export default function MarketAnalysisPage() {
                   }}
                   className={`
                      relative w-64 p-4 rounded-[24px] cursor-pointer transition-all duration-300 group
-                     ${selectedCoin.id === coin.id ? "bg-[#1A1D26] border-[#14F195]/30 shadow-[0_0_20px_rgba(20,241,149,0.1)]" : "bg-[#13151C]/50 border-white/5 hover:bg-[#13151C]"}
+                     ${selectedCoin?.id === coin.id ? "bg-[#1A1D26] border-[#14F195]/30 shadow-[0_0_20px_rgba(20,241,149,0.1)]" : "bg-[#13151C]/50 border-white/5 hover:bg-[#13151C]"}
                      border
                   `}
                >
                   <div className="flex justify-between items-start mb-4">
                      <div className="flex items-center gap-3">
-                        <img src={coin.icon} alt={coin.name} className="w-8 h-8 rounded-full" />
+                        <img src={coin.image} alt={coin.name} className="w-8 h-8 rounded-full" />
                         <div>
-                           <h3 className="font-bold text-sm text-white">{coin.symbol}</h3>
+                           <h3 className="font-bold text-sm text-white uppercase">{coin.symbol}</h3>
                            <p className="text-xs text-gray-500">{coin.name}</p>
                         </div>
                      </div>
-                     <span className={`text-xs font-bold px-2 py-1 rounded-full ${coin.change >= 0 ? "text-[#14F195] bg-[#14F195]/10" : "text-red-400 bg-red-400/10"}`}>
-                        {coin.change >= 0 ? "+" : ""}{coin.change}%
+                     <span className={`text-xs font-bold px-2 py-1 rounded-full ${coin.price_change_percentage_24h >= 0 ? "text-[#14F195] bg-[#14F195]/10" : "text-red-400 bg-red-400/10"}`}>
+                        {coin.price_change_percentage_24h >= 0 ? "+" : ""}{coin.price_change_percentage_24h.toFixed(2)}%
                      </span>
                   </div>
                   <div className="flex justify-between items-end">
-                     <span className="text-lg font-bold text-white">${coin.price.toLocaleString()}</span>
+                     <span className="text-lg font-bold text-white">${coin.current_price.toLocaleString()}</span>
                      <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                          <CaretRight size={16} className="text-gray-400" />
                      </div>
@@ -350,7 +293,7 @@ export default function MarketAnalysisPage() {
          
          {/* DYNAMIC MAIN CARD */}
          <AnimatePresence mode="wait">
-            {viewMode === 'chart' ? (
+            {viewMode === 'chart' && selectedCoin ? (
                 <motion.div 
                     key="chart"
                     initial={{ opacity: 0, rotateX: -15 }}
@@ -368,26 +311,26 @@ export default function MarketAnalysisPage() {
                     {/* Chart Header */}
                     <div className="flex flex-col md:flex-row justify-between md:items-center gap-6 mb-8 relative z-10">
                         <div className="flex items-center gap-4">
-                            <img src={selectedCoin.icon} alt={selectedCoin.name} className="w-10 h-10" />
+                            <img src={selectedCoin.image} alt={selectedCoin.name} className="w-10 h-10 rounded-full" />
                             <div>
                                 <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                                     {selectedCoin.name} 
                                     <span className="text-sm text-gray-500 font-normal">/ USD</span>
                                 </h2>
                                 <p className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
-                                    ${selectedCoin.price.toLocaleString()}
+                                    ${selectedCoin.current_price.toLocaleString()}
                                 </p>
                             </div>
                         </div>
 
                         <div className="flex bg-black/30 p-1 rounded-full border border-white/5 backdrop-blur-sm self-start md:self-auto">
-                            {['1H', '1D', '1W', '1M', '1Y', 'ALL'].map((time) => (
+                            {[{l:'24H', v:'1'}, {l:'7D', v:'7'}, {l:'30D', v:'30'}, {l:'Max', v:'max'}].map((tab) => (
                                 <button 
-                                    key={time}
-                                    onClick={() => setActiveTab(time)}
-                                    className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${activeTab === time ? 'bg-white text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                                    key={tab.v}
+                                    onClick={() => setActiveTab(tab.v)}
+                                    className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${activeTab === tab.v ? 'bg-white text-black shadow-lg' : 'text-gray-400 hover:text-white'}`}
                                 >
-                                    {time}
+                                    {tab.l}
                                 </button>
                             ))}
                         </div>
@@ -396,7 +339,7 @@ export default function MarketAnalysisPage() {
                     {/* Chart Area */}
                     <div className="flex-1 w-full relative z-10 h-[350px]">
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={selectedCoin.data}>
+                            <AreaChart data={chartData}>
                                 <defs>
                                     <linearGradient id="coinGradient" x1="0" y1="0" x2="0" y2="1">
                                         <stop offset="5%" stopColor={selectedCoin.color} stopOpacity={0.4}/>
@@ -410,6 +353,7 @@ export default function MarketAnalysisPage() {
                                     tickLine={false} 
                                     tick={{ fill: '#6B7280', fontSize: 11 }} 
                                     dy={10}
+                                    minTickGap={30}
                                 />
                                 <YAxis 
                                     domain={['auto', 'auto']} 
@@ -422,6 +366,7 @@ export default function MarketAnalysisPage() {
                                 <Tooltip 
                                     contentStyle={{ backgroundColor: '#0d0f18', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px' }}
                                     itemStyle={{ color: selectedCoin.color }}
+                                    formatter={(value: number) => [`$${value > 100 ? value.toLocaleString() : value.toFixed(4)}`, "Price"]}
                                 />
                                 <Area 
                                     type="monotone" 
@@ -491,6 +436,7 @@ export default function MarketAnalysisPage() {
 
 
          {/* STATS & AI PANEL */}
+         {selectedCoin && (
          <motion.div 
              className="flex flex-col gap-6"
              initial={{ opacity: 0, x: 20 }}
@@ -542,7 +488,9 @@ export default function MarketAnalysisPage() {
                           <TrendUp className="text-[#14F195]" size={16} />
                       </div>
                       <div>
-                          <p className="text-white font-mono font-bold text-lg leading-none mb-1">$842.5B</p>
+                          <p className="text-white font-mono font-bold text-base leading-none mb-1">
+                              ${(selectedCoin.market_cap / 1e9).toFixed(2)}B
+                          </p>
                           <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
                               <div className="h-full w-[70%] bg-[#14F195] rounded-full" />
                           </div>
@@ -556,26 +504,26 @@ export default function MarketAnalysisPage() {
                           <Sparkle className="text-[#9945FF]" size={16} weight="fill" />
                       </div>
                       <div>
-                          <p className="text-white font-mono font-bold text-lg leading-none mb-1">$24.1B</p>
+                          <p className="text-white font-mono font-bold text-base leading-none mb-1">
+                              ${(selectedCoin.total_volume / 1e9).toFixed(2)}B
+                          </p>
                           <div className="text-xs text-[#9945FF] font-medium">+12.5%</div>
                       </div>
                    </div>
 
-                   {/* Dominance */}
+                   {/* Dominance/Rank */}
                    <div className="p-4 rounded-2xl bg-black/20 border border-white/5 flex flex-col justify-between group hover:border-white/10 transition-colors">
                       <div className="flex justify-between items-start mb-2">
-                          <span className="text-gray-500 text-xs font-medium">Dominance</span>
+                          <span className="text-gray-500 text-xs font-medium">Rank</span>
                           <ChartLineUp className="text-blue-400" size={16} />
                       </div>
                       <div>
-                          <p className="text-white font-mono font-bold text-lg leading-none mb-1">52.1%</p>
-                          <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden mt-2">
-                              <div className="h-full w-[52%] bg-blue-400 rounded-full" />
-                          </div>
+                          <p className="text-white font-mono font-bold text-3xl leading-none mb-1">#{selectedCoin.market_cap_rank}</p>
+                          <span className="text-[10px] text-gray-500">Global Rank</span>
                       </div>
                    </div>
 
-                    {/* Sentiment */}
+                    {/* Sentiment - Mocked since API doesnt have it */}
                    <div className="p-4 rounded-2xl bg-black/20 border border-white/5 flex flex-col justify-between group hover:border-white/10 transition-colors">
                         <div className="flex justify-between items-start mb-2">
                             <span className="text-gray-500 text-xs font-medium">Sentiment</span>
@@ -592,6 +540,7 @@ export default function MarketAnalysisPage() {
                 </div>
              </div>
          </motion.div>
+         )}
 
       </div>
     </div>

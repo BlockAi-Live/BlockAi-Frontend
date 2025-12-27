@@ -9,6 +9,12 @@ interface TeamMember {
   name: string;
   role: string;
   bio: string;
+  socials: {
+    twitter?: string;
+    linkedin?: string;
+    telegram?: string;
+    website?: string;
+  };
 }
 
 const teamMembers: TeamMember[] = [
@@ -16,85 +22,12 @@ const teamMembers: TeamMember[] = [
     id: 1,
     name: "Siamak Khoshnood",
     role: "Founder & CEO",
-    bio: "Siamak is an experienced Web3 Founder with over seven years of hands-on involvement in the blockchain industry. He drives product vision and ecosystem strategy across DeFi, AI, and analytics to ensure successful project execution and growth"
-  },
-  {
-    id: 2,
-    name: "Raymond Henry (Mr. Eagle)",
-    role: "Chief Operating Officer (COO)",
-    bio: "Raymond is an experienced Web3 COO with over five years of expertise in blockchain coordination. He executes project roadmaps and manages cross-functional sprints, acting as the primary liaison between technical and marketing teams to ensure all deliverables align with the project’s long-term vision."
-  },
-  {
-    id: 3,
-    name: "Ferdous",
-    role: "Chief Financial Officer (CFO)",
-    bio: "Ferdous is a battle-tested CFO with over seven years of experience in crypto finance. He specializes in capital structuring and treasury management to maximize runway, while overseeing tokenomics frameworks and financial governance to ensure long-term scalability and performance."
-  },
-  {
-    id: 4,
-    name: "Bima",
-    role: "Chief Marketing Officer (CMO)",
-    bio: "Bima is a Web3 Marketing Strategist specializing in narrative building and user acquisition. He crafts story-driven campaigns and analyzes on-chain trends to drive liquidity attraction, converting market attention into scalable community growth and long-term user engagement."
-  },
-  {
-    id: 5,
-    name: "Kufre Asuquo",
-    role: "CFO/BDM",
-    bio: "Kufre is a Business Development Lead specializing in exchange relations and ecosystem expansion. He accelerates product adoption by securing high-value partnerships and investor collaborations, driving the strategic market positioning and growth of the BlockAI.live ecosystem."
-  },
-  {
-    id: 6,
-    name: "Renegade",
-    role: "Business Development Manager",
-    bio: "Renegade has three years of experience growing crypto communities across AI, Telegram apps, and gaming. He manages BlockAI’s presence on Telegram, Discord, and X, focusing on member onboarding and KOL partnerships. Assisting the founder on strategy, he provides vital feedback on branding and sentiment to drive project improvement."
-  },
-  {
-    id: 7,
-    name: "Kiwi",
-    role: "Community Manager",
-    bio: "Kiwi is a certified Web3 marketer and collaboration manager specialized in promoting decentralized products. She fosters engagement on Discord, Telegram, and X, while onboarding users to blockchain concepts. By managing DAO partnerships and token-based rewards, she bridges marketing and technical teams to drive long-term ecosystem growth."
-  },
-  {
-    id: 8,
-    name: "ImmortalSui",
-    role: "Frontend/Full-stack Engineer",
-    bio: "ImmortalSul is an experienced engineer with over 4.5 years of expertise in building scalable web applications. He manages the full development lifecycle, from high-performance frontends to robust backend APIs. By leading architectural decisions, he ensures code quality, security, and rapid feature prototyping to meet tight production timelines."
-  },
-  {
-    id: 9,
-    name: "Promise Bamgbola",
-    role: "Frontend Developer",
-    bio: "Promise is a Frontend Engineer with over three years of experience building modern, high-performance web applications using React and Vite. He specializes in mobile-first interfaces and efficient state management, ensuring clean, reliable user flows and optimized performance that align with real-world product goals and user needs."
-  },
-  {
-    id: 10,
-    name: "Victor Linkie",
-    role: "Product Designer & Head of Traction and Community",
-    bio: "Victor is the engine behind BlockAI’s visual identity and UI, designing everything from wireframes to the real-time dashboard. He bridges product design and community execution, running questing campaigns and growth playbooks to scale BlockAI into a top-tier crypto community with rapid-speed delivery."
-  },
-  {
-    id: 11,
-    name: "Sara",
-    role: "Graphic & 3D Designer",
-    bio: "Sara is a 3D and Graphic Designer with three years of Web3 experience. She produces the 2D/3D visual assets that define the project's identity across all platforms. By translating complex concepts into compelling visuals, she leads creative research to strengthen the brand’s aesthetic and long-term design direction."
-  },
-  {
-    id: 12,
-    name: "Web3guy",
-    role: "Content/KOL",
-    bio: "Web3guy is a Web3 ambassador and content creator focused on ecosystem growth and education. He simplifies complex concepts to onboard new users while producing high-value threads and memes. By fostering positive interactions and sharing trusted perspectives, he strengthens project visibility and inspires long-term community engagement."
-  },
-  {
-    id: 13,
-    name: "Harmonious Harmony",
-    role: "Content Writer / Graphic Designer",
-    bio: "Harmonious harmony is a digital creator with three years of experience collaborating with projects like Arcana Network and XX Network. He specializes in clear storytelling and strong visuals, transforming complex concepts into engaging narratives that drive community trust. By focusing on user-centered communication, he fosters project awareness and deep ecosystem engagement."
-  },
-  {
-    id: 14,
-    name: "Shuaib Nurudeen Olawale",
-    role: "Backend/Fullstack Developer",
-    bio: "Shuaib is a Full-Stack Developer specializing in the MERN stack and React Native to build scalable web and mobile applications. An Agile-certified practitioner and Google-certified marketer, he combines technical expertise in TypeScript and Next.js with SEO strategy to deliver secure, high-impact, and user-centric digital solutions."
+    bio: "Siamak is an experienced Web3 Founder with over seven years of hands-on involvement in the blockchain industry. He drives product vision and ecosystem strategy across DeFi, AI, and analytics to ensure successful project execution and growth",
+    socials: {
+        twitter: "https://x.com/Siamakkhoshnod",
+        linkedin: "https://www.linkedin.com/in/siamakkhoshnood",
+        telegram: "https://t.me/Siamakkhoshnood"
+    }
   }
 ];
 
@@ -124,15 +57,21 @@ const TeamCard = ({ member }: { member: TeamMember }) => {
 
       {/* Socials */}
       <div className="mt-auto flex gap-4 pt-4 border-t border-white/5 w-full justify-center">
-        <button className="text-gray-500 hover:text-white transition-colors">
-          <Twitter size={18} />
-        </button>
-        <button className="text-gray-500 hover:text-white transition-colors">
-          <Linkedin size={18} />
-        </button>
-        <button className="text-gray-500 hover:text-white transition-colors">
-          <Globe size={18} />
-        </button>
+        {member.socials.twitter && (
+            <a href={member.socials.twitter} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors">
+            <Twitter size={18} />
+            </a>
+        )}
+        {member.socials.linkedin && (
+            <a href={member.socials.linkedin} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors">
+            <Linkedin size={18} />
+            </a>
+        )}
+        {member.socials.telegram && (
+            <a href={member.socials.telegram} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors">
+            <Globe size={18} /> {/* Using Globe or similar if Telegram icon not available, ideally use specialized icon if Lucide has one or import from Phosphor if available in project, sticking to Lucide as imported */}
+            </a>
+        )}
       </div>
     </div>
   );
@@ -185,19 +124,9 @@ export default function Team() {
           </div>
 
           {/* Team Grid */}
-          <div className="pb-20 space-y-8">
-            {/* Top Row - Executives (2 columns) */}
-            <section className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto">
-              {teamMembers.slice(0, 2).map((member) => (
-                <ScrollReveal key={member.id}>
-                  <TeamCard member={member} />
-                </ScrollReveal>
-              ))}
-            </section>
-
-            {/* Remaining Team (3 columns) */}
-            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {teamMembers.slice(2).map((member) => (
+          <div className="pb-20 flex justify-center">
+            <section className="grid grid-cols-1 md:grid-cols-1 gap-6 md:gap-8 max-w-sm w-full">
+              {teamMembers.map((member) => (
                 <ScrollReveal key={member.id}>
                   <TeamCard member={member} />
                 </ScrollReveal>

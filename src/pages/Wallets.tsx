@@ -268,6 +268,158 @@ export function WalletsPage() {
             </div>
         </div>
 
+        {/* --- WHALE WATCH (TRACKED WALLETS) --- */}
+        <div className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                    <h3 className="text-xl font-bold text-white">Whale Watch</h3>
+                    <span className="px-2 py-0.5 rounded-lg bg-[#9945FF]/10 text-[#9945FF] text-[10px] font-bold uppercase tracking-wide border border-[#9945FF]/20">Beta</span>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                {/* Add New Tracker Card */}
+                <div className="p-6 rounded-[24px] bg-[#13151C] border border-white/5 flex flex-col justify-center gap-4">
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 rounded-xl bg-[#14F195]/10 flex items-center justify-center text-[#14F195]">
+                            <QrCode size={20} />
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-white text-sm">Track Wallet</h4>
+                            <p className="text-gray-500 text-xs">Monitor any address</p>
+                        </div>
+                    </div>
+                    <div className="space-y-3">
+                        <input 
+                            type="text" 
+                            placeholder="Enter Wallet Address (0x...)" 
+                            className="w-full bg-[#0d0f18] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-[#14F195] transition-colors"
+                        />
+                         <input 
+                            type="text" 
+                            placeholder="Label (e.g. Whale 1)" 
+                            className="w-full bg-[#0d0f18] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-[#14F195] transition-colors"
+                        />
+                        <button className="w-full py-3 rounded-xl bg-[#14F195] text-black font-bold text-sm hover:opacity-90 transition-opacity">
+                            Start Tracking
+                        </button>
+                    </div>
+                </div>
+
+                {/* Tracked Wallet Mock 1 */}
+                <div className="group p-6 rounded-[24px] bg-[#16181f] border border-white/5 hover:border-[#9945FF]/30 transition-all duration-300 relative overflow-hidden flex flex-col justify-between">
+                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <Wallet size={64} className="text-[#9945FF]" />
+                    </div>
+                    
+                    {/* Header */}
+                    <div className="flex justify-between items-start mb-6 relative z-10">
+                        <div className="flex items-center gap-3">
+                             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9945FF] to-blue-600 flex items-center justify-center text-sm font-bold text-white border border-white/10 shadow-lg">
+                                W1
+                             </div>
+                             <div>
+                                 <h4 className="font-bold text-white text-base">Smart Money #1</h4>
+                                 <div className="flex items-center gap-2 mt-0.5">
+                                     <span className="text-gray-500 text-xs font-mono bg-black/30 px-1.5 py-0.5 rounded">0x7a...9b2</span>
+                                 </div>
+                             </div>
+                        </div>
+                    </div>
+
+                    {/* Main Stats */}
+                    <div className="space-y-4 relative z-10 mb-6">
+                        <div>
+                             <p className="text-gray-500 text-xs uppercase tracking-wider font-bold mb-1">Total Value</p>
+                             <h3 className="text-3xl font-bold text-white tracking-tight">$1.24M</h3>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3">
+                             <div className="p-2 rounded-xl bg-white/5 border border-white/5">
+                                 <p className="text-[10px] text-gray-400 uppercase font-bold mb-1">24h Change</p>
+                                 <div className="flex items-center gap-1 text-[#14F195] font-bold text-sm">
+                                    <ArrowUpRight weight="bold" /> +240%
+                                </div>
+                             </div>
+                             <div className="p-2 rounded-xl bg-white/5 border border-white/5">
+                                 <p className="text-[10px] text-gray-400 uppercase font-bold mb-1">Win Rate</p>
+                                 <div className="flex items-center gap-1 text-white font-bold text-sm">
+                                    <TrendUp weight="bold" className="text-[#9945FF]" /> 68%
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+
+                    {/* Latest Activity Footer */}
+                    <div className="mt-auto pt-4 border-t border-white/5 relative z-10">
+                        <p className="text-[10px] text-gray-500 uppercase font-bold mb-2">Latest Activity</p>
+                        <div className="flex items-center gap-2 text-xs text-gray-300">
+                             <span className="w-1.5 h-1.5 rounded-full bg-[#14F195] animate-pulse" />
+                             Swapped <span className="text-white font-bold">50 ETH</span> for <span className="text-[#14F195] font-bold">PEPE</span>
+                             <span className="text-gray-600 ml-auto font-mono">2m ago</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Tracked Wallet Mock 2 */}
+                <div className="group p-6 rounded-[24px] bg-[#16181f] border border-white/5 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden flex flex-col justify-between">
+                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <Wallet size={64} className="text-blue-500" />
+                    </div>
+
+                     {/* Header */}
+                    <div className="flex justify-between items-start mb-6 relative z-10">
+                        <div className="flex items-center gap-3">
+                             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-sm font-bold text-white border border-white/10 shadow-lg">
+                                W2
+                             </div>
+                             <div>
+                                 <h4 className="font-bold text-white text-base">Vitalik.eth</h4>
+                                 <div className="flex items-center gap-2 mt-0.5">
+                                     <span className="text-gray-500 text-xs font-mono bg-black/30 px-1.5 py-0.5 rounded">0xd8...004</span>
+                                 </div>
+                             </div>
+                        </div>
+                    </div>
+
+                    {/* Main Stats */}
+                    <div className="space-y-4 relative z-10 mb-6">
+                        <div>
+                             <p className="text-gray-500 text-xs uppercase tracking-wider font-bold mb-1">Total Value</p>
+                             <h3 className="text-3xl font-bold text-white tracking-tight">$4.50M</h3>
+                        </div>
+
+                         <div className="grid grid-cols-2 gap-3">
+                             <div className="p-2 rounded-xl bg-white/5 border border-white/5">
+                                 <p className="text-[10px] text-gray-400 uppercase font-bold mb-1">24h Change</p>
+                                 <div className="flex items-center gap-1 text-red-400 font-bold text-sm">
+                                    <ArrowDownRight weight="bold" /> -2.4%
+                                </div>
+                             </div>
+                             <div className="p-2 rounded-xl bg-white/5 border border-white/5">
+                                 <p className="text-[10px] text-gray-400 uppercase font-bold mb-1">Top Hold</p>
+                                 <div className="flex items-center gap-1 text-white font-bold text-sm">
+                                     <div className="w-3 h-3 rounded-full bg-[#627EEA]" /> ETH
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+
+                     {/* Latest Activity Footer */}
+                    <div className="mt-auto pt-4 border-t border-white/5 relative z-10">
+                        <p className="text-[10px] text-gray-500 uppercase font-bold mb-2">Latest Activity</p>
+                        <div className="flex items-center gap-2 text-xs text-gray-300">
+                             <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                             Bridged <span className="text-white font-bold">100 ETH</span> to <span className="text-blue-400 font-bold">Base</span>
+                             <span className="text-gray-600 ml-auto font-mono">1d ago</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
         {/* --- RECENT ACTIVITY --- */}
         <div>
             <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
