@@ -44,7 +44,7 @@ export function SignInPage() {
   };
 
     const handleGitHubLogin = () => {
- window.location.href = "http://localhost:3000/auth/github";
+ window.location.href = "https://blockai.live/auth/github";
   };
 
   return (

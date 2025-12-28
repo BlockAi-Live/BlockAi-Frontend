@@ -19,6 +19,9 @@ export function SignUpPage() {
     email: "",
     password: ""
   });
+  const handleGitHubLogin = () => {
+ window.location.href = "https://blockai.live/auth/github";
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -174,7 +177,7 @@ export function SignUpPage() {
                 </div>
               </button>
               
-              <button type="button" className="flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white transition-all hover:-translate-y-0.5">
+              <button type="button"  onClick={handleGitHubLogin} className="flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white transition-all hover:-translate-y-0.5">
                 <Github size={18} />
                 <span className="text-sm font-medium">GitHub</span>
               </button>
