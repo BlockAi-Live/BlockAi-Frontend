@@ -25,6 +25,13 @@ export function SignUpPage() {
  window.location.href = "https://blockai.live/auth/github";
   };
 
+  const handleGoogleLogin = () => {
+ window.location.href = "https://blockai.live/auth/google";
+  };
+
+  const handleXLogin = () => {
+ window.location.href = "https://blockai.live/auth/twitter";
+  };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -178,7 +185,7 @@ export function SignUpPage() {
                   <span className="font-bold text-white group-hover:text-[#3B82F6] transition-colors">Connect Wallet</span>
                 </div>
               </button>
-              <button type="button" className="col-span-2 relative group overflow-hidden rounded-xl p-[1px]">
+              <button type="button"  onClick={handleGoogleLogin} className="col-span-2 relative group overflow-hidden rounded-xl p-[1px]">
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#3b60f6,#00a231,#ffcc26,#ff2116)] group-hover:opacity-100 transition-opacity" />
                 <div className="relative bg-[#0d0f18] group-hover:bg-opacity-90 transition-all h-full rounded-xl flex items-center justify-center gap-3 py-3.5">
                   <FaGoogle size={20} className="" />
@@ -191,7 +198,7 @@ export function SignUpPage() {
                 <span className="text-sm font-medium">GitHub</span>
               </button>
 
-              <button type="button" className="flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white transition-all hover:-translate-y-0.5">
+              <button type="button" onClick={handleXLogin} className="flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white transition-all hover:-translate-y-0.5">
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-[18px] h-[18px]"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
                 <span className="text-sm font-medium">Twitter</span>
               </button>
