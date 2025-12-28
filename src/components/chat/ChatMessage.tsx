@@ -48,14 +48,14 @@ export default function ChatMessage({ message }: ChatMessageProps) {
             }`}>
                 {isUser ? (
                      <div
-    className="whitespace-pre-wrap"
+    className="whitespace-pre-wrap m-0"
     dangerouslySetInnerHTML={{ __html: message.content }}
   />
                 ) : (
                     <div className="prose prose-invert max-w-none">
 
                           <div
-    className="whitespace-pre-wrap"
+    className="whitespace-pre-wrap m-0"
     dangerouslySetInnerHTML={{ __html: message.content }}
   />
                     </div>

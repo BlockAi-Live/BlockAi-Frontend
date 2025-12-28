@@ -17,6 +17,7 @@ import { SignInPage } from "./pages/SignIn";
 import MarketAnalysisPage from "./pages/MarketAnalysis";
 import { SettingsPage } from "./pages/Settings";
 import { Toaster } from "@/components/ui/toaster";
+import AuthSuccess from "./pages/AuthSuccess";
 
 // Layout with toggleable sidebar
 function MainLayout({ children }: { children: React.ReactNode }) {
@@ -56,6 +57,7 @@ function App() {
         {/* Auth Pages */}
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/signin" element={<SignInPage />} />
+        <Route path="/auth-success" element={<AuthSuccess />} />
         <Route path="/login" element={<Navigate to="/signin" replace />} />
 
         {/* Dashboard & other pages */}

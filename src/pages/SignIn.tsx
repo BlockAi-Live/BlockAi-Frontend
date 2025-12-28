@@ -43,6 +43,10 @@ export function SignInPage() {
     }
   };
 
+    const handleGitHubLogin = () => {
+ window.location.href = "http://localhost:3000/auth/github";
+  };
+
   return (
     <main className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-[#0d0f18]">
       {/* Ambient Background Effects */}
@@ -180,7 +184,7 @@ export function SignInPage() {
                 </div>
               </button>
               
-              <button type="button" className="flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white transition-all hover:-translate-y-0.5">
+              <button type="button"  onClick={handleGitHubLogin} className="flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white transition-all hover:-translate-y-0.5">
                 <Github size={18} />
                 <span className="text-sm font-medium">GitHub</span>
               </button>
