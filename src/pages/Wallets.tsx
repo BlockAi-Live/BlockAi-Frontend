@@ -129,6 +129,7 @@ export function WalletsPage() {
                    </div>
                </div>
 
+{/* 
                <div className="flex items-end gap-2 mt-8">
                    <button className="flex-1 py-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors text-sm font-medium">
                        Send
@@ -143,6 +144,7 @@ export function WalletsPage() {
                        <DotsThree size={20} />
                    </button>
                </div>
+               */}
             </motion.div>
 
             {/* Allocation Chart */}
@@ -158,7 +160,6 @@ export function WalletsPage() {
                 </div>
 
                 <div className="relative flex-1 flex items-center justify-center min-h-[220px]">
-                    {/* Ring Chart */}
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                             <Pie
@@ -186,7 +187,6 @@ export function WalletsPage() {
                         </PieChart>
                     </ResponsiveContainer>
 
-                    {/* Center Text Overlay */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                         <span className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-1">
                             {activeAsset ? activeAsset.name : "Top Asset"}
@@ -200,7 +200,6 @@ export function WalletsPage() {
                     </div>
                 </div>
 
-                {/* Refined Legend */}
                 <div className="grid grid-cols-2 gap-3 mt-4">
                     {allocationData.map(item => (
                         <div 
