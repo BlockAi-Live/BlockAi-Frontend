@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Navbar, Footer } from "@/components/home";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { Twitter, Linkedin, Github, Globe } from "lucide-react";
+import { XLogo, LinkedinLogo, TelegramLogo } from "@phosphor-icons/react";
 
 // Team Data
 interface TeamMember {
@@ -59,17 +59,17 @@ const TeamCard = ({ member }: { member: TeamMember }) => {
       <div className="mt-auto flex gap-4 pt-4 border-t border-white/5 w-full justify-center">
         {member.socials.twitter && (
             <a href={member.socials.twitter} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors">
-            <Twitter size={18} />
+            <XLogo size={18} weight="fill" />
             </a>
         )}
         {member.socials.linkedin && (
             <a href={member.socials.linkedin} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors">
-            <Linkedin size={18} />
+            <LinkedinLogo size={18} weight="fill" />
             </a>
         )}
         {member.socials.telegram && (
             <a href={member.socials.telegram} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors">
-            <Globe size={18} /> {/* Using Globe or similar if Telegram icon not available, ideally use specialized icon if Lucide has one or import from Phosphor if available in project, sticking to Lucide as imported */}
+            <TelegramLogo size={18} weight="fill" /> 
             </a>
         )}
       </div>
