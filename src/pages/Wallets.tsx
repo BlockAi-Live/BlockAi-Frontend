@@ -129,6 +129,7 @@ export function WalletsPage() {
                    </div>
                </div>
 
+{/* 
                <div className="flex items-end gap-2 mt-8">
                    <button className="flex-1 py-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors text-sm font-medium">
                        Send
@@ -143,10 +144,10 @@ export function WalletsPage() {
                        <DotsThree size={20} />
                    </button>
                </div>
+               */}
             </motion.div>
 
             {/* Allocation Chart */}
-{/* 
             <motion.div 
                initial={{ opacity: 0, x: 20 }}
                animate={{ opacity: 1, x: 0 }}
@@ -216,7 +217,6 @@ export function WalletsPage() {
                     ))}
                 </div>
             </motion.div>
-            */}
         </div>
 
         {/* --- WALLETS GRID --- */}
@@ -420,7 +420,6 @@ export function WalletsPage() {
         </div>
 
         {/* --- RECENT ACTIVITY --- */}
-{/* 
         <div>
             <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                 <ClockCounterClockwise size={20} className="text-gray-400" />
@@ -460,7 +459,6 @@ export function WalletsPage() {
                 ))}
             </div>
         </div>
-        */}
 
       </main>
     </div>
