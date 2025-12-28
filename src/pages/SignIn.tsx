@@ -43,16 +43,18 @@ export function SignInPage() {
     }
   };
 
-    const handleGitHubLogin = () => {
- window.location.href = "https://blockai.live/auth/github";
-  };
-  const handleGoogleLogin = () => {
- window.location.href = "https://blockai.li/auth/google";
-  };
-  const handleXLogin = () => {
- window.location.href = "https://blockai.live/auth/twitter";
+  const handleGitHubLogin = () => {
+ window.location.href = "https://blockai-api.onrender.com/auth/github";
   };
 
+  const handleGoogleLogin = () => {
+ window.location.href = "https://blockai-api.onrender.com/auth/google";
+  };
+
+  const handleXLogin = () => {
+ window.location.href = "https://blockai-api.onrender.com/auth/twitter";
+  };
+  
 
   return (
     <main className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-[#0d0f18]">

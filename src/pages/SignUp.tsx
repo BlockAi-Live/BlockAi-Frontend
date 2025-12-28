@@ -22,16 +22,17 @@ export function SignUpPage() {
     password: ""
   });
   const handleGitHubLogin = () => {
- window.location.href = "https://blockai.live/auth/github";
+ window.location.href = "https://blockai-api.onrender.com/auth/github";
   };
 
   const handleGoogleLogin = () => {
- window.location.href = "https://blockai.live/auth/google";
+ window.location.href = "https://blockai-api.onrender.com/auth/google";
   };
 
   const handleXLogin = () => {
- window.location.href = "https://blockai.live/auth/twitter";
+ window.location.href = "https://blockai-api.onrender.com/auth/twitter";
   };
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
