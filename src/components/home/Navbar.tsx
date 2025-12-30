@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, LogOut } from "lucide-react";
+import { Menu, LogOut, Wallet } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import {
   Sheet,
   SheetContent,
@@ -16,8 +17,10 @@ interface NavbarProps {
 
 export default function Navbar({ launch }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,6 +37,57 @@ export default function Navbar({ launch }: NavbarProps) {
       navigate("/");
     } else {
       navigate("/signup");
+    }
+  };
+
+  const connectWallet = async () => {
+    if (typeof window.ethereum === "undefined") {
+      toast({
+        title: "MetaMask not installed",
+        description: "Please install MetaMask to connect your wallet.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const accounts = await window.ethereum.request({ 
+        method: "eth_requestAccounts" 
+      }) as string[];
+      
+      if (accounts && accounts.length > 0) {
+        setWalletAddress(accounts[0]);
+        toast({
+          title: "Wallet connected",
+          description: `Connected to ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`,
+        });
+      }
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("User rejected")) {
+        return;
+      }
+      toast({
+        title: "Connection failed",
+        description: error instanceof Error ? error.message : "Failed to connect wallet",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const disconnectWallet = () => {
+    const address = walletAddress;
+    setWalletAddress(null);
+    toast({
+      title: "Wallet disconnected",
+      description: address ? `Disconnected from ${address.slice(0, 6)}...${address.slice(-4)}` : "Wallet disconnected",
+    });
+  };
+
+  const handleWalletAction = () => {
+    if (walletAddress) {
+      disconnectWallet();
+    } else {
+      connectWallet();
     }
   };
 
@@ -70,6 +124,24 @@ export default function Navbar({ launch }: NavbarProps) {
       </div>
 
       <div className="flex items-center gap-4">
+        <button
+          onClick={handleWalletAction}
+          className="hidden md:flex items-center gap-2 px-6 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-[#14F195] to-[#9B59B6] shadow-md hover:opacity-90 transition-opacity"
+          title={walletAddress ? "Click to disconnect" : "Click to connect wallet"}
+        >
+          {walletAddress ? (
+            <>
+              <Wallet size={16} />
+              <span>{`${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`}</span>
+              <LogOut size={14} />
+            </>
+          ) : (
+            <>
+              <Wallet size={16} />
+              <span>Connect wallet</span>
+            </>
+          )}
+        </button>
         <button
           onClick={handleAuthAction}
           className="hidden md:flex items-center gap-2 px-6 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-[#14F195] to-[#9B59B6] shadow-md hover:opacity-90 transition-opacity"
@@ -114,6 +186,25 @@ export default function Navbar({ launch }: NavbarProps) {
                 </div>
 
                 <div className="h-px bg-white/10 w-full my-2" />
+
+                <button
+                  onClick={handleWalletAction}
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-[#14F195] to-[#9B59B6] shadow-lg hover:opacity-90 transition-opacity text-center"
+                  title={walletAddress ? "Click to disconnect" : "Click to connect wallet"}
+                >
+                  {walletAddress ? (
+                    <>
+                      <Wallet size={16} />
+                      <span>{`${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`}</span>
+                      <LogOut size={14} />
+                    </>
+                  ) : (
+                    <>
+                      <Wallet size={16} />
+                      <span>Connect wallet</span>
+                    </>
+                  )}
+                </button>
 
                 <button
                   onClick={handleAuthAction}

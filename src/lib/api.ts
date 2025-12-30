@@ -4,7 +4,14 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
-const ai = new GoogleGenAI({apiKey:GEMINI_API_KEY});
+let ai: GoogleGenAI | null = null;
+
+const getAI = () => {
+  if (!ai && GEMINI_API_KEY) {
+    ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+  }
+  return ai;
+};
 
 export const api = {
   register: async (data: any) => {
@@ -71,8 +78,11 @@ export const api = {
 chatQuestion: async (data: { content: string }) => {
   if (!GEMINI_API_KEY) throw new Error("Gemini API key not set in .env");
 
+  const aiInstance = getAI();
+  if (!aiInstance) throw new Error("Gemini API key not set in .env");
+
   try {
-const response = await ai.models.generateContent({
+const response = await aiInstance.models.generateContent({
   model: "gemini-2.5-flash",
   contents: [
     {
