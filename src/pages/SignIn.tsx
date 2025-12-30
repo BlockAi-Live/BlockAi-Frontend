@@ -7,7 +7,7 @@ import { api } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../hooks/use-toast";
 import { FaGoogle } from "react-icons/fa";
-import { ConnectButton, darkTheme } from "thirdweb/react";
+import { ConnectButton, darkTheme, useConnectModal } from "thirdweb/react";
 import { createWallet } from "thirdweb/wallets";
 import { client } from "../client";
 
@@ -94,6 +94,17 @@ export function SignInPage() {
  window.location.href = "https://blockai-api.onrender.com/auth/twitter";
   };
   
+
+  const { connect } = useConnectModal();
+
+  const handleGenesisPassClick = async () => {
+    try {
+      const wallet = await connect({ client, wallets, theme: customTheme });
+      handleWalletConnect(wallet);
+    } catch (error) {
+      console.error("Failed to connect:", error);
+    }
+  };
 
   return (
     <main className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-[#0d0f18]">
@@ -216,7 +227,7 @@ export function SignInPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <button type="button" className="col-span-2 relative group overflow-hidden rounded-xl p-[1px]">
+              <button type="button" onClick={handleGenesisPassClick} className="col-span-2 relative group overflow-hidden rounded-xl p-[1px]">
                 <div className="absolute inset-0 bg-gradient-to-r from-[#FFD700] to-[#FFA500] opacity-80 group-hover:opacity-100 transition-opacity" />
                 <div className="relative bg-[#0d0f18] group-hover:bg-opacity-90 transition-all h-full rounded-xl flex items-center justify-center gap-3 py-3.5">
                   <Star size={20} className="text-[#FFD700] fill-[#FFD700]" />
