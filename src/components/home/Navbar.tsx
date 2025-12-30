@@ -10,7 +10,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ConnectButton, darkTheme } from "thirdweb/react";
+import { ConnectButton, darkTheme, useActiveAccount } from "thirdweb/react";
 import { createWallet } from "thirdweb/wallets";
 import { client } from "../../client";
 
@@ -19,7 +19,6 @@ const wallets = [
   createWallet("com.coinbase.wallet"),
   createWallet("me.rainbow"),
   createWallet("io.rabby"),
-  createWallet("io.zerion"),
 ];
 
 interface NavbarProps {
@@ -30,6 +29,7 @@ export default function Navbar({ launch }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const account = useActiveAccount();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -46,6 +46,25 @@ export default function Navbar({ launch }: NavbarProps) {
       navigate("/");
     } else {
       navigate("/signup");
+    }
+  };
+
+  const handleWalletConnect = async (wallet: any) => {
+    const account = wallet.getAccount();
+    const address = account?.address;
+    if (address) {
+      login("wallet-mock-token-" + address, {
+        id: address,
+        email: `${address.slice(0,6)}...@wallet.connect`,
+        fullName: "Wallet User",
+        walletAddress: address,
+        avatar: `https://effigy.im/a/${address}.png`
+      });
+      toast({
+        title: "Wallet Connected",
+        description: "Successfully logged in with wallet.",
+      });
+      navigate("/dashboard");
     }
   };
 
@@ -92,22 +111,25 @@ export default function Navbar({ launch }: NavbarProps) {
       </div>
 
       <div className="flex items-center gap-4">
-        {/* Thirdweb Connect Button */}
-        <div className="hidden md:block">
-            <ConnectButton 
-                client={client}
-                theme={customTheme}
-                wallets={wallets}
-                connectModal={{
-                    size: "compact",
-                    titleIcon: "https://blockai-frontend-v1.vercel.app/blockai.svg",
-                    showThirdwebBranding: false,
-                }}
-                connectButton={{
-                    label: "Connect Wallet",
-                }}
-            />
-        </div>
+        {/* Thirdweb Connect Button - Only show when connected */}
+        {account && (
+            <div className="hidden md:block">
+                <ConnectButton 
+                    client={client}
+                    theme={customTheme}
+                    wallets={wallets}
+                    onConnect={handleWalletConnect}
+                    connectModal={{
+                        size: "compact",
+                        titleIcon: "https://blockai-frontend-v1.vercel.app/blockai.svg",
+                        showThirdwebBranding: false,
+                    }}
+                    connectButton={{
+                        label: "Connect Wallet",
+                    }}
+                />
+            </div>
+        )}
 
         <button
           onClick={handleAuthAction}
@@ -154,21 +176,24 @@ export default function Navbar({ launch }: NavbarProps) {
 
                 <div className="h-px bg-white/10 w-full my-2" />
                 
-                <div className="w-full flex justify-center">
-                    <ConnectButton 
-                        client={client}
-                        theme={customTheme}
-                        wallets={wallets}
-                        connectModal={{
-                            size: "compact",
-                            titleIcon: "https://blockai-frontend-v1.vercel.app/blockai.svg",
-                            showThirdwebBranding: false,
-                        }}
-                        connectButton={{
-                            label: "Connect Wallet",
-                        }}
-                    />
-                </div>
+                {account && (
+                    <div className="w-full flex justify-center">
+                        <ConnectButton 
+                            client={client}
+                            theme={customTheme}
+                            wallets={wallets}
+                            onConnect={handleWalletConnect}
+                            connectModal={{
+                                size: "compact",
+                                titleIcon: "https://blockai-frontend-v1.vercel.app/blockai.svg",
+                                showThirdwebBranding: false,
+                            }}
+                            connectButton={{
+                                label: "Connect Wallet",
+                            }}
+                        />
+                    </div>
+                )}
 
                 <button
                   onClick={handleAuthAction}

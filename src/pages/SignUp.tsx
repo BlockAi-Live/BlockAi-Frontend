@@ -9,6 +9,26 @@ import { useAuth } from "../context/AuthContext";
 import { useToast } from "../hooks/use-toast";
 import { GoogleLogoIcon } from "@phosphor-icons/react";
 import { FaGoogle } from "react-icons/fa";
+import { ConnectButton, darkTheme } from "thirdweb/react";
+import { createWallet } from "thirdweb/wallets";
+import { client } from "../client";
+
+const wallets = [
+  createWallet("io.metamask"),
+  createWallet("com.coinbase.wallet"),
+  createWallet("me.rainbow"),
+  createWallet("io.rabby"),
+];
+
+const customTheme = darkTheme({
+    colors: {
+        primaryButtonBg: "#14F195",
+        primaryButtonText: "#000000",
+        modalBg: "#0d0f18",
+        borderColor: "#14F195",
+        accentText: "#14F195",
+    },
+});
 
 export function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -21,6 +41,25 @@ export function SignUpPage() {
     email: "",
     password: ""
   });
+  const handleWalletConnect = async (wallet: any) => {
+    const account = wallet.getAccount();
+    const address = account?.address;
+    if (address) {
+      login("wallet-mock-token-" + address, {
+        id: address,
+        email: `${address.slice(0,6)}...@wallet.connect`,
+        fullName: "Wallet User",
+        walletAddress: address,
+        avatar: `https://effigy.im/a/${address}.png`
+      });
+      toast({
+        title: "Wallet Connected",
+        description: "Successfully logged in with wallet.",
+      });
+      navigate("/dashboard");
+    }
+  };
+
   const handleGitHubLogin = () => {
  window.location.href = "https://blockai-api.onrender.com/auth/github";
   };
@@ -179,13 +218,23 @@ export function SignUpPage() {
                 </div>
               </button>
 
-              <button type="button" className="col-span-2 relative group overflow-hidden rounded-xl p-[1px]">
-                <div className="absolute inset-0 bg-gradient-to-r from-[#3B82F6] to-[#8B5CF6] opacity-80 group-hover:opacity-100 transition-opacity" />
-                <div className="relative bg-[#0d0f18] group-hover:bg-opacity-90 transition-all h-full rounded-xl flex items-center justify-center gap-3 py-3.5">
-                  <Wallet size={20} className="text-[#3B82F6]" />
-                  <span className="font-bold text-white group-hover:text-[#3B82F6] transition-colors">Connect Wallet</span>
-                </div>
-              </button>
+              <div className="col-span-2">
+                <ConnectButton
+                  client={client}
+                  theme={customTheme}
+                  wallets={wallets}
+                  onConnect={handleWalletConnect}
+                  connectModal={{
+                    size: "compact",
+                    titleIcon: "https://blockai-frontend-v1.vercel.app/blockai.svg",
+                    showThirdwebBranding: false,
+                  }}
+                  connectButton={{
+                    label: "Connect Wallet",
+                    style: { width: "100%", height: "52px" },
+                  }}
+                />
+              </div>
               <button type="button"  onClick={handleGoogleLogin} className="col-span-2 relative group overflow-hidden rounded-xl p-[1px]">
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#3b60f6,#00a231,#ffcc26,#ff2116)] group-hover:opacity-100 transition-opacity" />
                 <div className="relative bg-[#0d0f18] group-hover:bg-opacity-90 transition-all h-full rounded-xl flex items-center justify-center gap-3 py-3.5">
