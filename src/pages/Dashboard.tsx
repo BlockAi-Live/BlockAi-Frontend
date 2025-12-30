@@ -60,7 +60,7 @@ export function DashboardPage() {
        <div 
         className="fixed inset-0 pointer-events-none z-0"
         style={{
-          background: "radial-gradient(circle at 50% 0%, rgba(20, 241, 149, 0.03) 0%, rgba(13, 15, 24, 0) 50%)"
+          background: "radial-gradient(circle at 50% 0%, rgba(20, 241, 149, 0.04) 0%, rgba(13, 15, 24, 0) 50%)"
         }}
       />
 

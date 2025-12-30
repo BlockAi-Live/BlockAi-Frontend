@@ -18,7 +18,7 @@ function StepCircle({ title, number }: { title: string; number: string }) {
       <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full flex flex-col items-center justify-center p-8 transition-transform duration-300 hover:scale-105">
         {/* Gradient Border Ring */}
         <div className="absolute inset-0 rounded-full p-[2px] bg-gradient-to-b from-[#10e291] to-[#9b59b6]">
-          <div className="w-full h-full rounded-full bg-[#0B0E1A]/90 backdrop-blur-xl" />
+          <div className="w-full h-full rounded-full bg-[#13151C]/90 backdrop-blur-xl" />
         </div>
 
         {/* Content */}

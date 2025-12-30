@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, LogOut, Wallet } from "lucide-react";
+import { Menu, LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -10,6 +10,17 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { ConnectButton, darkTheme } from "thirdweb/react";
+import { createWallet } from "thirdweb/wallets";
+import { client } from "../../client";
+
+const wallets = [
+  createWallet("io.metamask"),
+  createWallet("com.coinbase.wallet"),
+  createWallet("me.rainbow"),
+  createWallet("io.rabby"),
+  createWallet("io.zerion"),
+];
 
 interface NavbarProps {
   launch: () => void;
@@ -17,10 +28,8 @@ interface NavbarProps {
 
 export default function Navbar({ launch }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -40,57 +49,6 @@ export default function Navbar({ launch }: NavbarProps) {
     }
   };
 
-  const connectWallet = async () => {
-    if (typeof window.ethereum === "undefined") {
-      toast({
-        title: "MetaMask not installed",
-        description: "Please install MetaMask to connect your wallet.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const accounts = await window.ethereum.request({ 
-        method: "eth_requestAccounts" 
-      }) as string[];
-      
-      if (accounts && accounts.length > 0) {
-        setWalletAddress(accounts[0]);
-        toast({
-          title: "Wallet connected",
-          description: `Connected to ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`,
-        });
-      }
-    } catch (error) {
-      if (error instanceof Error && error.message.includes("User rejected")) {
-        return;
-      }
-      toast({
-        title: "Connection failed",
-        description: error instanceof Error ? error.message : "Failed to connect wallet",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const disconnectWallet = () => {
-    const address = walletAddress;
-    setWalletAddress(null);
-    toast({
-      title: "Wallet disconnected",
-      description: address ? `Disconnected from ${address.slice(0, 6)}...${address.slice(-4)}` : "Wallet disconnected",
-    });
-  };
-
-  const handleWalletAction = () => {
-    if (walletAddress) {
-      disconnectWallet();
-    } else {
-      connectWallet();
-    }
-  };
-
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Features", href: "/#features" },
@@ -98,6 +56,16 @@ export default function Navbar({ launch }: NavbarProps) {
     { name: "Team", href: "/team" },
     { name: "Community", href: "/#community" },
   ];
+
+  const customTheme = darkTheme({
+    colors: {
+        primaryButtonBg: "#14F195",
+        primaryButtonText: "#000000",
+        modalBg: "#0d0f18",
+        borderColor: "#14F195",
+        accentText: "#14F195",
+    },
+  });
 
   return (
     <nav 
@@ -115,7 +83,7 @@ export default function Navbar({ launch }: NavbarProps) {
       </Link>
 
       {/* Desktop Navigation */}
-      <div className="hidden md:flex gap-8 text-sm text-gray-300">
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex gap-8 text-sm text-gray-300">
         {navLinks.map((link) => (
           <a key={link.name} href={link.href} className="hover:text-white cursor-pointer transition-colors">
             {link.name}
@@ -124,27 +92,26 @@ export default function Navbar({ launch }: NavbarProps) {
       </div>
 
       <div className="flex items-center gap-4">
-        <button
-          onClick={handleWalletAction}
-          className="hidden md:flex items-center gap-2 px-6 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-[#14F195] to-[#9B59B6] shadow-md hover:opacity-90 transition-opacity"
-          title={walletAddress ? "Click to disconnect" : "Click to connect wallet"}
-        >
-          {walletAddress ? (
-            <>
-              <Wallet size={16} />
-              <span>{`${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`}</span>
-              <LogOut size={14} />
-            </>
-          ) : (
-            <>
-              <Wallet size={16} />
-              <span>Connect wallet</span>
-            </>
-          )}
-        </button>
+        {/* Thirdweb Connect Button */}
+        <div className="hidden md:block">
+            <ConnectButton 
+                client={client}
+                theme={customTheme}
+                wallets={wallets}
+                connectModal={{
+                    size: "compact",
+                    titleIcon: "https://blockai-frontend-v1.vercel.app/blockai.svg",
+                    showThirdwebBranding: false,
+                }}
+                connectButton={{
+                    label: "Connect Wallet",
+                }}
+            />
+        </div>
+
         <button
           onClick={handleAuthAction}
-          className="hidden md:flex items-center gap-2 px-6 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-[#14F195] to-[#9B59B6] shadow-md hover:opacity-90 transition-opacity"
+          className="hidden md:flex items-center gap-2 px-6 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-[#14F195] to-[#9B59B6] shadow-md hover:opacity-90 transition-opacity text-white"
         >
           {isAuthenticated ? (
             <>
@@ -186,29 +153,26 @@ export default function Navbar({ launch }: NavbarProps) {
                 </div>
 
                 <div className="h-px bg-white/10 w-full my-2" />
-
-                <button
-                  onClick={handleWalletAction}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-[#14F195] to-[#9B59B6] shadow-lg hover:opacity-90 transition-opacity text-center"
-                  title={walletAddress ? "Click to disconnect" : "Click to connect wallet"}
-                >
-                  {walletAddress ? (
-                    <>
-                      <Wallet size={16} />
-                      <span>{`${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`}</span>
-                      <LogOut size={14} />
-                    </>
-                  ) : (
-                    <>
-                      <Wallet size={16} />
-                      <span>Connect wallet</span>
-                    </>
-                  )}
-                </button>
+                
+                <div className="w-full flex justify-center">
+                    <ConnectButton 
+                        client={client}
+                        theme={customTheme}
+                        wallets={wallets}
+                        connectModal={{
+                            size: "compact",
+                            titleIcon: "https://blockai-frontend-v1.vercel.app/blockai.svg",
+                            showThirdwebBranding: false,
+                        }}
+                        connectButton={{
+                            label: "Connect Wallet",
+                        }}
+                    />
+                </div>
 
                 <button
                   onClick={handleAuthAction}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-[#14F195] to-[#9B59B6] shadow-lg hover:opacity-90 transition-opacity text-center"
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-[#14F195] to-[#9B59B6] shadow-lg hover:opacity-90 transition-opacity text-white"
                 >
                   {isAuthenticated ? (
                     <>

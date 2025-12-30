@@ -5,7 +5,7 @@ import { StaggerContainer, StaggerItem } from "../ScrollReveal";
 export default function Community() {
   return (
     <section id="community" className="mt-32 px-6 md:px-0 relative z-10 max-w-6xl mx-auto">
-      <div className="relative rounded-[2.5rem] overflow-hidden border border-white/10 bg-[#0B0E1A]/50 backdrop-blur-xl p-12 md:p-20 text-center group">
+      <div className="relative rounded-[32px] overflow-hidden border border-white/5 bg-[#13151C]/70 backdrop-blur-xl p-12 md:p-20 text-center group">
         
         {/* Background Effects */}
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-transparent to-emerald-900/20 opacity-50" />

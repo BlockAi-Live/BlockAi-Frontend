@@ -54,27 +54,22 @@ export default function FeaturesGrid({ features }: FeaturesGridProps) {
             {features.map((f, i) => (
               <CarouselItem key={i} className="pl-4 md:basis-1/2">
                 <div className="flex flex-col items-center group h-full">
-                  <div className="relative w-full rounded-2xl h-full p-[1px] bg-gradient-to-b from-white/20 to-transparent">
-                    {/* Card Content */}
+                    {/* Glass Card */}
                     <div 
-                      className="rounded-2xl p-8 w-full relative h-full bg-[#0B0E1A]/90 flex flex-col items-center justify-center min-h-[250px] transition-all duration-300 group-hover:bg-[#0B0E1A]"
+                      className="rounded-[32px] p-8 w-full relative h-full bg-[#13151C] border border-white/5 flex flex-col items-center justify-center min-h-[250px] transition-all duration-300 group-hover:border-[#14F195]/30 group-hover:shadow-[0_0_30px_rgba(20,241,149,0.1)]"
                     >
-                      <div className="flex justify-center mb-6 transform group-hover:scale-110 transition-transform duration-300">{f.icon}</div>
-                      <p className="text-gray-300 text-sm text-center leading-relaxed">{f.text}</p>
+                      <div className="flex justify-center mb-6 transform group-hover:scale-110 transition-transform duration-300 text-[#14F195]">{f.icon}</div>
+                      <p className="text-gray-400 text-sm text-center leading-relaxed font-medium">{f.text}</p>
                     </div>
-
-                    {/* Active Border Glow */}
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#10e291] to-[#9b59b6] opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-sm" />
-                  </div>
-                  <div className="mt-4 font-bold text-lg md:text-xl tracking-wide text-center group-hover:text-[#10e291] transition-colors">{f.label}</div>
+                  <div className="mt-4 font-bold text-lg md:text-xl tracking-wide text-center group-hover:text-[#14F195] transition-colors">{f.label}</div>
                 </div>
               </CarouselItem>
             ))}
           </CarouselContent>
           <div className="flex justify-center mt-8">
-             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm animate-pulse">
-                <Hand className="w-4 h-4 text-[#10e291]" />
-                <span className="text-xs font-medium text-gray-300">Swipe to explore</span>
+             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#13151C] border border-white/10 backdrop-blur-sm animate-pulse">
+                <Hand className="w-4 h-4 text-[#14F195]" />
+                <span className="text-xs font-medium text-gray-400">Swipe to explore</span>
              </div>
           </div>
         </Carousel>
@@ -86,16 +81,14 @@ export default function FeaturesGrid({ features }: FeaturesGridProps) {
     <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-16 px-6 md:px-0">
       {features.map((f, i) => (
         <StaggerItem key={i} className="flex flex-col items-center group">
-          <div className="relative w-full rounded-2xl h-full p-[1px] bg-gradient-to-b from-white/20 to-transparent transition-all duration-300 group-hover:-translate-y-2 will-change-transform">
-            {/* Card Content */}
+            {/* Glass Card */}
             <div 
-              className="rounded-2xl p-8 w-full relative h-full bg-[#0B0E1A]/90 border border-transparent transition-all duration-300 group-hover:bg-[#0B0E1A]"
+              className="rounded-[32px] p-8 w-full relative h-full bg-[#13151C] border border-white/5 transition-all duration-300 group-hover:border-[#14F195]/30 group-hover:shadow-[0_0_30px_rgba(20,241,149,0.1)] group-hover:-translate-y-2 will-change-transform flex flex-col items-center justify-center min-h-[240px]"
             >
-              <div className="flex justify-center mb-6 transform group-hover:scale-110 transition-transform duration-300">{f.icon}</div>
-              <p className="text-gray-300 text-sm text-center leading-relaxed">{f.text}</p>
+              <div className="flex justify-center mb-6 transform group-hover:scale-110 transition-transform duration-300 text-[#14F195]">{f.icon}</div>
+              <p className="text-gray-400 text-sm text-center leading-relaxed font-medium">{f.text}</p>
             </div>
-          </div>
-          <div className="mt-4 font-bold text-lg md:text-xl tracking-wide text-center group-hover:text-[#10e291] transition-colors duration-300">{f.label}</div>
+          <div className="mt-4 font-bold text-lg md:text-xl tracking-wide text-center group-hover:text-[#14F195] transition-colors duration-300">{f.label}</div>
         </StaggerItem>
       ))}
     </StaggerContainer>

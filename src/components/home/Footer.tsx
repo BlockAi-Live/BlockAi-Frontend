@@ -1,7 +1,7 @@
 export default function Footer() {
   return (
     <footer className="mt-32 pb-10 px-6 md:px-0 max-w-7xl mx-auto">
-      <div className="relative rounded-3xl border border-white/10 bg-[#0B0E1A]/80 backdrop-blur-xl p-12 md:p-16 overflow-hidden">
+      <div className="relative rounded-[32px] border border-white/5 bg-[#13151C]/80 backdrop-blur-xl p-12 md:p-16 overflow-hidden">
         {/* Background Glow */}
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
         

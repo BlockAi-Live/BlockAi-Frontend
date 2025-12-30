@@ -57,9 +57,8 @@ export default function Hero({ launch }: HeroProps) {
         <div className="mt-12 flex justify-center">
           <button 
             onClick={() => navigate(isAuthenticated ? "/dashboard" : "/signup")}
-            className="group relative px-8 py-4 rounded-full text-base font-bold text-white shadow-lg hover:shadow-[#9945FF]/25 hover:scale-105 transition-all duration-300 flex items-center gap-2 overflow-hidden"
+            className="group relative px-8 py-4 rounded-full text-base font-bold text-black bg-[#14F195] shadow-[0_0_20px_rgba(20,241,149,0.3)] hover:shadow-[0_0_30px_rgba(20,241,149,0.5)] hover:scale-105 transition-all duration-300 flex items-center gap-2 overflow-hidden hover-shine"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-[#9945FF] to-[#14F195] opacity-90 group-hover:opacity-100 transition-opacity" />
             <span className="relative z-10 flex items-center gap-2">
               {isAuthenticated ? "Go to Dashboard" : "Start Your Journey"} 
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

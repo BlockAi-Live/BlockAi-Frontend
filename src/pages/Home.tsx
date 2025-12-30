@@ -57,13 +57,13 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen w-full bg-[#0B0E1A] text-white font-inter relative overflow-x-hidden">
+    <div className="min-h-screen w-full bg-[#0d0f18] text-white font-inter relative overflow-x-hidden">
       {/* Background gradient overlay - absolute positioning so it scrolls with content */}
       <div 
-        className="absolute inset-0 pointer-events-none w-full"
+        className="fixed inset-0 pointer-events-none w-full"
         style={{
-          background: 'linear-gradient(136deg, rgba(155, 89, 182, 0.2) 0%, rgba(155, 89, 182, 0.2) 25%, rgba(20, 241, 149, 0.2) 50%, rgba(11, 14, 26, 0) 75%)',
-          minHeight: '100%'
+            background: "radial-gradient(circle at 50% 0%, rgba(20, 241, 149, 0.05) 0%, rgba(13, 15, 24, 0) 50%)",
+            minHeight: '100%'
         }}
       />
       

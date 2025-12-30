@@ -42,7 +42,7 @@ export default function FAQ() {
               <StaggerItem key={i}>
                 <AccordionItem 
                   value={`item-${i}`} 
-                  className="border border-white/10 bg-[#0B0E1A]/80 backdrop-blur-md rounded-xl px-6 overflow-hidden data-[state=open]:border-[#10e291]/50 transition-colors duration-300"
+                  className="border border-white/5 bg-[#13151C]/80 backdrop-blur-md rounded-3xl px-6 overflow-hidden data-[state=open]:border-[#10e291]/50 transition-colors duration-300"
                 >
                   <AccordionTrigger className="text-left text-white hover:text-[#10e291] hover:no-underline py-6 text-lg font-medium transition-colors">
                     {f.q}

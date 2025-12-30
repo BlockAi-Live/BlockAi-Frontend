@@ -4,18 +4,18 @@
 
 /* Satoshi Font */
 @font-face {
-  font-family: 'Satoshi';
-  src: url('/fonts/Satoshi-Variable.woff2') format('woff2'),
-       url('/fonts/Satoshi-Variable.woff') format('woff');
+  font-family: "Satoshi";
+  src: url("/fonts/Satoshi-Variable.woff2") format("woff2"),
+    url("/fonts/Satoshi-Variable.woff") format("woff");
   font-weight: 300 900;
   font-display: swap;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Satoshi';
-  src: url('/fonts/Satoshi-VariableItalic.woff2') format('woff2'),
-       url('/fonts/Satoshi-VariableItalic.woff') format('woff');
+  font-family: "Satoshi";
+  src: url("/fonts/Satoshi-VariableItalic.woff2") format("woff2"),
+    url("/fonts/Satoshi-VariableItalic.woff") format("woff");
   font-weight: 300 900;
   font-display: swap;
   font-style: italic;
@@ -23,15 +23,15 @@
 
 /* LIGHT MODE */
 :root {
-  --button-outline: rgba(0,0,0, .10);
-  --badge-outline: rgba(0,0,0, .05);
+  --button-outline: rgba(0, 0, 0, 0.1);
+  --badge-outline: rgba(0, 0, 0, 0.05);
 
   /* Automatic computation of border around primary / danger buttons */
   --opaque-button-border-intensity: -8; /* In terms of percentages */
 
   /* Backgrounds applied on top of other backgrounds when hovered/active */
-  --elevate-1: rgba(0,0,0, .03);
-  --elevate-2: rgba(0,0,0, .08);
+  --elevate-1: rgba(0, 0, 0, 0.03);
+  --elevate-2: rgba(0, 0, 0, 0.08);
 
   --background: 220 15% 8%;
 
@@ -95,17 +95,25 @@
   --chart-4: 340 80% 60%;
   --chart-5: 160 80% 45%;
 
-  --font-sans: 'Satoshi', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-serif: 'Satoshi', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
-  --radius: .5rem; /* 8px */
+  --font-sans: "Satoshi", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Satoshi", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas,
+    "Liberation Mono", Menlo, monospace;
+  --radius: 0.5rem; /* 8px */
   --shadow-2xs: 0px 2px 0px 0px hsl(220 15% 8% / 0.02);
   --shadow-xs: 0px 2px 0px 0px hsl(220 15% 8% / 0.03);
-  --shadow-sm: 0px 2px 0px 0px hsl(220 15% 8% / 0.04), 0px 1px 2px -1px hsl(220 15% 8% / 0.06);
-  --shadow: 0px 2px 0px 0px hsl(220 15% 8% / 0.05), 0px 1px 2px -1px hsl(220 15% 8% / 0.07);
-  --shadow-md: 0px 2px 0px 0px hsl(220 15% 8% / 0.06), 0px 2px 4px -1px hsl(220 15% 8% / 0.08);
-  --shadow-lg: 0px 2px 0px 0px hsl(220 15% 8% / 0.08), 0px 4px 6px -1px hsl(220 15% 8% / 0.10);
-  --shadow-xl: 0px 2px 0px 0px hsl(220 15% 8% / 0.10), 0px 8px 10px -1px hsl(220 15% 8% / 0.12);
+  --shadow-sm: 0px 2px 0px 0px hsl(220 15% 8% / 0.04),
+    0px 1px 2px -1px hsl(220 15% 8% / 0.06);
+  --shadow: 0px 2px 0px 0px hsl(220 15% 8% / 0.05),
+    0px 1px 2px -1px hsl(220 15% 8% / 0.07);
+  --shadow-md: 0px 2px 0px 0px hsl(220 15% 8% / 0.06),
+    0px 2px 4px -1px hsl(220 15% 8% / 0.08);
+  --shadow-lg: 0px 2px 0px 0px hsl(220 15% 8% / 0.08),
+    0px 4px 6px -1px hsl(220 15% 8% / 0.1);
+  --shadow-xl: 0px 2px 0px 0px hsl(220 15% 8% / 0.1),
+    0px 8px 10px -1px hsl(220 15% 8% / 0.12);
   --shadow-2xl: 0px 2px 0px 0px hsl(220 15% 8% / 0.12);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
@@ -113,48 +121,93 @@
   /* Automatically computed borders - intensity can be controlled by the user by the --opaque-button-border-intensity setting */
 
   /* Fallback for older browsers */
-  --sidebar-primary-border: hsl(from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --sidebar-primary-border: hsl(from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --sidebar-primary-border: hsl(
+    from hsl(var(--sidebar-primary)) h s
+      calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
+  --sidebar-primary-border: hsl(
+    from hsl(var(--sidebar-primary)) h s
+      calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
 
   /* Fallback for older browsers */
-  --sidebar-accent-border: hsl(from hsl(var(--sidebar-accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --sidebar-accent-border: hsl(from hsl(var(--sidebar-accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --sidebar-accent-border: hsl(
+    from hsl(var(--sidebar-accent)) h s
+      calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
+  --sidebar-accent-border: hsl(
+    from hsl(var(--sidebar-accent)) h s
+      calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
 
   /* Fallback for older browsers */
-  --primary-border: hsl(from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --primary-border: hsl(from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --primary-border: hsl(
+    from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) /
+      alpha
+  );
+  --primary-border: hsl(
+    from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) /
+      alpha
+  );
 
   /* Fallback for older browsers */
-  --secondary-border: hsl(from hsl(var(--secondary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --secondary-border: hsl(from hsl(var(--secondary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --secondary-border: hsl(
+    from hsl(var(--secondary)) h s
+      calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
+  --secondary-border: hsl(
+    from hsl(var(--secondary)) h s
+      calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
 
   /* Fallback for older browsers */
-  --muted-border: hsl(from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --muted-border: hsl(from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --muted-border: hsl(
+    from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) /
+      alpha
+  );
+  --muted-border: hsl(
+    from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) /
+      alpha
+  );
 
   /* Fallback for older browsers */
-  --accent-border: hsl(from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --accent-border: hsl(from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --accent-border: hsl(
+    from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) /
+      alpha
+  );
+  --accent-border: hsl(
+    from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) /
+      alpha
+  );
 
   /* Fallback for older browsers */
-  --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --destructive-border: hsl(
+    from hsl(var(--destructive)) h s
+      calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
+  --destructive-border: hsl(
+    from hsl(var(--destructive)) h s
+      calc(l + var(--opaque-button-border-intensity)) / alpha
+  );
 
   /* Quest button colors - goldish orange */
   --quest: 35 95% 58%;
   --quest-foreground: 0 0% 100%;
-  --quest-border: hsl(from hsl(var(--quest)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --quest-border: hsl(
+    from hsl(var(--quest)) h s calc(l + var(--opaque-button-border-intensity)) /
+      alpha
+  );
 }
 
 .dark {
-  --button-outline: rgba(255,255,255, .10);
-  --badge-outline: rgba(255,255,255, .05);
+  --button-outline: rgba(255, 255, 255, 0.1);
+  --badge-outline: rgba(255, 255, 255, 0.05);
 
-  --opaque-button-border-intensity: 9;  /* In terms of percentages */
+  --opaque-button-border-intensity: 9; /* In terms of percentages */
 
   /* Backgrounds applied on top of other backgrounds when hovered/active */
-  --elevate-1: rgba(255,255,255, .04);
-  --elevate-2: rgba(255,255,255, .09);
+  --elevate-1: rgba(255, 255, 255, 0.04);
+  --elevate-2: rgba(255, 255, 255, 0.09);
 
   --background: 220 15% 8%;
 
@@ -213,7 +266,10 @@
   /* Quest button colors - goldish orange */
   --quest: 35 95% 58%;
   --quest-foreground: 0 0% 100%;
-  --quest-border: hsl(from hsl(var(--quest)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --quest-border: hsl(
+    from hsl(var(--quest)) h s calc(l + var(--opaque-button-border-intensity)) /
+      alpha
+  );
 
   /* Used as the border around inputs. Dark mode: Should be a border that is light enough to have high contrast when rendered on a --card background. More contrast than standard --border */
   --input: 220 20% 35%;
@@ -225,14 +281,18 @@
   --chart-5: 160 80% 65%;
 
   --shadow-2xs: 0px 2px 0px 0px hsl(0 0% 0% / 0.15);
-  --shadow-xs: 0px 2px 0px 0px hsl(0 0% 0% / 0.20);
-  --shadow-sm: 0px 2px 0px 0px hsl(0 0% 0% / 0.25), 0px 1px 2px -1px hsl(0 0% 0% / 0.30);
-  --shadow: 0px 2px 0px 0px hsl(0 0% 0% / 0.30), 0px 1px 2px -1px hsl(0 0% 0% / 0.35);
-  --shadow-md: 0px 2px 0px 0px hsl(0 0% 0% / 0.35), 0px 2px 4px -1px hsl(0 0% 0% / 0.40);
-  --shadow-lg: 0px 2px 0px 0px hsl(0 0% 0% / 0.40), 0px 4px 6px -1px hsl(0 0% 0% / 0.45);
-  --shadow-xl: 0px 2px 0px 0px hsl(0 0% 0% / 0.45), 0px 8px 10px -1px hsl(0 0% 0% / 0.50);
-  --shadow-2xl: 0px 2px 0px 0px hsl(0 0% 0% / 0.50);
-
+  --shadow-xs: 0px 2px 0px 0px hsl(0 0% 0% / 0.2);
+  --shadow-sm: 0px 2px 0px 0px hsl(0 0% 0% / 0.25),
+    0px 1px 2px -1px hsl(0 0% 0% / 0.3);
+  --shadow: 0px 2px 0px 0px hsl(0 0% 0% / 0.3),
+    0px 1px 2px -1px hsl(0 0% 0% / 0.35);
+  --shadow-md: 0px 2px 0px 0px hsl(0 0% 0% / 0.35),
+    0px 2px 4px -1px hsl(0 0% 0% / 0.4);
+  --shadow-lg: 0px 2px 0px 0px hsl(0 0% 0% / 0.4),
+    0px 4px 6px -1px hsl(0 0% 0% / 0.45);
+  --shadow-xl: 0px 2px 0px 0px hsl(0 0% 0% / 0.45),
+    0px 8px 10px -1px hsl(0 0% 0% / 0.5);
+  --shadow-2xl: 0px 2px 0px 0px hsl(0 0% 0% / 0.5);
 }
 
 @layer base {
@@ -266,7 +326,6 @@
  * need to be distinguished from eachother visually.
  */
 @layer utilities {
-
   /* Hide ugly search cancel button in Chrome until we can style it properly */
   input[type="search"]::-webkit-search-cancel-button {
     @apply hidden;
@@ -282,10 +341,11 @@
   /* .no-default-hover-elevate/no-default-active-elevate is an escape hatch so consumers of
    * buttons/badges can remove the automatic brightness adjustment on interactions
    * and program their own. */
-  .no-default-hover-elevate {}
+  .no-default-hover-elevate {
+  }
 
-  .no-default-active-elevate {}
-
+  .no-default-active-elevate {
+  }
 
   /**
    * Toggleable backgrounds go behind the content. Hoverable/active goes on top.
@@ -376,20 +436,25 @@
 
 /* Lightning Animation Keyframes */
 @keyframes lightning-glow {
-  0%, 100% { 
-    box-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
+  0%,
+  100% {
+    box-shadow: 0 0 5px currentColor, 0 0 10px currentColor,
+      0 0 15px currentColor;
     opacity: 1;
   }
-  25% { 
-    box-shadow: 0 0 8px currentColor, 0 0 16px currentColor, 0 0 24px currentColor;
+  25% {
+    box-shadow: 0 0 8px currentColor, 0 0 16px currentColor,
+      0 0 24px currentColor;
     opacity: 0.9;
   }
-  50% { 
-    box-shadow: 0 0 12px currentColor, 0 0 24px currentColor, 0 0 36px currentColor;
+  50% {
+    box-shadow: 0 0 12px currentColor, 0 0 24px currentColor,
+      0 0 36px currentColor;
     opacity: 1;
   }
-  75% { 
-    box-shadow: 0 0 8px currentColor, 0 0 16px currentColor, 0 0 24px currentColor;
+  75% {
+    box-shadow: 0 0 8px currentColor, 0 0 16px currentColor,
+      0 0 24px currentColor;
     opacity: 0.8;
   }
 }
@@ -454,4 +519,81 @@
   color: rgb(34, 197, 94) !important;
   border-left: 3px solid rgb(34, 197, 94);
   animation: lightning-glow 2s ease-in-out infinite;
+}
+
+/* Thirdweb ConnectButton Overrides for Premium Gradient Style */
+button[data-test="connect-wallet-button"] {
+  border-radius: 12px !important; /* Rounded Square */
+  background: linear-gradient(135deg, #14F195 0%, #0e9f6e 100%) !important;
+  color: #000000 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 4px 15px rgba(20, 241, 149, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  font-family: "Satoshi", sans-serif !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+button[data-test="connect-wallet-button"]:hover {
+  background: linear-gradient(135deg, #26ffa5 0%, #10b981 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(20, 241, 149, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+}
+
+button[data-test="connect-wallet-button"] > div {
+  font-weight: 800 !important; /* Extra Bold */
+  font-size: 0.95rem !important;
+  letter-spacing: -0.01em !important;
+  color: #000000 !important;
+  z-index: 10 !important;
+  position: relative !important;
+}
+
+/* Shine Effect on Hover */
+button[data-test="connect-wallet-button"]::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+    );
+    transition: 0.5s;
+    z-index: 1;
+}
+
+button[data-test="connect-wallet-button"]:hover::before {
+    left: 100%;
+}
+
+/* Reusable Shine Effect */
+.hover-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.hover-shine::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.5),
+        transparent
+    );
+    transition: 0.5s;
+    z-index: 1;
+}
+
+.hover-shine:hover::before {
+    left: 100%;
 }

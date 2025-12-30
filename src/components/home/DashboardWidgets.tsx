@@ -28,7 +28,7 @@ export default function DashboardWidgets() {
       {/* Card 1: Portfolio Growth */}
       <StaggerItem className="relative group w-full max-w-md">
         <div className="absolute -inset-0.5 bg-gradient-to-r from-[#10e291] to-[#9b59b6] rounded-3xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
-        <div className="relative bg-[#0B0E1A]/90 backdrop-blur-xl p-8 rounded-3xl border border-white/10 h-[320px] flex flex-col justify-between">
+        <div className="relative bg-[#13151C]/90 backdrop-blur-xl p-8 rounded-3xl border border-white/10 h-[320px] flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-6">
               <div className="p-3 bg-[#10e291]/10 rounded-xl">
@@ -73,7 +73,7 @@ export default function DashboardWidgets() {
       {/* Card 2: Trending Tokens (Elevated) */}
       <StaggerItem className="relative group w-full max-w-md lg:-mt-12">
         <div className="absolute -inset-0.5 bg-gradient-to-r from-[#9b59b6] to-[#10e291] rounded-3xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
-        <div className="relative bg-[#0B0E1A]/90 backdrop-blur-xl p-8 rounded-3xl border border-white/10 h-[320px] flex flex-col">
+        <div className="relative bg-[#13151C]/90 backdrop-blur-xl p-8 rounded-3xl border border-white/10 h-[320px] flex flex-col">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-[#9b59b6]/10 rounded-xl">
@@ -111,11 +111,11 @@ export default function DashboardWidgets() {
       {/* Card 3: AI Chat */}
       <StaggerItem className="relative group w-full max-w-md">
         <div className="absolute -inset-0.5 bg-gradient-to-r from-[#10e291] to-[#9b59b6] rounded-3xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
-        <div className="relative bg-[#0B0E1A]/90 backdrop-blur-xl p-6 rounded-3xl border border-white/10 h-[320px] flex flex-col">
+        <div className="relative bg-[#13151C]/90 backdrop-blur-xl p-6 rounded-3xl border border-white/10 h-[320px] flex flex-col">
           {/* Header */}
           <div className="flex items-center gap-3 mb-4 border-b border-white/5 pb-4">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#10e291] to-[#9b59b6] p-[1px]">
-               <div className="w-full h-full rounded-full bg-[#0B0E1A] flex items-center justify-center">
+               <div className="w-full h-full rounded-full bg-[#13151C] flex items-center justify-center">
                   <MessageSquare className="w-5 h-5 text-[#10e291]" />
                </div>
             </div>
