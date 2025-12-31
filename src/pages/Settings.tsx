@@ -8,19 +8,24 @@ import { useAuth } from "@/context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   User, Bell, PuzzlePiece, CreditCard, Shield, Camera, Trash, 
-  Envelope, LockKey, CaretRight, Check, Globe, CurrencyDollar,
-  DeviceMobile, Key, Warning, CaretDown, CheckCircle
+  Envelope, LockKey, CaretRight, Check, CurrencyDollar,
+  Key, Warning, CaretDown, CheckCircle, Code
 } from "@phosphor-icons/react";
+import SettingsAPI from "../components/settings/SettingsAPI";
 
-type TabType = "general" | "notifications" | "plugins" | "subscription" | "security";
+type TabType = "general" | "notifications" | "plugins" | "subscription" | "security" | "api";
 
 const tabs = [
   { id: "general" as TabType, label: "General", icon: User },
   { id: "notifications" as TabType, label: "Notifications", icon: Bell },
+  { id: "api" as TabType, label: "API & Billing", icon: Code }, // New Tab
   { id: "plugins" as TabType, label: "Integrations", icon: PuzzlePiece },
   { id: "subscription" as TabType, label: "Subscription", icon: CreditCard },
   { id: "security" as TabType, label: "Security", icon: Shield },
 ];
+
+
+
 
 const currencies = ["USD ($)", "EUR (€)", "GBP (£)", "JPY (¥)", "BTC (₿)", "ETH (Ξ)"];
 
@@ -146,6 +151,12 @@ export function SettingsPage() {
   };
 
   // --- RENDERERS ---
+
+  const renderApiTab = () => (
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          <SettingsAPI />
+      </motion.div>
+  );
 
   const renderGeneralTab = () => (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
@@ -391,6 +402,7 @@ export function SettingsPage() {
                   <div className="relative">
                        {activeTab === 'general' && renderGeneralTab()}
                        {activeTab === 'notifications' && renderNotificationsTab()}
+                       {activeTab === 'api' && renderApiTab()}
                        {activeTab === 'subscription' && renderSubscriptionTab()}
                        {activeTab === 'security' && renderSecurityTab()}
                        {activeTab === 'plugins' && renderPluginsTab()}

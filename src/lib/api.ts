@@ -1,17 +1,5 @@
-import { GoogleGenAI } from "@google/genai";
-
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-
-let ai: GoogleGenAI | null = null;
-
-const getAI = () => {
-  if (!ai && GEMINI_API_KEY) {
-    ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
-  }
-  return ai;
-};
 
 export const api = {
   register: async (data: any) => {
@@ -75,52 +63,58 @@ export const api = {
     return response.json();
   },
 
-chatQuestion: async (data: { content: string }) => {
-  if (!GEMINI_API_KEY) throw new Error("Gemini API key not set in .env");
-
-  const aiInstance = getAI();
-  if (!aiInstance) throw new Error("Gemini API key not set in .env");
-
-  try {
-const response = await aiInstance.models.generateContent({
-  model: "gemini-2.5-flash",
-  contents: [
-    {
-      role: "user",
-      parts: [
-        { text: "INSTRUCTION: Only respond if the following message is about economics, crypto and AI. Otherwise, say you can only help with economics, crypto and AI related question." },
-        { text: data.content }
-      ]
-    }
-  ],
-});
-
-    
-    let aiAnswer = "No response from AI";
-
-    if (response?.candidates?.[0]?.content?.parts?.[0]?.text) {
-      aiAnswer = response.candidates[0].content.parts[0].text;
-    }
-
-    await fetch(`${API_URL}/ai/log`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+  chatQuestion: async (data: { content: string }) => {
+    const token = localStorage.getItem('auth_token');
+    const response = await fetch(`${API_URL}/api/v1/chat`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({
-        question: data.content,
-        answer: aiAnswer,
-      }),
+      body: JSON.stringify(data),
     });
 
-    return {
-      question: data.content,
-      answer: aiAnswer,
-    };
-  } catch (error: any) {
-    console.error("Gemini API Error:", error);
-    throw new Error(error.message || "AI chat failed");
-  }
-}
+    if (response.status === 402) {
+      throw new Error("Payment Required: Insufficient Credits");
+    }
 
+    if (!response.ok) {
+       const err = await response.json();
+       throw new Error(err.error || "AI Chat Failed");
+    }
+    
+    // Log is handled by backend now
+    return response.json();
+  },
+
+  getBillingStats: async () => {
+    const token = localStorage.getItem("auth_token");
+    const response = await fetch(`${API_URL}/api/v1/billing`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error("Failed to fetch billing");
+    return response.json();
+  },
+
+  createApiKey: async (name: string) => {
+    const token = localStorage.getItem("auth_token");
+    const response = await fetch(`${API_URL}/api/v1/api-keys`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ name }),
+    });
+    if (!response.ok) throw new Error("Failed to create key");
+    return response.json();
+  },
+
+  simulatePayment: async () => {
+    const token = localStorage.getItem("auth_token");
+    const response = await fetch(`${API_URL}/api/v1/payment/simulate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({}),
+    });
+    if (!response.ok) throw new Error("Payment simulation failed");
+    return response.json();
+  }
 };

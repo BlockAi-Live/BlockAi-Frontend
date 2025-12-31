@@ -4,12 +4,31 @@ import ChatEmptyState from "../components/chat/ChatEmptyState";
 import ChatInput from "../components/chat/ChatInput";
 import ChatMessage, { Message } from "../components/chat/ChatMessage";
 import { api } from "@/lib/api";
+import { Lightning } from "@phosphor-icons/react";
 
 export default function ChatPage() {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [credits, setCredits] = useState<number | null>(null);
+  const [isPaid, setIsPaid] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const fetchBilling = async () => {
+      try {
+          const stats = await api.getBillingStats();
+          if (stats?.billing) {
+              setCredits(stats.billing.credits);
+              setIsPaid(stats.billing.tier === 'PAID');
+          }
+      } catch (e) {
+          console.error("Failed to load billing", e);
+      }
+  };
+
+  useEffect(() => {
+      fetchBilling();
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -68,6 +87,17 @@ function syntaxToHTML(text: string): string {
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) return;
 
+    // Optimistic Check
+    if (credits !== null && credits < 1 && !isPaid) {
+         setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            role: "assistant", 
+            content: "⚠️ **Insufficient Credits**. You need at least 1 credit to send a message. Please upgrade or top up in Settings.",
+            timestamp: new Date()
+         }]);
+         return;
+    }
+
     const newUserMessage: Message = {
       id: Date.now().toString(),
       role: "user",
@@ -80,6 +110,10 @@ function syntaxToHTML(text: string): string {
 
     try {
       const response = await api.chatQuestion({ content });
+      
+      // Deduct credit locally for instant feedback
+      if (!isPaid && credits) setCredits(c => c ? c - 1 : 0);
+
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
@@ -90,20 +124,40 @@ function syntaxToHTML(text: string): string {
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error: any) {
       console.error("Gemini AI Error:", error);
+      
+      let errorText = "Sorry, I couldn't process your request.";
+      if (error.message.includes("Payment Required") || error.message.includes("Insufficient Credits")) {
+          errorText = "💳 **Payment Required**: You have run out of free credits. [Upgrade to Pro](/settings) to continue chatting without limits.";
+      }
+
       const errorMsg: Message = {
         id: (Date.now() + 2).toString(),
         role: "assistant",
-        content: "Sorry, I couldn't process your request.",
+        content: errorText,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMsg]);
     } finally {
       setIsLoading(false);
+      // Refresh actual stats
+      fetchBilling(); 
     }
   };
 
   return (
     <div className="flex flex-col h-full min-h-[calc(100vh-4rem)] relative font-sans bg-[#0d0f18]">
+      
+      {/* Credit Badge */}
+      <div className="absolute top-4 right-6 z-30 pointer-events-none">
+         <div className="bg-[#13151C]/80 backdrop-blur-md border border-white/10 rounded-full px-4 py-1.5 flex items-center gap-2 shadow-lg">
+             <Lightning size={14} weight="fill" className={isPaid ? "text-purple-400" : "text-[#14F195]"} />
+             <span className="text-xs font-bold text-white">
+                 {isPaid ? "PRO UNLIMITED" : `${credits ?? '...'} Credits`}
+             </span>
+             {!isPaid && <span className="text-[10px] text-gray-500 border-l border-white/10 pl-2 ml-1">1 Cost/Msg</span>}
+         </div>
+      </div>
+
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto
 [&::-webkit-scrollbar]:w-1.5
