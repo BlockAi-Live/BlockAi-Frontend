@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Navbar, Footer } from "@/components/home";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { XLogo, LinkedinLogo, TelegramLogo } from "@phosphor-icons/react";
+import { XLogo, LinkedinLogo, TelegramLogo, GithubLogo } from "@phosphor-icons/react";
 
 // Team Data
 interface TeamMember {
@@ -9,10 +9,12 @@ interface TeamMember {
   name: string;
   role: string;
   bio: string;
+  customImage?: string;
   socials: {
     twitter?: string;
     linkedin?: string;
     telegram?: string;
+    github?: string;
     website?: string;
   };
 }
@@ -28,6 +30,45 @@ const teamMembers: TeamMember[] = [
         linkedin: "https://www.linkedin.com/in/siamakkhoshnood",
         telegram: "https://t.me/Siamakkhoshnood"
     }
+  },
+  {
+    id: 2,
+    name: "Raymond Henry (Mr. Eagle)",
+    role: "Chief Operating Officer (COO)",
+    bio: "Raymond is an experienced Web3 COO with over five years of expertise in blockchain coordination. He executes project roadmaps and manages cross-functional sprints, acting as the primary liaison between technical and marketing teams to ensure all deliverables align with the project’s long-term vision.",
+    socials: {
+        twitter: "https://x.com/web3eaglealpha",
+        telegram: "https://t.me/web3eaglealpha"
+    }
+  },
+  {
+    id: 8,
+    name: "ImmortalSui",
+    role: "Frontend/Full-stack Engineer",
+    bio: "ImmortalSul is an experienced engineer with over 4.5 years of expertise in building scalable web applications. He manages the full development lifecycle, from high-performance frontends to robust backend APIs. By leading architectural decisions, he ensures code quality, security, and rapid feature prototyping to meet tight production timelines.",
+    socials: {
+        twitter: "https://x.com/ImmortalSul",
+        telegram: "https://t.me/ImmortalSul",
+        github: "https://github.com/ImmortalSul/"
+    }
+  },
+  {
+    id: 5,
+    name: "Kufre Asuquo",
+    role: "BDM",
+    bio: "Kufre is a Business Development Lead specializing in exchange relations and ecosystem expansion. He accelerates product adoption by securing high-value partnerships and investor collaborations, driving the strategic market positioning and growth of the BlockAI.live ecosystem.",
+    socials: {
+        telegram: "https://t.me/kufreezy",
+        linkedin: "https://www.linkedin.com/in/kufre-a-217693223/"
+    }
+  },
+  {
+    id: 99,
+    name: "Preetham AK",
+    role: "Smart Contract Engineer & Auditor",
+    bio: "Preetham is a seasoned Solidity engineer specializing in smart contract security and gas optimization. With a background in auditing core DeFi protocols, he ensures the integrity of BlockAI's on-chain infrastructure through rigorous testing and formal verification methods.",
+    customImage: "https://ui-avatars.com/api/?name=Preetham+AK&background=10e291&color=000&size=200",
+    socials: {}
   }
 ];
 
@@ -40,7 +81,7 @@ const TeamCard = ({ member }: { member: TeamMember }) => {
         <div className="absolute inset-0 bg-[#10e291]/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <div className="w-32 h-32 rounded-full p-1 border-2 border-white/10 relative z-10 group-hover:border-[#10e291]/50 transition-colors overflow-hidden bg-gray-900">
            <img 
-             src={`/pfps/${member.id}.png`} 
+             src={member.customImage || `/pfps/${member.id}.png`} 
              alt={member.name}
              className="w-full h-full object-cover rounded-full"
            />
@@ -70,6 +111,11 @@ const TeamCard = ({ member }: { member: TeamMember }) => {
         {member.socials.telegram && (
             <a href={member.socials.telegram} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors">
             <TelegramLogo size={18} weight="fill" /> 
+            </a>
+        )}
+        {member.socials.github && (
+            <a href={member.socials.github} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors">
+            <GithubLogo size={18} weight="fill" /> 
             </a>
         )}
       </div>
@@ -125,7 +171,7 @@ export default function Team() {
 
           {/* Team Grid */}
           <div className="pb-20 flex justify-center">
-            <section className="grid grid-cols-1 md:grid-cols-1 gap-6 md:gap-8 max-w-sm w-full">
+            <section className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-7xl w-full">
               {teamMembers.map((member) => (
                 <ScrollReveal key={member.id}>
                   <TeamCard member={member} />

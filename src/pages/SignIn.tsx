@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { Mail, Lock, ArrowRight, Wallet, Github, ChevronRight, Eye, EyeOff, Star } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { api } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../hooks/use-toast";
@@ -33,29 +33,75 @@ export function SignInPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
   const { toast } = useToast();
+  
+  // Clear any existing stale tokens on mount
+  useEffect(() => {
+    logout();
+  }, []);
+
   const [formData, setFormData] = useState({
     email: "",
     password: ""
   });
+  const [showUsernameModal, setShowUsernameModal] = useState(false);
+  const [username, setUsername] = useState("");
+  const [connectedWallet, setConnectedWallet] = useState<string | null>(null);
 
   const handleWalletConnect = async (wallet: any) => {
     const account = wallet.getAccount();
     const address = account?.address;
+    
     if (address) {
-      login("wallet-mock-token-" + address, {
-        id: address,
-        email: `${address.slice(0,6)}...@wallet.connect`,
-        fullName: "Wallet User",
-        walletAddress: address,
-        avatar: `https://effigy.im/a/${address}.png`
-      });
-      toast({
-        title: "Wallet Connected",
-        description: "Successfully logged in with wallet.",
-      });
-      navigate("/dashboard");
+      try {
+        const response = await api.walletLogin(address);
+        
+        if (!response) {
+            // User not found, prompt for username
+            setConnectedWallet(address);
+            setShowUsernameModal(true);
+            return;
+        }
+
+        login(response.token, response.user);
+        toast({
+            title: "Wallet Connected",
+            description: "Successfully logged in.",
+        });
+        navigate("/dashboard");
+
+      } catch (error) {
+        toast({
+            title: "Wallet Error",
+            description: "Failed to authenticate wallet.",
+            variant: "destructive"
+        });
+      }
+    }
+  };
+
+  const handleUsernameSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!connectedWallet || !username) return;
+    
+    setIsLoading(true);
+    try {
+        const response = await api.walletRegister(connectedWallet, username);
+        login(response.token, response.user);
+        toast({
+            title: "Account Created",
+            description: `Welcome to BlockAI, ${username}!`,
+        });
+        navigate("/dashboard");
+    } catch (error) {
+        toast({
+            title: "Registration Failed",
+            description: "Could not create account.",
+            variant: "destructive"
+        });
+    } finally {
+        setIsLoading(false);
     }
   };
 
@@ -288,6 +334,46 @@ export function SignInPage() {
           <p className="mt-2">© 2024 BLOCK AI Protocol</p>
         </div>
       </motion.div>
+
+      {/* Username Modal */}
+      {showUsernameModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <motion.div 
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="w-full max-w-sm bg-[#13151C] border border-[#14F195]/20 rounded-2xl p-6 shadow-2xl relative overflow-hidden"
+            >
+                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#9945FF] to-[#14F195]" />
+                 
+                 <h2 className="text-xl font-bold text-white mb-2">Finish Setup</h2>
+                 <p className="text-gray-400 text-sm mb-6">Choose a username to identify yourself on the network.</p>
+                 
+                 <form onSubmit={handleUsernameSubmit}>
+                    <div className="mb-6">
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Username</label>
+                        <input 
+                            type="text" 
+                            className="w-full bg-[#0d0f18] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#14F195] transition-colors"
+                            placeholder="e.g. Satoshi"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                            minLength={3}
+                        />
+                    </div>
+                    
+                    <button 
+                        type="submit" 
+                        disabled={isLoading}
+                        className="w-full py-3 rounded-xl bg-[#14F195] text-black font-bold hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                    >
+                         {isLoading ? <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" /> : "Complete Registration"}
+                    </button>
+                 </form>
+            </motion.div>
+        </div>
+      )}
+
     </main>
   );
 }

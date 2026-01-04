@@ -19,7 +19,11 @@ import {
   Pie, 
   Cell, 
   ResponsiveContainer,
-  Tooltip 
+  Tooltip,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis
 } from "recharts";
 
 // --- Mock Data ---
@@ -65,6 +69,16 @@ const transactions = [
   { id: 1, type: "Receive", asset: "ETH", amount: "1.5", value: "$3,200", from: "0x88...9a", time: "2h ago" },
   { id: 2, type: "Send", asset: "USDT", amount: "500", value: "$500", to: "Binance", time: "5h ago" },
   { id: 3, type: "Swap", asset: "SOL", amount: "200", value: "$18,400", from: "USDC", time: "1d ago" },
+];
+
+const portfolioHistory = [
+  { name: 'Mon', BTC: 45000, ETH: 30000, SOL: 15000, USDT: 10000 },
+  { name: 'Tue', BTC: 46000, ETH: 31000, SOL: 14500, USDT: 10000 },
+  { name: 'Wed', BTC: 44000, ETH: 32000, SOL: 16000, USDT: 9000 },
+  { name: 'Thu', BTC: 48000, ETH: 31500, SOL: 17000, USDT: 11000 },
+  { name: 'Fri', BTC: 52000, ETH: 33000, SOL: 18000, USDT: 12000 },
+  { name: 'Sat', BTC: 54000, ETH: 35000, SOL: 19000, USDT: 13000 },
+  { name: 'Sun', BTC: 56000, ETH: 36000, SOL: 20000, USDT: 13678 },
 ];
 
 export function WalletsPage() {
@@ -128,6 +142,32 @@ export function WalletsPage() {
                        <span className="text-gray-500 text-sm">vs last month</span>
                    </div>
                </div>
+
+                {/* --- Chart Area --- */}
+                <div className="absolute bottom-0 left-0 right-0 h-32 opacity-30 pointer-events-none">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={portfolioHistory}>
+                             <defs>
+                                <linearGradient id="colorBTC" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#F7931A" stopOpacity={0.8}/>
+                                    <stop offset="95%" stopColor="#F7931A" stopOpacity={0}/>
+                                </linearGradient>
+                                <linearGradient id="colorETH" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#627EEA" stopOpacity={0.8}/>
+                                    <stop offset="95%" stopColor="#627EEA" stopOpacity={0}/>
+                                </linearGradient>
+                                <linearGradient id="colorSOL" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#14F195" stopOpacity={0.8}/>
+                                    <stop offset="95%" stopColor="#14F195" stopOpacity={0}/>
+                                </linearGradient>
+                            </defs>
+                            <Area type="monotone" dataKey="BTC" stackId="1" stroke="#F7931A" fill="url(#colorBTC)" strokeWidth={0} />
+                            <Area type="monotone" dataKey="ETH" stackId="1" stroke="#627EEA" fill="url(#colorETH)" strokeWidth={0} />
+                            <Area type="monotone" dataKey="SOL" stackId="1" stroke="#14F195" fill="url(#colorSOL)" strokeWidth={0} />
+                            <Area type="monotone" dataKey="USDT" stackId="1" stroke="#26A17B" fill="#26A17B" fillOpacity={0.5} strokeWidth={0} />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                </div>
 
 {/* 
                <div className="flex items-end gap-2 mt-8">

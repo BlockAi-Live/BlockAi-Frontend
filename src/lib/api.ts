@@ -28,6 +28,33 @@ export const api = {
     return response.json();
   },
 
+  walletLogin: async (walletAddress: string) => {
+    const response = await fetch(`${API_URL}/api/auth/wallet-login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ walletAddress }),
+    });
+    if (response.status === 404) return null; // User not found
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Wallet Login failed");
+    }
+    return response.json();
+  },
+
+  walletRegister: async (walletAddress: string, username: string) => {
+    const response = await fetch(`${API_URL}/api/auth/wallet-register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ walletAddress, username }),
+    });
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Wallet Registration failed");
+    }
+    return response.json();
+  },
+
   getMe: async (token: string) => {
     const response = await fetch(`${API_URL}/api/auth/me`, {
       method: 'GET',
