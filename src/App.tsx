@@ -16,6 +16,7 @@ import { SignUpPage } from "./pages/SignUp";
 import { SignInPage } from "./pages/SignIn";
 import MarketAnalysisPage from "./pages/MarketAnalysis";
 import { SettingsPage } from "./pages/Settings";
+import GenesisPass from "./pages/GenesisPass";
 import { Toaster } from "@/components/ui/toaster";
 import AuthSuccess from "./pages/AuthSuccess";
 
@@ -52,7 +53,9 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Navigate to="/" replace />} />
         <Route path="/about" element={<About />} />
+        <Route path="/about" element={<About />} />
         <Route path="/team" element={<Team />} />
+        <Route path="/genesis" element={<GenesisPass />} />
 
         {/* Auth Pages */}
         <Route path="/signup" element={<SignUpPage />} />

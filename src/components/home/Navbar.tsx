@@ -73,6 +73,7 @@ export default function Navbar({ launch }: NavbarProps) {
     { name: "Features", href: "/#features" },
     { name: "About", href: "/about" },
     { name: "Team", href: "/team" },
+    { name: "Genesis", href: "/genesis" },
     { name: "Community", href: "/#community" },
   ];
 
