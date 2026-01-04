@@ -25,7 +25,7 @@ export default function GenesisPass() {
   
   const [isMinting, setIsMinting] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [mintedCount, setMintedCount] = useState(342); // Mock initial count
+  const [mintedCount, setMintedCount] = useState(0); // Mock initial count
   
   // Confetti cleanup
   useEffect(() => {
