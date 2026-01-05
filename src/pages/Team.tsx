@@ -68,7 +68,11 @@ const teamMembers: TeamMember[] = [
     role: "Smart Contract Engineer & Auditor",
     bio: "Preetham is a seasoned Solidity engineer specializing in smart contract security and gas optimization. With a background in auditing core DeFi protocols, he ensures the integrity of BlockAI's on-chain infrastructure through rigorous testing and formal verification methods.",
     customImage: "https://ui-avatars.com/api/?name=Preetham+AK&background=10e291&color=000&size=200",
-    socials: {}
+    socials: {
+        twitter: "https://x.com/preethamak17159",
+        linkedin: "https://www.linkedin.com/in/preetham-a-k-18b97931b/",
+        github: "https://github.com/preethamak"
+    }
   }
 ];
 
