@@ -40,7 +40,7 @@ export default function Community() {
             {/* Discord */}
             <StaggerItem>
             <a
-              href="https://discord.gg/7XR2kafsAT"
+              href="https://discord.gg/FuPn3FbkG9"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 px-8 py-4 bg-white/5 border border-white/10 rounded-full hover:bg-[#5865F2] hover:border-[#5865F2] transition-all duration-300 group/btn hover:-translate-y-1 hover:shadow-lg hover:shadow-[#5865F2]/20"
