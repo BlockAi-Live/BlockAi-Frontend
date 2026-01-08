@@ -4,10 +4,10 @@ import ChatEmptyState from "../components/chat/ChatEmptyState";
 import ChatInput from "../components/chat/ChatInput";
 import ChatMessage, { Message } from "../components/chat/ChatMessage";
 import { api } from "@/lib/api";
-import { Lightning } from "@phosphor-icons/react";
+import { Lightning, Sparkle } from "@phosphor-icons/react";
 
 export default function ChatPage() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [credits, setCredits] = useState<number | null>(null);
@@ -139,16 +139,33 @@ function syntaxToHTML(text: string): string {
       setMessages((prev) => [...prev, errorMsg]);
     } finally {
       setIsLoading(false);
-      // Refresh actual stats
+      // Refresh billing stats (for limits)
       fetchBilling(); 
+      // Refresh User Points (global state)
+      try {
+          const { user: updatedUser } = await api.getMe(localStorage.getItem('auth_token') || '');
+          if (updatedUser) {
+              updateUser({ points: updatedUser.points });
+          }
+      } catch (e) {
+          console.error("Failed to refresh points", e);
+      }
     }
   };
 
   return (
     <div className="flex flex-col h-full min-h-[calc(100vh-4rem)] relative font-sans bg-[#0d0f18]">
       
-      {/* Credit Badge */}
-      <div className="absolute top-4 right-6 z-30 pointer-events-none">
+      {/* Status Badges */}
+      <div className="absolute top-4 right-6 z-30 pointer-events-none flex flex-col items-end gap-2">
+         
+         {/* Points Badge */}
+         <div className="bg-[#13151C]/80 backdrop-blur-md border border-[#9945FF]/30 rounded-full pl-3 pr-4 py-1.5 flex items-center gap-2 shadow-lg animate-fade-in-up">
+             <Sparkle size={14} weight="fill" className="text-[#9945FF]" />
+             <span className="text-xs font-bold text-white">{user?.points || 0} PTS</span>
+         </div>
+
+         {/* Credits Badge */}
          <div className="bg-[#13151C]/80 backdrop-blur-md border border-white/10 rounded-full px-4 py-1.5 flex items-center gap-2 shadow-lg">
              <Lightning size={14} weight="fill" className={isPaid ? "text-purple-400" : "text-[#14F195]"} />
              <span className="text-xs font-bold text-white">

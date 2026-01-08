@@ -17,6 +17,9 @@ import { SignInPage } from "./pages/SignIn";
 import MarketAnalysisPage from "./pages/MarketAnalysis";
 import { SettingsPage } from "./pages/Settings";
 import GenesisPass from "./pages/GenesisPass";
+import Waitlist from "./pages/Waitlist";
+import AdminWaitlist from "./pages/AdminWaitlist";
+import { AccessGateway } from "./components/access/AccessGateway";
 import { Toaster } from "@/components/ui/toaster";
 import AuthSuccess from "./pages/AuthSuccess";
 
@@ -56,6 +59,8 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/team" element={<Team />} />
         <Route path="/genesis" element={<GenesisPass />} />
+        <Route path="/waitlist" element={<Waitlist />} />
+        <Route path="/admin/waitlist" element={<AdminWaitlist />} />
 
         {/* Auth Pages */}
         <Route path="/signup" element={<SignUpPage />} />
@@ -79,7 +84,9 @@ function App() {
           element={
             <ProtectedRoute>
               <MainLayout>
-                <Chat />
+                <AccessGateway>
+                    <Chat />
+                </AccessGateway>
               </MainLayout>
             </ProtectedRoute>
           }

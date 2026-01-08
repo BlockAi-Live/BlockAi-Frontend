@@ -143,5 +143,60 @@ export const api = {
     });
     if (!response.ok) throw new Error("Payment simulation failed");
     return response.json();
+  },
+
+  // --- Access & Points System ---
+
+  joinWaitlist: async (data: { email: string; walletAddress?: string; telegram?: string; twitter?: string; reason?: string }) => {
+    const response = await fetch(`${API_URL}/api/access/waitlist`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to join waitlist");
+    }
+    return response.json();
+  },
+
+  redeemAccessCode: async (code: string, userId: string) => {
+    const response = await fetch(`${API_URL}/api/access/redeem`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, userId }),
+    });
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to redeem code");
+    }
+    return response.json();
+  },
+
+  getWaitlist: async () => {
+    // Admin check logic relies on backend or client secret typically, but here we just fetch.
+    const response = await fetch(`${API_URL}/api/access/admin/waitlist`, {});
+    if (!response.ok) throw new Error("Failed to fetch waitlist");
+    return response.json();
+  },
+
+  approveWaitlist: async (id: string) => {
+    const response = await fetch(`${API_URL}/api/access/admin/approve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+    });
+    if (!response.ok) throw new Error("Failed to approve");
+    return response.json();
+  },
+
+  generateInvite: async (maxUses: number = 1) => {
+    const response = await fetch(`${API_URL}/api/access/admin/invite`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ maxUses }),
+    });
+    if (!response.ok) throw new Error("Failed to generate code");
+    return response.json();
   }
 };

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, LogOut } from "lucide-react";
+import { Menu, LogOut, Sparkles } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -27,7 +27,8 @@ interface NavbarProps {
 
 export default function Navbar({ launch }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, user, login } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const account = useActiveAccount();
 
@@ -112,6 +113,7 @@ export default function Navbar({ launch }: NavbarProps) {
       </div>
 
       <div className="flex items-center gap-4">
+        
         {/* Thirdweb Connect Button - Only show when connected */}
         {account && (
             <div className="hidden md:block">

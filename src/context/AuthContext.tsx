@@ -6,6 +6,8 @@ interface User {
   fullName?: string;
   walletAddress?: string;
   avatar?: string;
+  points?: number;
+  isAccessGranted?: boolean;
 }
 
 interface AuthContextType {
