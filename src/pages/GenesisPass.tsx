@@ -22,17 +22,46 @@ import GenesisPassABI from "@/contracts/GenesisPass.json";
 
 // Window.ethereum is already defined in global.d.ts
 
-// Contract addresses - Anvil (local) and Sepolia (testnet)
-const ANVIL_CONTRACT_ADDRESS = import.meta.env.VITE_ANVIL_CONTRACT_ADDRESS || "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-const SEPOLIA_CONTRACT_ADDRESS = import.meta.env.VITE_SEPOLIA_CONTRACT_ADDRESS || "";
+// Contract address - Sepolia (testnet)
+const SEPOLIA_CONTRACT_ADDRESS = import.meta.env.VITE_SEPOLIA_CONTRACT_ADDRESS || "0xef243E21545eeE86541B412015b03748C339a8D0";
 
-// RPC URLs
-const ANVIL_RPC_URL = "http://localhost:8545";
+// RPC URL
 const SEPOLIA_RPC_URL = import.meta.env.VITE_SEPOLIA_RPC_URL || "https://rpc.sepolia.org";
 
-// Chain IDs
-const ANVIL_CHAIN_ID = 31337;
+// Chain ID
 const SEPOLIA_CHAIN_ID = 11155111;
+
+// Helper function to detect any available wallet provider (MetaMask, Coinbase, Rabby, Rainbow, Zerion, etc.)
+const getWalletProvider = () => {
+  if (typeof window === 'undefined') return null;
+  
+  // Check for window.ethereum (MetaMask, Coinbase, Rabby, Rainbow, etc.)
+  if (window.ethereum) {
+    return window.ethereum;
+  }
+  
+  // Check for Coinbase Wallet
+  if ((window as any).coinbaseWalletExtension) {
+    return (window as any).coinbaseWalletExtension;
+  }
+  
+  // Check for Rabby
+  if ((window as any).rabby?.ethereum) {
+    return (window as any).rabby.ethereum;
+  }
+  
+  // Check for Rainbow
+  if ((window as any).rainbow) {
+    return (window as any).rainbow;
+  }
+  
+  // Check for Zerion
+  if ((window as any).zerionWallet) {
+    return (window as any).zerionWallet;
+  }
+  
+  return null;
+};
 
 export default function GenesisPass() {
   const navigate = useNavigate();
@@ -41,7 +70,7 @@ export default function GenesisPass() {
   const { width, height } = useWindowSize();
   const thirdwebAccount = useActiveAccount();
   
-  // State for wallet address (from MetaMask or thirdweb)
+  // State for wallet address (from any connected wallet)
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
@@ -52,71 +81,24 @@ export default function GenesisPass() {
   const [mintPriceWei, setMintPriceWei] = useState("0");
   const [hasMinted, setHasMinted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentNetwork, setCurrentNetwork] = useState<"anvil" | "sepolia" | null>(null);
-  const [contractAddress, setContractAddress] = useState<string>("");
-  const [rpcUrl, setRpcUrl] = useState<string>(ANVIL_RPC_URL);
+  const [contractAddress, setContractAddress] = useState<string>(SEPOLIA_CONTRACT_ADDRESS);
+  const [rpcUrl, setRpcUrl] = useState<string>(SEPOLIA_RPC_URL);
 
-  // Detect network and set contract address
+  // Set Sepolia as default network
   useEffect(() => {
-    const detectNetwork = async () => {
-      if (!window.ethereum) {
-        // Default to Anvil if no wallet
-        setCurrentNetwork("anvil");
-        setContractAddress(ANVIL_CONTRACT_ADDRESS);
-        setRpcUrl(ANVIL_RPC_URL);
-        return;
-      }
-
-      try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const network = await provider.getNetwork();
-        const chainId = Number(network.chainId);
-
-        if (chainId === ANVIL_CHAIN_ID) {
-          setCurrentNetwork("anvil");
-          setContractAddress(ANVIL_CONTRACT_ADDRESS);
-          setRpcUrl(ANVIL_RPC_URL);
-        } else if (chainId === SEPOLIA_CHAIN_ID) {
-          setCurrentNetwork("sepolia");
-          setContractAddress(SEPOLIA_CONTRACT_ADDRESS || "");
-          setRpcUrl(SEPOLIA_RPC_URL);
-        } else {
-          // Try to detect from connected account
-          const accounts = (await window.ethereum?.request({ method: 'eth_accounts' })) as string[] | undefined;
-          if (accounts && Array.isArray(accounts) && accounts.length > 0) {
-            // Default to Sepolia if wallet is connected but network is unknown
-            setCurrentNetwork("sepolia");
-            setContractAddress(SEPOLIA_CONTRACT_ADDRESS || "");
-            setRpcUrl(SEPOLIA_RPC_URL);
-          } else {
-            // Default to Anvil
-            setCurrentNetwork("anvil");
-            setContractAddress(ANVIL_CONTRACT_ADDRESS);
-            setRpcUrl(ANVIL_RPC_URL);
-          }
-        }
-      } catch (error) {
-        console.error("Error detecting network:", error);
-        // Default to Anvil on error
-        setCurrentNetwork("anvil");
-        setContractAddress(ANVIL_CONTRACT_ADDRESS);
-        setRpcUrl(ANVIL_RPC_URL);
-      }
-    };
-
-    detectNetwork();
+    setContractAddress(SEPOLIA_CONTRACT_ADDRESS);
+    setRpcUrl(SEPOLIA_RPC_URL);
 
     // Listen for network changes
-    if (window.ethereum && typeof (window.ethereum as any).on === 'function') {
-      (window.ethereum as any).on('chainChanged', () => {
-        detectNetwork();
-        // Reload page on network change
+    const provider = getWalletProvider();
+    if (provider && typeof provider.on === 'function') {
+      provider.on('chainChanged', () => {
         window.location.reload();
       });
     }
   }, []);
 
-  // Check for MetaMask connection
+  // Check for wallet connection (supports all wallets)
   useEffect(() => {
     const checkWalletConnection = async () => {
       // First check thirdweb account
@@ -125,22 +107,24 @@ export default function GenesisPass() {
         return;
       }
       
-      // Then check MetaMask directly
-      if (window.ethereum) {
+      // Then check any available wallet provider
+      const provider = getWalletProvider();
+      if (provider) {
         try {
-          const accounts = await window.ethereum.request({ method: 'eth_accounts' }) as string[] | undefined;
+          const accounts = await provider.request({ method: 'eth_accounts' }) as string[] | undefined;
           if (accounts && accounts.length > 0) {
             setWalletAddress(accounts[0]);
           }
         } catch (error) {
-          console.error("Error checking MetaMask accounts:", error);
+          console.error("Error checking wallet accounts:", error);
         }
       }
     };
     checkWalletConnection();
     
     // Listen for account changes
-    if (window.ethereum && typeof (window.ethereum as any).on === 'function') {
+    const provider = getWalletProvider();
+    if (provider && typeof provider.on === 'function') {
       const handleAccountsChanged = (accounts: string[]) => {
         if (accounts.length > 0) {
           setWalletAddress(accounts[0]);
@@ -149,34 +133,68 @@ export default function GenesisPass() {
         }
       };
       
-      (window.ethereum as any).on('accountsChanged', handleAccountsChanged);
+      provider.on('accountsChanged', handleAccountsChanged);
       
       return () => {
-        if (typeof (window.ethereum as any)?.removeListener === 'function') {
-          (window.ethereum as any).removeListener('accountsChanged', handleAccountsChanged);
+        if (typeof provider.removeListener === 'function') {
+          provider.removeListener('accountsChanged', handleAccountsChanged);
         }
       };
     }
   }, [thirdwebAccount?.address]);
 
-  // Connect wallet function
+  // Connect wallet function (supports all wallets)
   const connectWallet = async () => {
-    if (!window.ethereum) {
+    const provider = getWalletProvider();
+    
+    if (!provider) {
       toast({
-        title: "MetaMask Not Found",
-        description: "Please install MetaMask to connect your wallet.",
+        title: "Wallet Not Found",
+        description: "Please install a compatible wallet (MetaMask, Coinbase Wallet, Rabby, Rainbow, or Zerion).",
         variant: "destructive",
       });
       return;
     }
+    
     setIsConnecting(true);
     try {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' }) as string[] | undefined;
+      const accounts = await provider.request({ method: 'eth_requestAccounts' }) as string[] | undefined;
       if (accounts && accounts.length > 0) {
         setWalletAddress(accounts[0]);
+        
+        // Ensure we're on Sepolia
+        try {
+          const ethersProvider = new ethers.BrowserProvider(provider);
+          const network = await ethersProvider.getNetwork();
+          if (Number(network.chainId) !== SEPOLIA_CHAIN_ID) {
+            await provider.request({
+              method: 'wallet_switchEthereumChain',
+              params: [{ chainId: `0x${SEPOLIA_CHAIN_ID.toString(16)}` }],
+            });
+          }
+        } catch (switchError: any) {
+          // If Sepolia network doesn't exist, add it
+          if (switchError.code === 4902) {
+            await provider.request({
+              method: 'wallet_addEthereumChain',
+              params: [{
+                chainId: `0x${SEPOLIA_CHAIN_ID.toString(16)}`,
+                chainName: 'Sepolia',
+                nativeCurrency: {
+                  name: 'ETH',
+                  symbol: 'ETH',
+                  decimals: 18
+                },
+                rpcUrls: [SEPOLIA_RPC_URL],
+                blockExplorerUrls: ['https://sepolia.etherscan.io']
+              }],
+            });
+          }
+        }
+        
         toast({
           title: "Wallet Connected",
-          description: "Successfully connected to MetaMask.",
+          description: "Successfully connected to your wallet.",
         });
       }
     } catch (error: any) {
@@ -208,7 +226,18 @@ export default function GenesisPass() {
 
     const fetchContractData = async () => {
       try {
-        const provider = new ethers.JsonRpcProvider(rpcUrl);
+        // Use wallet provider if available (avoids CORS issues), otherwise use RPC
+        let provider: ethers.Provider;
+        const walletProvider = getWalletProvider();
+        
+        if (walletProvider) {
+          // Use wallet provider (no CORS issues)
+          provider = new ethers.BrowserProvider(walletProvider);
+        } else {
+          // Fallback to RPC provider (may have CORS issues, but we'll handle gracefully)
+          provider = new ethers.JsonRpcProvider(rpcUrl);
+        }
+        
         const contract = new ethers.Contract(contractAddress, GenesisPassABI, provider);
         
         // Fetch contract data
@@ -221,54 +250,83 @@ export default function GenesisPass() {
         setMintPriceWei(price.toString());
         setMintPrice(ethers.formatEther(price));
         
-        // Check if user has minted
+        // Check if user has minted (only if wallet is connected)
         const addressToCheck = walletAddress || thirdwebAccount?.address;
         if (addressToCheck) {
-          const userHasMinted = await contract.hasMinted(addressToCheck);
-          setHasMinted(userHasMinted);
+          try {
+            const userHasMinted = await contract.hasMinted(addressToCheck);
+            setHasMinted(userHasMinted);
+          } catch (error) {
+            // Silently fail if we can't check mint status
+            console.warn("Could not check mint status:", error);
+          }
         }
         
         setIsLoading(false);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching contract data:", error);
+        
+        // If it's a CORS error and no wallet is connected, don't show error
+        // Just set default values and stop loading
+        if (error.message?.includes("CORS") || error.message?.includes("Failed to fetch")) {
+          if (!walletAddress && !thirdwebAccount?.address) {
+            // No wallet connected and CORS error - just use defaults
+            setIsLoading(false);
+            return;
+          }
+        }
+        
         setIsLoading(false);
-        const networkName = currentNetwork === "sepolia" ? "Sepolia" : "Anvil";
-        toast({
-          title: "Connection Error",
-          description: `Could not connect to contract on ${networkName}. Make sure the network is accessible.`,
-          variant: "destructive",
-        });
-      }
-    };
-    fetchContractData();
-    
-    // Set up event listener for new mints
-    if (contractAddress) {
-      const provider = new ethers.JsonRpcProvider(rpcUrl);
-      const contract = new ethers.Contract(contractAddress, GenesisPassABI, provider);
-      
-      const handleMinted = (to: string, tokenId: bigint, price: bigint) => {
-        const currentAddress = walletAddress || thirdwebAccount?.address;
-        if (currentAddress && to.toLowerCase() === currentAddress.toLowerCase()) {
-          setShowConfetti(true);
+        // Only show error toast if wallet is connected
+        if (walletAddress || thirdwebAccount?.address) {
           toast({
-            title: "Genesis Pass Minted! 🚀",
-            description: "Welcome to the inner circle. Your NFT has been sent to your wallet.",
-            duration: 5000,
+            title: "Connection Error",
+            description: "Could not connect to contract on Sepolia. Make sure the network is accessible.",
+            variant: "destructive",
           });
         }
-        // Update minted count
-        contract.totalSupply().then((supply: bigint) => {
-          setMintedCount(Number(supply));
-        });
-      };
-      
-      contract.on("Minted", handleMinted);
-      return () => {
-        contract.off("Minted", handleMinted);
-      };
+      }
+    };
+    
+    fetchContractData();
+    
+    // Set up event listener for new mints (only if wallet provider is available)
+    if (contractAddress) {
+      const walletProvider = getWalletProvider();
+      if (walletProvider) {
+        try {
+          const provider = new ethers.BrowserProvider(walletProvider);
+          const contract = new ethers.Contract(contractAddress, GenesisPassABI, provider);
+          
+          const handleMinted = (to: string, tokenId: bigint, price: bigint) => {
+            const currentAddress = walletAddress || thirdwebAccount?.address;
+            if (currentAddress && to.toLowerCase() === currentAddress.toLowerCase()) {
+              setShowConfetti(true);
+              toast({
+                title: "Genesis Pass Minted! 🚀",
+                description: "Welcome to the inner circle. Your NFT has been sent to your wallet.",
+                duration: 5000,
+              });
+            }
+            // Update minted count
+            contract.totalSupply().then((supply: bigint) => {
+              setMintedCount(Number(supply));
+            }).catch(() => {
+              // Silently fail if we can't update
+            });
+          };
+          
+          contract.on("Minted", handleMinted);
+          return () => {
+            contract.off("Minted", handleMinted);
+          };
+        } catch (error) {
+          // Silently fail if we can't set up event listener
+          console.warn("Could not set up event listener:", error);
+        }
+      }
     }
-  }, [walletAddress, thirdwebAccount?.address, contractAddress, rpcUrl, currentNetwork, toast]);
+  }, [walletAddress, thirdwebAccount?.address, contractAddress, rpcUrl, toast]);
 
   // Confetti cleanup
   useEffect(() => {
@@ -294,9 +352,7 @@ export default function GenesisPass() {
     if (!contractAddress) {
       toast({
         title: "Contract Not Configured",
-        description: currentNetwork === "sepolia" 
-          ? "Sepolia contract address not set. Please set VITE_SEPOLIA_CONTRACT_ADDRESS."
-          : "Contract address not available.",
+        description: "Sepolia contract address not set. Please set VITE_SEPOLIA_CONTRACT_ADDRESS.",
         variant: "destructive",
       });
       return;
@@ -323,80 +379,62 @@ export default function GenesisPass() {
     setIsMinting(true);
     
     try {
-      // Use browser's ethereum provider (MetaMask, etc.)
-      let provider: ethers.BrowserProvider | ethers.JsonRpcProvider;
-      let signer: ethers.Signer;
+      // Get wallet provider (supports MetaMask, Coinbase, Rabby, Rainbow, Zerion, etc.)
+      const walletProvider = getWalletProvider();
       
-      if (window.ethereum) {
-        // Use MetaMask or other injected wallet
-        provider = new ethers.BrowserProvider(window.ethereum);
-        
-        // Check and switch network if needed
-        const network = await provider.getNetwork();
-        const chainId = Number(network.chainId);
-        const targetChainId = currentNetwork === "sepolia" ? SEPOLIA_CHAIN_ID : ANVIL_CHAIN_ID;
-        
-        if (chainId !== targetChainId) {
-          try {
-            await window.ethereum.request({
-              method: 'wallet_switchEthereumChain',
-              params: [{ chainId: `0x${targetChainId.toString(16)}` }],
+      if (!walletProvider) {
+        throw new Error("No wallet found. Please install a compatible wallet.");
+      }
+      
+      // Use browser's ethereum provider (works with any EIP-1193 wallet)
+      const provider = new ethers.BrowserProvider(walletProvider);
+      
+      // Check and switch to Sepolia if needed
+      const network = await provider.getNetwork();
+      const chainId = Number(network.chainId);
+      
+      if (chainId !== SEPOLIA_CHAIN_ID) {
+        try {
+          await walletProvider.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: `0x${SEPOLIA_CHAIN_ID.toString(16)}` }],
+          });
+        } catch (switchError: any) {
+          // If Sepolia network doesn't exist, add it
+          if (switchError.code === 4902) {
+            await walletProvider.request({
+              method: 'wallet_addEthereumChain',
+              params: [{
+                chainId: `0x${SEPOLIA_CHAIN_ID.toString(16)}`,
+                chainName: 'Sepolia',
+                nativeCurrency: {
+                  name: 'ETH',
+                  symbol: 'ETH',
+                  decimals: 18
+                },
+                rpcUrls: [SEPOLIA_RPC_URL],
+                blockExplorerUrls: ['https://sepolia.etherscan.io']
+              }],
             });
-          } catch (switchError: any) {
-            // If network doesn't exist, add it (for Anvil)
-            if (switchError.code === 4902 && currentNetwork === "anvil") {
-              await window.ethereum.request({
-                method: 'wallet_addEthereumChain',
-                params: [{
-                  chainId: `0x${ANVIL_CHAIN_ID.toString(16)}`,
-                  chainName: 'Anvil Local',
-                  nativeCurrency: {
-                    name: 'ETH',
-                    symbol: 'ETH',
-                    decimals: 18
-                  },
-                  rpcUrls: [ANVIL_RPC_URL]
-                }],
-              });
-            } else {
-              throw new Error(`Please switch to ${currentNetwork === "sepolia" ? "Sepolia" : "Anvil"} network`);
-            }
+          } else {
+            throw new Error("Please switch to Sepolia network");
           }
         }
-        
-        signer = await provider.getSigner();
-      } else {
-        // Fallback to RPC provider (for testing without wallet)
-        provider = new ethers.JsonRpcProvider(rpcUrl);
-        // For Anvil testing without MetaMask, we need to use a private key
-        // NOTE: This is the well-known default Anvil private key (safe for local dev only)
-        // This is only for development/testing when MetaMask is not available
-        const privateKey = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
-        signer = new ethers.Wallet(privateKey, provider);
       }
+      
+      const signer = await provider.getSigner();
       
       // First verify contract exists at address before creating contract instance
       try {
         const code = await provider.getCode(contractAddress);
         if (!code || code === "0x" || code === "0x0") {
-          const networkName = currentNetwork === "sepolia" ? "Sepolia" : "Anvil";
-          if (currentNetwork === "anvil") {
-            throw new Error(`No contract found at ${contractAddress} on Anvil.\n\nPlease:\n1. Start Anvil: cd BlockAi-Frontend/Contracts && anvil --chain-id 31337 --port 8545\n2. Deploy contract: forge script script/Deploy.s.sol --rpc-url http://localhost:8545 --broadcast\n3. Connect MetaMask to Anvil (Chain ID: 31337, RPC: http://localhost:8545)`);
-          } else {
-            throw new Error(`No contract found at ${contractAddress} on Sepolia.\n\nMake sure:\n1. You're connected to Sepolia network in MetaMask\n2. The contract address is correct: ${contractAddress}`);
-          }
+          throw new Error(`No contract found at ${contractAddress} on Sepolia.\n\nMake sure:\n1. You're connected to Sepolia network\n2. The contract address is correct: ${contractAddress}`);
         }
       } catch (error: any) {
         if (error.message.includes("No contract found")) {
           throw error;
         }
-        // If getCode fails, it might be a network issue
-        const networkName = currentNetwork === "sepolia" ? "Sepolia" : "Anvil";
-        if (currentNetwork === "anvil") {
-          throw new Error(`Cannot connect to Anvil network.\n\nPlease:\n1. Start Anvil: cd BlockAi-Frontend/Contracts && anvil --chain-id 31337 --port 8545\n2. Connect MetaMask to Anvil network\n3. Refresh this page`);
-        } else {
-          throw new Error(`Cannot connect to Sepolia network. Make sure MetaMask is connected to Sepolia testnet.`);
-        }
+        throw new Error(`Cannot connect to Sepolia network. Make sure your wallet is connected to Sepolia testnet.`);
       }
       
       const contract = new ethers.Contract(contractAddress, GenesisPassABI, signer);
@@ -405,8 +443,7 @@ export default function GenesisPass() {
       try {
         await contract.MAX_SUPPLY();
       } catch (error: any) {
-        const networkName = currentNetwork === "sepolia" ? "Sepolia" : "Anvil";
-        throw new Error(`Contract exists but cannot read data. ${currentNetwork === "anvil" ? "Make sure Anvil is running." : "Check your network connection."}`);
+        throw new Error(`Contract exists but cannot read data. Check your network connection to Sepolia.`);
       }
       
       // Check if user has already minted
@@ -492,8 +529,8 @@ export default function GenesisPass() {
       setShowConfetti(true);
       
       const message = tokenId 
-        ? `Welcome to the inner circle! Your NFT (Token ID: ${tokenId}) has been sent to your wallet. Check MetaMask's NFT tab to view it.`
-        : "Welcome to the inner circle. Your NFT has been sent to your wallet. Check MetaMask's NFT tab to view it.";
+        ? `Welcome to the inner circle! Your NFT (Token ID: ${tokenId}) has been sent to your wallet. Check your wallet's NFT tab to view it.`
+        : "Welcome to the inner circle. Your NFT has been sent to your wallet. Check your wallet's NFT tab to view it.";
       
       toast({
         title: "Genesis Pass Minted! 🚀",
@@ -524,20 +561,16 @@ export default function GenesisPass() {
         } else if (error.message.includes("allowlist") || error.message.includes("Not on allowlist")) {
           errorMessage = error.message;
         } else if (error.message.includes("CALL_EXCEPTION") || error.message.includes("missing revert data") || error.message.includes("Internal JSON-RPC error")) {
-          const networkName = currentNetwork === "sepolia" ? "Sepolia" : "Anvil";
-          if (currentNetwork === "anvil") {
-            errorMessage = `Cannot connect to Anvil. Please:\n1. Start Anvil: cd Contracts && anvil --chain-id 31337 --port 8545\n2. Connect MetaMask to Anvil network (Chain ID: 31337, RPC: http://localhost:8545)\n3. Refresh the page`;
-          } else {
-            errorMessage = `Cannot connect to Sepolia contract. Make sure:\n1. You're connected to Sepolia network in MetaMask\n2. The contract address is correct: ${contractAddress || "Not set"}`;
-          }
+          errorMessage = `Cannot connect to Sepolia contract. Make sure:\n1. You're connected to Sepolia network\n2. The contract address is correct: ${contractAddress || "Not set"}`;
         } else if (error.message.includes("No contract found")) {
+          errorMessage = error.message;
+        } else if (error.message.includes("No wallet found")) {
           errorMessage = error.message;
         } else {
           errorMessage = error.message;
         }
       } else if (error.code === "CALL_EXCEPTION") {
-        const networkName = currentNetwork === "sepolia" ? "Sepolia" : "Anvil";
-        errorMessage = `Cannot connect to contract on ${networkName}. ${currentNetwork === "anvil" ? "Make sure Anvil is running at http://localhost:8545" : "Make sure you're connected to Sepolia network"}.`;
+        errorMessage = `Cannot connect to contract on Sepolia. Make sure you're connected to Sepolia network.`;
       }
       
       // Format error message for toast (replace newlines with spaces)
@@ -639,27 +672,16 @@ export default function GenesisPass() {
                             <div className="absolute top-0 right-0 w-32 h-32 bg-[#14F195]/5 rounded-full blur-3xl -z-0" />
                             
                             {/* Network Badge */}
-                            {currentNetwork && (
-                              <div className="mb-4 flex flex-col items-center justify-center gap-2">
-                                <div className={`px-3 py-1 rounded-full text-xs font-bold ${
-                                  currentNetwork === "sepolia" 
-                                    ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-                                    : "bg-purple-500/20 text-purple-400 border border-purple-500/30"
-                                }`}>
-                                  {currentNetwork === "sepolia" ? "🌐 Sepolia Testnet" : "🔧 Anvil Local"}
-                                </div>
-                                {currentNetwork === "anvil" && !contractAddress && (
-                                  <p className="text-xs text-yellow-500 text-center">
-                                    Make sure Anvil is running: <code className="bg-black/30 px-1 rounded">anvil --chain-id 31337</code>
-                                  </p>
-                                )}
-                                {currentNetwork === "sepolia" && !contractAddress && (
-                                  <p className="text-xs text-yellow-500 text-center">
-                                    Set VITE_SEPOLIA_CONTRACT_ADDRESS in .env file
-                                  </p>
-                                )}
+                            <div className="mb-4 flex flex-col items-center justify-center gap-2">
+                              <div className="px-3 py-1 rounded-full text-xs font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                                🌐 Sepolia Testnet
                               </div>
-                            )}
+                              {!contractAddress && (
+                                <p className="text-xs text-yellow-500 text-center">
+                                  Set VITE_SEPOLIA_CONTRACT_ADDRESS in .env file
+                                </p>
+                              )}
+                            </div>
 
                             {/* Stats Grid */}
                             <div className="grid grid-cols-2 gap-6 mb-8">
@@ -710,7 +732,7 @@ export default function GenesisPass() {
                                         disabled={isConnecting}
                                         className="w-full mt-2 py-2 px-4 rounded-lg bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/30 text-yellow-500 text-sm font-medium transition-colors disabled:opacity-50"
                                     >
-                                        {isConnecting ? "Connecting..." : "Connect MetaMask"}
+                                        {isConnecting ? "Connecting..." : "Connect Wallet"}
                                     </button>
                                 </div>
                             )}
