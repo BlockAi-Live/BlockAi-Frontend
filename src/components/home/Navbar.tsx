@@ -90,12 +90,12 @@ export default function Navbar({ launch }: NavbarProps) {
 
   return (
     <nav 
-      className="w-full fixed top-0 left-0 right-0 z-50 flex items-center justify-between py-4 px-6 md:px-12 lg:px-20"
+      className="w-full sticky top-0 left-0 right-0 z-50 flex items-center justify-between py-4 px-6 md:px-12 lg:px-20"
       style={{
         backdropFilter: isScrolled ? 'blur(16px)' : 'blur(0px)',
         backgroundColor: isScrolled ? 'rgba(11, 14, 26, 0.7)' : 'rgba(11, 14, 26, 0)',
         borderBottom: isScrolled ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0)',
-        transition: 'backdrop-filter 0.6s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), border-bottom 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+        transition: 'all 0.3s ease'
       }}
     >
       <Link to="/" className="flex items-center gap-2 cursor-pointer">

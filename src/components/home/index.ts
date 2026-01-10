@@ -8,3 +8,4 @@ export { default as Community } from './Community';
 export { default as FAQ } from './FAQ';
 export { default as Footer } from './Footer';
 export { default as LogoSVG } from './LogoSVG';
+export { default as Ticker } from './Ticker';

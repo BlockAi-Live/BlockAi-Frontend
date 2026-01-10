@@ -16,7 +16,8 @@ import {
   DashboardWidgets,
   Community,
   FAQ,
-  Footer
+  Footer,
+  Ticker
 } from "@/components/home";
 
 export default function Home() {
@@ -57,7 +58,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen w-full bg-[#0d0f18] text-white font-inter relative overflow-x-hidden">
+    <div className="min-h-screen w-full bg-[#0d0f18] text-white font-inter relative">
       {/* Background gradient overlay - absolute positioning so it scrolls with content */}
       <div 
         className="fixed inset-0 pointer-events-none w-full"
@@ -67,7 +68,9 @@ export default function Home() {
         }}
       />
       
+      
       <div className="relative z-10">
+        <Ticker />
         <Navbar launch={launch} />
         <main className="max-w-[1200px] mx-auto">
         <ScrollReveal>

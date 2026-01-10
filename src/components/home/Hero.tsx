@@ -11,7 +11,7 @@ export default function Hero({ launch }: HeroProps) {
   const { isAuthenticated } = useAuth();
 
   return (
-    <section className="relative overflow-visible pt-32 md:pt-48 pb-12">
+    <section className="relative overflow-visible pt-16 md:pt-24 pb-12">
       <video
         autoPlay
         loop
