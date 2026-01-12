@@ -45,17 +45,29 @@ export default function MarketAnalysisPage() {
   useEffect(() => {
     const fetchMarkets = async () => {
         setIsLoading(true);
-        const data = await coingecko.getMarkets();
-        if (data.length > 0) {
-            // Map API data to our UI needs (add colors)
-            const processed = data.map((coin: any) => ({
-                ...coin,
-                color: coingecko.getColor(coin.symbol),
-                price: coin.current_price,
-                change: coin.price_change_percentage_24h
-            }));
-            setCoins(processed);
-            setSelectedCoin(processed[0]); // Default to first
+        try {
+            const data = await coingecko.getMarkets();
+            if (Array.isArray(data) && data.length > 0) {
+                // Map API data to our UI needs (add colors)
+                const processed = data.map((coin: any) => ({
+                    ...coin,
+                    color: coingecko.getColor(coin.symbol),
+                    current_price: coin.current_price || 0,
+                    price: coin.current_price || 0,
+                    price_change_percentage_24h: coin.price_change_percentage_24h || 0,
+                    change: coin.price_change_percentage_24h || 0,
+                    market_cap: coin.market_cap || 0,
+                    total_volume: coin.total_volume || 0,
+                    image: coin.image || "", 
+                }));
+                setCoins(processed);
+                setSelectedCoin(processed[0]); // Default to first
+            } else {
+                setCoins([]);
+            }
+        } catch (e) {
+            console.error("Market fetch error:", e);
+            setCoins([]);
         }
         setIsLoading(false);
     };

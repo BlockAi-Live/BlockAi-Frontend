@@ -58,7 +58,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen w-full bg-[#0d0f18] text-white font-inter relative">
+    <div className="min-h-screen w-full bg-[#0d0f18] text-white font-inter relative overflow-x-hidden">
       {/* Background gradient overlay - absolute positioning so it scrolls with content */}
       <div 
         className="fixed inset-0 pointer-events-none w-full"
