@@ -48,6 +48,14 @@ export default function AdminWaitlist() {
             <div>
                 <h1 className="text-3xl font-bold mb-2">Waitlist Management</h1>
                 <p className="text-gray-400">Total Entries: {waitlist.length}</p>
+                {/* 
+                  SECURITY NOTE: This is a demo version. 
+                  The admin authentication is currently disabled for demonstration purposes.
+                  Ensure proper backend auth middleware is enabled in production.
+                */}
+                <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/20 text-yellow-200 rounded-lg text-sm max-w-md">
+                   ⚠️ <b>Demo Mode:</b> Admin authentication is currently disabled. This page is publicly viewable for demo purposes.
+                </div>
             </div>
             
             <div className="flex gap-4">
