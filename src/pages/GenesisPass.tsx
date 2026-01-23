@@ -76,9 +76,9 @@ export default function GenesisPass() {
   const [isMinting, setIsMinting] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [mintedCount, setMintedCount] = useState(0);
-  const [maxSupply, setMaxSupply] = useState(1000);
-  const [mintPrice, setMintPrice] = useState("0.005");
-  const [mintPriceWei, setMintPriceWei] = useState("0");
+  const [maxSupply, setMaxSupply] = useState(500);
+  const [mintPrice, setMintPrice] = useState("0.015");
+  const [mintPriceWei, setMintPriceWei] = useState("15000000000000000");
   const [hasMinted, setHasMinted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [contractAddress, setContractAddress] = useState<string>(SEPOLIA_CONTRACT_ADDRESS);
@@ -246,9 +246,9 @@ export default function GenesisPass() {
         const price = await contract.mintPrice();
         
         setMintedCount(Number(totalSupply));
-        setMaxSupply(Number(maxSupplyValue));
-        setMintPriceWei(price.toString());
-        setMintPrice(ethers.formatEther(price));
+        // setMaxSupply(Number(maxSupplyValue));
+        // setMintPriceWei(price.toString());
+        // setMintPrice(ethers.formatEther(price));
         
         // Check if user has minted (only if wallet is connected)
         const addressToCheck = walletAddress || thirdwebAccount?.address;
@@ -692,9 +692,9 @@ export default function GenesisPass() {
                                     ) : (
                                         <>
                                             <div className="text-2xl font-bold flex items-end gap-1">
-                                                ${(parseFloat(mintPrice) * 2000).toFixed(0)} <span className="text-sm text-gray-500 font-normal mb-1">USD</span>
+                                                {mintPrice} <span className="text-sm text-gray-500 font-normal mb-1">ETH</span>
                                             </div>
-                                            <p className="text-xs text-[#14F195]">~{mintPrice} ETH</p>
+                                            <p className="text-xs text-[#14F195]">~${(parseFloat(mintPrice) * 2000).toFixed(0)} USD</p>
                                         </>
                                     )}
                                 </div>
@@ -810,7 +810,7 @@ export default function GenesisPass() {
                                 <Coins size={24} weight="fill" />
                             </div>
                             <div>
-                                <h3 className="font-bold text-white">500 $BLOCKAI Airdrop</h3>
+                                <h3 className="font-bold text-white">1000 $BLOCKAI Airdrop</h3>
                                 <p className="text-sm text-gray-400">Fixed allocation from community pool. 0.005% of total supply per NFT.</p>
                             </div>
                         </div>
