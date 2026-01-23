@@ -19,6 +19,7 @@ import { useWindowSize } from "react-use";
 import { useActiveAccount } from "thirdweb/react";
 import { ethers } from "ethers";
 import GenesisPassABI from "@/contracts/GenesisPass.json";
+import { coingecko } from "@/lib/coingecko";
 
 // Window.ethereum is already defined in global.d.ts
 
@@ -83,6 +84,7 @@ export default function GenesisPass() {
   const [isLoading, setIsLoading] = useState(true);
   const [contractAddress, setContractAddress] = useState<string>(SEPOLIA_CONTRACT_ADDRESS);
   const [rpcUrl, setRpcUrl] = useState<string>(SEPOLIA_RPC_URL);
+  const [ethPriceInUsd, setEthPriceInUsd] = useState<number>(2966.67); // Fallback results in ~$44.50 USD
 
   // Set Sepolia as default network
   useEffect(() => {
@@ -142,6 +144,22 @@ export default function GenesisPass() {
       };
     }
   }, [thirdwebAccount?.address]);
+
+  // Fetch ETH Price
+  useEffect(() => {
+    const fetchEthPrice = async () => {
+      try {
+        const markets = await coingecko.getMarkets();
+        const eth = markets.find((coin: any) => coin.id === "ethereum");
+        if (eth) {
+          setEthPriceInUsd(eth.current_price);
+        }
+      } catch (error) {
+        console.error("Failed to fetch ETH price:", error);
+      }
+    };
+    fetchEthPrice();
+  }, []);
 
   // Connect wallet function (supports all wallets)
   const connectWallet = async () => {
@@ -694,7 +712,7 @@ export default function GenesisPass() {
                                             <div className="text-2xl font-bold flex items-end gap-1">
                                                 {mintPrice} <span className="text-sm text-gray-500 font-normal mb-1">ETH</span>
                                             </div>
-                                            <p className="text-xs text-[#14F195]">~${(parseFloat(mintPrice) * 2000).toFixed(0)} USD</p>
+                                            <p className="text-xs text-[#14F195]">~${(parseFloat(mintPrice) * ethPriceInUsd).toFixed(2)} USD</p>
                                         </>
                                     )}
                                 </div>
