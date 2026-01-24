@@ -103,10 +103,11 @@ export default function GenesisPass() {
     if (maxSupplyError) {
       console.error("Error loading max supply:", maxSupplyError);
     }
-    if (totalNFTSupply !== undefined) {
-      const count = Number(totalNFTSupply.toString());
-      setMaxSupply(count > 0 ? count : 500);
-    }
+    // We want to force 500 as the max supply for now, ignoring nextTokenIdToMint which is likely current count
+    // if (totalNFTSupply !== undefined) {
+    //   const count = Number(totalNFTSupply.toString());
+    //   setMaxSupply(count > 0 ? count : 500);
+    // }
   }, [totalNFTSupply, maxSupplyError]);
   
   // Update mint price from claim condition
@@ -449,7 +450,7 @@ export default function GenesisPass() {
                 <div className="p-6 rounded-2xl bg-[#13151C]/40 backdrop-blur-md border border-white/5 hover:border-[#14F195]/30 transition-colors group">
                     <h3 className="text-xl font-bold mb-3 text-white">Fair Launch</h3>
                     <p className="text-gray-400 leading-relaxed">
-                        Price fixed at ${mintPrice ? (parseFloat(mintPrice) * 2000).toFixed(0) : "39"}. No bonding curves. No complex mechanics. Simple, transparent support for the project.
+                        Price fixed at ${mintPrice ? (parseFloat(mintPrice) * ethPriceInUsd).toFixed(0) : "45"}. No bonding curves. No complex mechanics. Simple, transparent support for the project.
                     </p>
                 </div>
             </motion.div>

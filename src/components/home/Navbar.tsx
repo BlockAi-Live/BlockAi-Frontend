@@ -65,7 +65,11 @@ export default function Navbar({ launch }: NavbarProps) {
         title: "Wallet Connected",
         description: "Successfully logged in with wallet.",
       });
-      navigate("/dashboard");
+      
+      // Don't redirect if on genesis page
+      if (!window.location.pathname.includes('/genesis')) {
+        navigate("/dashboard");
+      }
     }
   };
 
