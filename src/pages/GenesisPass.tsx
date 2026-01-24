@@ -95,10 +95,7 @@ export default function GenesisPass() {
     }
     if (claimedSupply !== undefined) {
       const count = Number(claimedSupply.toString());
-      console.log("✅ Tokens Claimed by Users:", count);
       setMintedCount(count);
-    } else {
-      console.log("⏳ Claimed Supply: undefined");
     }
   }, [claimedSupply, totalSupplyError]);
   
@@ -108,10 +105,7 @@ export default function GenesisPass() {
     }
     if (totalNFTSupply !== undefined) {
       const count = Number(totalNFTSupply.toString());
-      console.log("✅ Total NFT Supply:", count);
       setMaxSupply(count > 0 ? count : 500);
-    } else {
-      console.log("⏳ Total NFT Supply: undefined");
     }
   }, [totalNFTSupply, maxSupplyError]);
   
@@ -119,28 +113,14 @@ export default function GenesisPass() {
   useEffect(() => {
     if (claimCondition?.pricePerToken) {
       const priceInEth = toEther(claimCondition.pricePerToken);
-      console.log("✅ Mint Price:", priceInEth, "ETH");
       setMintPrice(priceInEth);
     }
   }, [claimCondition]);
   
   useEffect(() => {
     const loading = loadingSupply || loadingClaimCondition;
-    console.log("Loading status:", { loadingSupply, loadingClaimCondition, isLoading: loading });
     setIsLoading(loading);
   }, [loadingSupply, loadingClaimCondition]);
-  
-  // Debug: Log contract data
-  useEffect(() => {
-    console.log("📊 Final Contract State:", {
-      claimed: mintedCount,
-      available: maxSupply,
-      remaining: maxSupply - mintedCount,
-      price: mintPrice,
-      isSoldOut: mintedCount >= maxSupply,
-      loadingDone: !isLoading
-    });
-  }, [claimedSupply, totalNFTSupply, mintedCount, maxSupply, mintPrice, isLoading]);
 
 
   // Fetch ETH Price
@@ -193,8 +173,6 @@ export default function GenesisPass() {
       description: "Welcome to the inner circle! Your NFT has been sent to your wallet.",
       duration: 8000,
     });
-    
-    console.log("✅ Mint successful!");
   };
   
   // Handle mint error
