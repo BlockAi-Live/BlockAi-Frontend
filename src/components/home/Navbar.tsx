@@ -54,12 +54,14 @@ export default function Navbar({ launch }: NavbarProps) {
     const account = wallet.getAccount();
     const address = account?.address;
     if (address) {
+      const refCode = localStorage.getItem('blockai_ref_code');
       login("wallet-mock-token-" + address, {
         id: address,
         email: `${address.slice(0,6)}...@wallet.connect`,
         fullName: "Wallet User",
         walletAddress: address,
-        avatar: `https://effigy.im/a/${address}.png`
+        avatar: `https://effigy.im/a/${address}.png`,
+        referralCode: refCode
       });
       toast({
         title: "Wallet Connected",
