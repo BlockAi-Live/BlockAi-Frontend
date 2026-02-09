@@ -31,16 +31,16 @@ const teamMembers: TeamMember[] = [
         telegram: "https://t.me/Siamakkhoshnood"
     }
   },
-  {
-    id: 2,
-    name: "Raymond Henry (Mr. Eagle)",
-    role: "Chief Operating Officer (COO)",
-    bio: "Raymond is an experienced Web3 COO with over five years of expertise in blockchain coordination. He executes project roadmaps and manages cross-functional sprints, acting as the primary liaison between technical and marketing teams to ensure all deliverables align with the project’s long-term vision.",
-    socials: {
-        twitter: "https://x.com/web3eaglealpha",
-        telegram: "https://t.me/web3eaglealpha"
-    }
-  },
+  // {
+  //   id: 2,
+  //   name: "Raymond Henry (Mr. Eagle)",
+  //   role: "Chief Operating Officer (COO)",
+  //   bio: "Raymond is an experienced Web3 COO with over five years of expertise in blockchain coordination. He executes project roadmaps and manages cross-functional sprints, acting as the primary liaison between technical and marketing teams to ensure all deliverables align with the project’s long-term vision.",
+  //   socials: {
+  //       twitter: "https://x.com/web3eaglealpha",
+  //       telegram: "https://t.me/web3eaglealpha"
+  //   }
+  // },
   {
     id: 8,
     name: "ImmortalSui",
