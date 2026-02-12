@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
+import { AnimatedGridPattern } from "../ui/AnimatedGridPattern";
 
 interface HeroProps {
   launch: () => void;
@@ -11,60 +13,103 @@ export default function Hero({ launch }: HeroProps) {
   const { isAuthenticated } = useAuth();
 
   return (
-    <section className="relative overflow-visible pt-16 md:pt-24 pb-12">
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="pointer-events-none select-none 
-                   w-[350px] md:w-[480px] 
-                   absolute left-20 -top-10 
-                   -translate-x-1/4 
-                   z-[1] mix-blend-screen
-                   [mask-image:radial-gradient(circle_at_center,white_60%,transparent_95%)]"
-      >
-        <source src="/sphere-render.webm" type="video/webm" />
-      </video>
+    <section className="relative pt-20 md:pt-28 pb-12 md:pb-16">
+      {/* Animated grid — subtle, behind everything */}
+      <AnimatedGridPattern
+        numSquares={30}
+        maxOpacity={0.08}
+        duration={4}
+        repeatDelay={1}
+        className="[mask-image:radial-gradient(600px_circle_at_center,white,transparent)] fill-neutral-700/20 stroke-neutral-700/20"
+      />
 
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="pointer-events-none select-none 
-                   w-[600px] md:w-[800px] 
-                   absolute right-0 top-32 
-                   translate-x-1/3 
-                   z-[1] mix-blend-screen
-                   [mask-image:radial-gradient(circle_at_center,white_60%,transparent_95%)]"
-      >
-        <source src="/sphere-render2.webm" type="video/webm" />
-      </video>
+      {/* Single soft top glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#14F195] rounded-full blur-[200px] opacity-[0.04] pointer-events-none" />
 
       <div className="max-w-4xl mx-auto text-center px-6 relative z-10">
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-4">
-          Talk to AI. Discover Alpha.
-        </h1>
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight bg-gradient-to-r from-[#FFFFFF] via-[#794F9D] to-[#FFFFFF] bg-[length:200%_auto] animate-gradient-x bg-clip-text text-transparent pb-2">
-          Track Everything.
-        </h2>
+        {/* Small status pill */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="relative inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs text-neutral-300 mb-10 overflow-hidden"
+        >
+          {/* Animated border */}
+          <span className="absolute inset-0 rounded-full border border-neutral-700/60" />
+          <span className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/[0.04] to-transparent animate-[shimmer_3s_ease-in-out_infinite]" />
+          <span className="relative flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#14F195] animate-pulse" />
+            Public Beta
+          </span>
+        </motion.div>
 
-        <p className="mt-12 text-gray-400 max-w-2xl mx-auto text-base md:text-lg">
-          Real-time on-chain analytics, alpha discovery & wallet alerts – all decentralized.
-        </p>
+        {/* Headline */}
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="text-5xl md:text-7xl lg:text-[80px] font-bold leading-[1.05] tracking-[-0.03em] text-white"
+        >
+          AI-powered
+          <br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#14F195] to-[#9945FF]">
+            on-chain intelligence
+          </span>
+        </motion.h1>
 
-        <div className="mt-12 flex justify-center">
-          <button 
+        {/* Sub */}
+        <motion.p
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.25 }}
+          className="mt-6 text-neutral-400 text-lg md:text-xl max-w-xl mx-auto leading-relaxed"
+        >
+          Real-time analytics, alpha discovery, and wallet tracking.
+          <br className="hidden md:block" />
+          Everything you need in one place.
+        </motion.p>
+
+        {/* Buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3"
+        >
+          <button
             onClick={() => navigate(isAuthenticated ? "/dashboard" : "/signup")}
-            className="group relative px-8 py-4 rounded-full text-base font-bold text-black bg-[#14F195] shadow-[0_0_20px_rgba(20,241,149,0.3)] hover:shadow-[0_0_30px_rgba(20,241,149,0.5)] hover:scale-105 transition-all duration-300 flex items-center gap-2 overflow-hidden hover-shine"
+            className="group px-7 py-3 rounded-lg text-sm font-semibold text-black bg-[#14F195] hover:bg-[#12d883] transition-colors duration-200 flex items-center gap-2"
           >
-            <span className="relative z-10 flex items-center gap-2">
-              {isAuthenticated ? "Go to Dashboard" : "Start Your Journey"} 
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </span>
+            {isAuthenticated ? "Go to Dashboard" : "Get Started"}
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </button>
-        </div>
+
+          <a
+            href="/about"
+            className="px-7 py-3 rounded-lg text-sm font-semibold text-neutral-300 border border-neutral-800 hover:border-neutral-600 hover:text-white transition-all duration-200"
+          >
+            Learn More
+          </a>
+        </motion.div>
+
+        {/* Minimal stats row */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+          className="mt-20 flex items-center justify-center gap-8 md:gap-16 text-sm"
+        >
+          {[
+            { value: "$2.1B+", label: "Volume Tracked" },
+            { value: "24/7", label: "Monitoring" },
+            { value: "< 1s", label: "Latency" },
+          ].map((stat, i) => (
+            <div key={i} className="text-center">
+              <div className="text-white font-semibold text-lg">{stat.value}</div>
+              <div className="text-neutral-500 text-xs mt-0.5">{stat.label}</div>
+            </div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );

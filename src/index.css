@@ -597,3 +597,8 @@ button[data-test="connect-wallet-button"]:hover::before {
 .hover-shine:hover::before {
     left: 100%;
 }
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}

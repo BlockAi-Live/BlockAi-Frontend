@@ -23,85 +23,69 @@ function Counter({ value, prefix = "", suffix = "", decimals = 0 }: { value: num
 
 export default function DashboardWidgets() {
   return (
-    <StaggerContainer className="flex flex-col lg:flex-row gap-8 items-center justify-center mt-32 px-6 max-w-7xl mx-auto">
+    <StaggerContainer className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-32 px-6 max-w-5xl mx-auto">
       
-      {/* Card 1: Portfolio Growth */}
-      <StaggerItem className="relative group w-full max-w-md">
-        <div className="absolute -inset-0.5 bg-gradient-to-r from-[#10e291] to-[#9b59b6] rounded-3xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
-        <div className="relative bg-[#13151C]/90 backdrop-blur-xl p-8 rounded-3xl border border-white/10 h-[320px] flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <div className="p-3 bg-[#10e291]/10 rounded-xl">
-                <Wallet className="w-6 h-6 text-[#10e291]" />
-              </div>
-              <span className="text-xs font-medium text-[#10e291] bg-[#10e291]/10 px-3 py-1 rounded-full border border-[#10e291]/20">
-                <Counter value={12.4} prefix="+" suffix="% today" decimals={1} />
-              </span>
+      {/* Card 1: Portfolio */}
+      <StaggerItem className="lg:col-span-1">
+        <div className="bg-neutral-900/50 border border-neutral-800/60 rounded-xl p-6 h-full hover:border-neutral-700 transition-colors">
+          <div className="flex items-center justify-between mb-5">
+            <div className="p-2.5 bg-neutral-800 rounded-lg">
+              <Wallet className="w-5 h-5 text-[#14F195]" />
             </div>
-            <div className="space-y-1">
-              <p className="text-gray-400 text-sm font-medium">Wallet Portfolio</p>
-              <h3 className="text-4xl font-bold text-white">
-                <Counter value={428420} prefix="$" />
-              </h3>
-              <div className="flex items-center gap-2 text-[#10e291] text-sm font-bold mt-2">
-                <span className="bg-[#10e291]/10 px-2 py-0.5 rounded text-xs">
-                  <Counter value={12.4} prefix="+" suffix="%" decimals={1} />
-                </span>
-                <span>
-                  <Counter value={47290.10} prefix="+$" decimals={2} />
-                </span>
-              </div>
-            </div>
+            <span className="text-xs font-medium text-[#14F195] bg-[#14F195]/10 px-2.5 py-1 rounded-md">
+              <Counter value={12.4} prefix="+" suffix="%" decimals={1} />
+            </span>
           </div>
+          <p className="text-neutral-500 text-xs font-medium mb-1">Portfolio Value</p>
+          <h3 className="text-2xl font-bold text-white">
+            <Counter value={428420} prefix="$" />
+          </h3>
           
-          {/* Simplified Chart Visualization */}
-          <div className="h-24 w-full flex items-end gap-1">
-            {[40, 65, 50, 80, 60, 90, 75, 95, 85, 100].map((h, i) => (
+          {/* Mini chart */}
+          <div className="h-16 w-full flex items-end gap-0.5 mt-4">
+            {[40, 65, 50, 80, 60, 90, 75, 95, 85, 100, 70, 92].map((h, i) => (
               <motion.div 
                 key={i} 
                 initial={{ height: 0 }}
                 whileInView={{ height: `${h}%` }}
                 viewport={{ once: true }}
-                transition={{ duration: 1, delay: i * 0.1, ease: "easeOut" }}
-                className="flex-1 bg-gradient-to-t from-[#10e291]/20 to-[#10e291] rounded-t-sm hover:opacity-80"
+                transition={{ duration: 0.8, delay: i * 0.05, ease: "easeOut" }}
+                className="flex-1 bg-[#14F195]/20 rounded-[2px] hover:bg-[#14F195]/40 transition-colors"
               />
             ))}
           </div>
         </div>
       </StaggerItem>
 
-      {/* Card 2: Trending Tokens (Elevated) */}
-      <StaggerItem className="relative group w-full max-w-md lg:-mt-12">
-        <div className="absolute -inset-0.5 bg-gradient-to-r from-[#9b59b6] to-[#10e291] rounded-3xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
-        <div className="relative bg-[#13151C]/90 backdrop-blur-xl p-8 rounded-3xl border border-white/10 h-[320px] flex flex-col">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-[#9b59b6]/10 rounded-xl">
-                <TrendingUp className="w-6 h-6 text-[#9b59b6]" />
+      {/* Card 2: Trending */}
+      <StaggerItem className="lg:col-span-1">
+        <div className="bg-neutral-900/50 border border-neutral-800/60 rounded-xl p-6 h-full hover:border-neutral-700 transition-colors">
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2.5 bg-neutral-800 rounded-lg">
+                <TrendingUp className="w-5 h-5 text-[#9945FF]" />
               </div>
-              <h3 className="font-bold text-white text-lg">Trending tokens</h3>
+              <h3 className="font-semibold text-white text-sm">Trending</h3>
             </div>
-            <Activity className="w-5 h-5 text-gray-500 animate-pulse" />
+            <Activity className="w-4 h-4 text-neutral-600 animate-pulse" />
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             {[
-              { name: "BONK", price: "$0.000024", change: 42, color: "text-[#10e291]" },
-              { name: "WIF", price: "$3.45", change: 28, color: "text-[#10e291]" },
-              { name: "POPCAT", price: "$0.45", change: 19, color: "text-[#10e291]" },
+              { name: "BONK", change: 42 },
+              { name: "WIF", change: 28 },
+              { name: "POPCAT", change: 19 },
             ].map((token, i) => (
-              <div key={i} className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer group/item">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold">
+              <div key={i} className="flex items-center justify-between py-2 px-2 rounded-lg hover:bg-neutral-800/50 transition-colors cursor-pointer">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-md bg-neutral-800 flex items-center justify-center text-[10px] font-bold text-neutral-400">
                     {token.name[0]}
                   </div>
-                  <span className="font-bold text-gray-200">${token.name}</span>
+                  <span className="font-medium text-sm text-neutral-300">${token.name}</span>
                 </div>
-                <div className="text-right">
-                  <p className={`text-lg font-bold ${token.color}`}>
-                    <Counter value={token.change} prefix="+" suffix="%" />
-                  </p>
-                </div>
+                <span className="text-sm font-semibold text-[#14F195]">
+                  <Counter value={token.change} prefix="+" suffix="%" />
+                </span>
               </div>
             ))}
           </div>
@@ -109,69 +93,48 @@ export default function DashboardWidgets() {
       </StaggerItem>
 
       {/* Card 3: AI Chat */}
-      <StaggerItem className="relative group w-full max-w-md">
-        <div className="absolute -inset-0.5 bg-gradient-to-r from-[#10e291] to-[#9b59b6] rounded-3xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
-        <div className="relative bg-[#13151C]/90 backdrop-blur-xl p-6 rounded-3xl border border-white/10 h-[320px] flex flex-col">
-          {/* Header */}
-          <div className="flex items-center gap-3 mb-4 border-b border-white/5 pb-4">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#10e291] to-[#9b59b6] p-[1px]">
-               <div className="w-full h-full rounded-full bg-[#13151C] flex items-center justify-center">
-                  <MessageSquare className="w-5 h-5 text-[#10e291]" />
-               </div>
+      <StaggerItem className="lg:col-span-1">
+        <div className="bg-neutral-900/50 border border-neutral-800/60 rounded-xl p-5 h-full hover:border-neutral-700 transition-colors flex flex-col">
+          <div className="flex items-center gap-2.5 mb-4 pb-3 border-b border-neutral-800/60">
+            <div className="w-8 h-8 rounded-lg bg-neutral-800 flex items-center justify-center">
+              <MessageSquare className="w-4 h-4 text-[#14F195]" />
             </div>
             <div>
-              <h3 className="font-bold text-white text-sm">Recent chats</h3>
-              <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#10e291] animate-pulse" />
-                <span className="text-[10px] text-gray-400 font-medium">Online</span>
+              <h3 className="font-semibold text-white text-xs">BlockAI Chat</h3>
+              <div className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#14F195]" />
+                <span className="text-[10px] text-neutral-500">Online</span>
               </div>
             </div>
           </div>
 
-          {/* Chat Area */}
-          <div className="flex-1 space-y-4 overflow-hidden relative flex flex-col justify-center">
-             {/* User Message 1 */}
-             <div className="flex justify-end">
-                <div className="bg-blue-600 text-white text-sm font-medium py-3 px-4 rounded-2xl rounded-tr-sm max-w-[90%] shadow-lg">
-                  What's the next 100x?
-                </div>
-                <span className="text-[10px] text-gray-500 self-end ml-2 mb-1">5h ago</span>
-             </div>
-
-             {/* User Message 2 */}
-             <div className="flex justify-end">
-                <div className="bg-blue-600 text-white text-sm font-medium py-3 px-4 rounded-2xl rounded-tr-sm max-w-[90%] shadow-lg">
-                  Analyze wallet 8sdf...
-                </div>
-                <span className="text-[10px] text-gray-500 self-end ml-2 mb-1">2h ago</span>
-             </div>
-
-             {/* AI Typing Indicator */}
-             <div className="flex justify-start">
-                <div className="bg-white/10 text-white text-sm font-medium py-3 px-4 rounded-2xl rounded-tl-sm shadow-lg flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></span>
-                </div>
-             </div>
+          <div className="flex-1 space-y-3 flex flex-col justify-center">
+            <div className="flex justify-end">
+              <div className="bg-neutral-800 text-white text-xs font-medium py-2.5 px-3.5 rounded-lg rounded-tr-sm max-w-[85%]">
+                What's the next 100x?
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <div className="bg-neutral-800 text-white text-xs font-medium py-2.5 px-3.5 rounded-lg rounded-tr-sm max-w-[85%]">
+                Analyze wallet 8sdf...
+              </div>
+            </div>
+            <div className="flex justify-start">
+              <div className="bg-neutral-800/50 border border-neutral-700/50 text-white text-xs py-2.5 px-3.5 rounded-lg rounded-tl-sm flex items-center gap-1">
+                <span className="w-1 h-1 bg-neutral-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                <span className="w-1 h-1 bg-neutral-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                <span className="w-1 h-1 bg-neutral-500 rounded-full animate-bounce" />
+              </div>
+            </div>
           </div>
 
-          {/* Input Area */}
-          <div className="mt-3 relative">
+          <div className="mt-3">
             <input 
               type="text" 
-              placeholder="Ask BlockAI anything..." 
-              className="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-4 pr-10 text-xs text-white placeholder:text-gray-500 focus:outline-none focus:border-[#10e291]/50 transition-colors"
+              placeholder="Ask anything..." 
+              className="w-full bg-neutral-800/50 border border-neutral-800 rounded-lg py-2.5 px-3.5 text-xs text-white placeholder:text-neutral-600 focus:outline-none focus:border-neutral-600 transition-colors"
               readOnly
             />
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-white transition-colors cursor-pointer">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                <line x1="12" y1="19" x2="12" y2="23"></line>
-                <line x1="8" y1="23" x2="16" y2="23"></line>
-              </svg>
-            </div>
           </div>
         </div>
       </StaggerItem>

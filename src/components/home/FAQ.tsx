@@ -27,35 +27,33 @@ export default function FAQ() {
   ];
 
   return (
-    <section className="mt-32 px-6 md:px-0 max-w-4xl mx-auto relative z-10 mb-32">
-      <h3 className="text-[#10e291] text-3xl md:text-4xl lg:text-5xl font-bold mb-16 text-center tracking-wide">
-        Frequently Asked Questions
+    <section className="mt-32 px-6 md:px-0 max-w-3xl mx-auto relative z-10 mb-32">
+      <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-center tracking-tight text-white">
+        FAQ
       </h3>
+      <p className="text-neutral-500 text-base md:text-lg text-center mb-12 max-w-md mx-auto">
+        Common questions, answered.
+      </p>
       
-      <div className="relative">
-        {/* Background Glow */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-[#10e291] to-[#9b59b6] rounded-2xl opacity-10 blur-xl pointer-events-none"></div>
-        
-        <Accordion type="single" collapsible className="w-full">
-          <StaggerContainer className="space-y-4">
-            {faqs.map((f, i) => (
-              <StaggerItem key={i}>
-                <AccordionItem 
-                  value={`item-${i}`} 
-                  className="border border-white/5 bg-[#13151C]/80 backdrop-blur-md rounded-3xl px-6 overflow-hidden data-[state=open]:border-[#10e291]/50 transition-colors duration-300"
-                >
-                  <AccordionTrigger className="text-left text-white hover:text-[#10e291] hover:no-underline py-6 text-lg font-medium transition-colors">
-                    {f.q}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-gray-400 text-base leading-relaxed pb-6">
-                    {f.a}
-                  </AccordionContent>
-                </AccordionItem>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
-        </Accordion>
-      </div>
+      <Accordion type="single" collapsible className="w-full">
+        <StaggerContainer className="space-y-2">
+          {faqs.map((f, i) => (
+            <StaggerItem key={i}>
+              <AccordionItem 
+                value={`item-${i}`} 
+                className="border border-neutral-800/60 bg-neutral-900/30 rounded-xl px-5 overflow-hidden data-[state=open]:border-neutral-700 transition-colors duration-200"
+              >
+                <AccordionTrigger className="text-left text-neutral-200 hover:text-white hover:no-underline py-5 text-[15px] font-medium transition-colors">
+                  {f.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-neutral-500 text-sm leading-relaxed pb-5">
+                  {f.a}
+                </AccordionContent>
+              </AccordionItem>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+      </Accordion>
     </section>
   );
 }

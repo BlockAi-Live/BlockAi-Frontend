@@ -1,64 +1,81 @@
 export default function Footer() {
   return (
-    <footer className="mt-32 pb-10 px-6 md:px-0 max-w-7xl mx-auto">
-      <div className="relative rounded-[32px] border border-white/5 bg-[#13151C]/80 backdrop-blur-xl p-12 md:p-16 overflow-hidden">
-        {/* Background Glow */}
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
-        
-        <div className="relative z-10 flex flex-col lg:flex-row justify-between gap-12 lg:gap-20">
-          {/* Logo Section */}
-          <div className="flex flex-col items-start">
-            <img src="/blockai.svg" alt="BlockAI Logo" className="w-32 h-32 md:w-48 md:h-48 mb-6" />
+    <footer className="mt-32 relative">
+      {/* Top border with center notch */}
+      <div className="relative">
+        <div className="border-t border-neutral-800/60" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          <div className="w-8 h-1.5 bg-neutral-500 rounded-full" />
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-6 pt-16 pb-12">
+        <div className="flex flex-col lg:flex-row justify-between gap-12 lg:gap-20">
+          {/* Logo + tagline */}
+          <div className="flex flex-col items-start lg:max-w-[220px]">
+            <div className="flex items-center gap-2.5 mb-4">
+              <img src="/blockai.svg" alt="BlockAI Logo" className="w-8 h-8" />
+            </div>
+            <p className="text-neutral-600 text-sm leading-relaxed">
+              AI-powered on-chain intelligence for smarter decisions.
+            </p>
           </div>
 
-          {/* Links Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-10 lg:gap-16 w-full lg:w-auto">
-            {/* GENERAL */}
-            <div className="flex flex-col gap-6">
-              <h4 className="font-bold text-gray-400 tracking-wider">GENERAL</h4>
-              <div className="flex flex-col gap-4 text-sm font-medium text-gray-500">
-                <a href="#" className="hover:text-[#10e291] transition-colors">APP</a>
-                <a href="#" className="hover:text-[#10e291] transition-colors">DOCS</a>
-                <a href="#" className="hover:text-[#10e291] transition-colors">ABOUT</a>
+          {/* Link columns */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-10 lg:gap-14">
+            <div className="flex flex-col gap-4">
+              <h4 className="text-xs font-semibold text-neutral-400 tracking-wider uppercase">Product</h4>
+              <div className="flex flex-col gap-3 text-sm text-neutral-600">
+                <a href="/dashboard" className="hover:text-neutral-300 transition-colors">Dashboard</a>
+                <a href="#" className="hover:text-neutral-300 transition-colors">Pricing</a>
+                <a href="#" className="hover:text-neutral-300 transition-colors">Marketplace</a>
               </div>
             </div>
 
-            {/* COMMUNITY */}
-            <div className="flex flex-col gap-6">
-              <h4 className="font-bold text-gray-400 tracking-wider">COMMUNITY</h4>
-              <div className="flex flex-col gap-4 text-sm font-medium text-gray-500">
-                <a href="https://x.com/BlockAi_live" target="_blank" rel="noopener noreferrer" className="hover:text-[#10e291] transition-colors">X (TWITTER)</a>
-                <a href="https://discord.gg/FuPn3FbkG9" target="_blank" rel="noopener noreferrer" className="hover:text-[#10e291] transition-colors">DISCORD</a>
-                <a href="https://t.me/BlockAiOrg" target="_blank" rel="noopener noreferrer" className="hover:text-[#10e291] transition-colors">TELEGRAM</a>
+            <div className="flex flex-col gap-4">
+              <h4 className="text-xs font-semibold text-neutral-400 tracking-wider uppercase">Community</h4>
+              <div className="flex flex-col gap-3 text-sm text-neutral-600">
+                <a href="https://x.com/BlockAi_live" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-300 transition-colors">Twitter</a>
+                <a href="https://discord.gg/FuPn3FbkG9" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-300 transition-colors">Discord</a>
+                <a href="https://t.me/BlockAiOrg" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-300 transition-colors">Telegram</a>
               </div>
             </div>
 
-            {/* PRODUCT */}
-            <div className="flex flex-col gap-6">
-              <h4 className="font-bold text-gray-400 tracking-wider">PRODUCT</h4>
-              <div className="flex flex-col gap-4 text-sm font-medium text-gray-500">
-                <a href="#" className="hover:text-[#10e291] transition-colors">LIVE DASHBOARD</a>
-                <a href="#" className="hover:text-[#10e291] transition-colors">PLUGIN MARKETPLACE</a>
-                <a href="#" className="hover:text-[#10e291] transition-colors">TOKENOMICS</a>
+            <div className="flex flex-col gap-4">
+              <h4 className="text-xs font-semibold text-neutral-400 tracking-wider uppercase">Resources</h4>
+              <div className="flex flex-col gap-3 text-sm text-neutral-600">
+                <a href="/Roadmap.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-300 transition-colors">Roadmap</a>
+                <a href="/Whitepaper.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-300 transition-colors">Whitepaper</a>
+                <a href="/Tokenomics.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-300 transition-colors">Tokenomics</a>
               </div>
             </div>
 
-            {/* RESOURCES */}
-            <div className="flex flex-col gap-6">
-              <h4 className="font-bold text-gray-400 tracking-wider">RESOURCES</h4>
-              <div className="flex flex-col gap-4 text-sm font-medium text-gray-500">
-                <a href="/Roadmap.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-[#10e291] transition-colors">ROADMAP</a>
-                <a href="/Tokenomics.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-[#10e291] transition-colors">TOKENOMICS</a>
-                <a href="/Whitepaper.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-[#10e291] transition-colors">WHITEPAPER</a>
+            <div className="flex flex-col gap-4">
+              <h4 className="text-xs font-semibold text-neutral-400 tracking-wider uppercase">Company</h4>
+              <div className="flex flex-col gap-3 text-sm text-neutral-600">
+                <a href="/about" className="hover:text-neutral-300 transition-colors">About Us</a>
+                <a href="/team" className="hover:text-neutral-300 transition-colors">Team</a>
+                <a href="#" className="hover:text-neutral-300 transition-colors">Terms</a>
               </div>
             </div>
           </div>
         </div>
       </div>
-      
-      {/* Copyright */}
-      <div className="text-center text-gray-600 text-xs mt-8">
-        © 2025 BlockAI. All rights reserved.
+
+      {/* Bottom: copyright + watermark */}
+      <div className="relative overflow-hidden">
+        <div className="border-t border-neutral-800/40 px-6 py-6">
+          <p className="max-w-6xl mx-auto text-neutral-700 text-xs">
+            © 2026 BlockAI INC. All rights reserved.
+          </p>
+        </div>
+
+        {/* Giant watermark text */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[30%] pointer-events-none select-none">
+          <span className="text-[120px] md:text-[180px] lg:text-[220px] font-black tracking-tight text-transparent [-webkit-text-stroke:1px_rgba(255,255,255,0.025)] whitespace-nowrap leading-none">
+            BLOCKAI
+          </span>
+        </div>
       </div>
     </footer>
   );
