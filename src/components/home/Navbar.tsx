@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Menu, LogOut, ChevronDown, ArrowRight, BarChart3, MessageSquare, Bell, Wallet, FileText, Map, Coins, BookOpen, Sparkles } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -136,12 +136,19 @@ export default function Navbar({ launch }: NavbarProps) {
   const navRef = useRef<HTMLElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Smoothly slide up once user scrolls past the ticker
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
+
+  // Smoothly slide up once user scrolls past the ticker (home page only)
   useEffect(() => {
+    if (!isHomePage) {
+      setIsPinned(true);
+      return;
+    }
     const handleScroll = () => setIsPinned(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isHomePage]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -202,7 +209,7 @@ export default function Navbar({ launch }: NavbarProps) {
     <nav
       ref={navRef}
       className="fixed left-0 right-0 z-50 px-4 pt-3 transition-[top] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
-      style={{ top: isPinned ? 0 : 44 }}
+      style={{ top: isHomePage ? (isPinned ? 0 : 44) : 0 }}
     >
       <div
         className={`max-w-5xl mx-auto flex items-center justify-between px-5 py-2 rounded-2xl border transition-all duration-300 ${
