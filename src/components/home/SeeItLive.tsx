@@ -17,18 +17,19 @@ export default function SeeItLive() {
         </div>
 
         {/* Product showcase — contained */}
-        <div className="relative max-w-lg mx-auto">
+        <div className="relative max-w-2xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="relative z-10"
+            className="relative z-10 overflow-hidden rounded-xl"
+            style={{ aspectRatio: "16/8" }}
           >
             <img
-              src="/laptop.png"
+              src="/blockaimockup.png"
               alt="BlockAI Dashboard"
-              className="w-full h-auto"
+              className="w-[115%] h-auto ml-[2%] -mt-[10%]"
             />
           </motion.div>
 
