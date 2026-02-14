@@ -60,7 +60,7 @@ export default function GenesisPass() {
   /* ── State ── */
   const [showConfetti, setShowConfetti] = useState(false);
   const [mintedCount, setMintedCount] = useState(0);
-  const [maxSupply] = useState(500);
+  const [maxSupply] = useState(100);
   const [mintPrice, setMintPrice] = useState("0.015");
   const [hasMinted, setHasMinted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
