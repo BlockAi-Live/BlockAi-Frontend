@@ -198,5 +198,14 @@ export const api = {
     });
     if (!response.ok) throw new Error("Failed to generate code");
     return response.json();
-  }
+  },
+
+  getActivity: async () => {
+    const token = localStorage.getItem("auth_token");
+    const response = await fetch(`${API_URL}/api/v1/activity`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error("Failed to fetch activity");
+    return response.json();
+  },
 };
