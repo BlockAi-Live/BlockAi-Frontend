@@ -1,91 +1,142 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
-  Plus, 
   Wallet, 
   ArrowUpRight, 
   ArrowDownRight, 
   Copy, 
-  DotsThree,
   CreditCard,
   QrCode,
   ClockCounterClockwise,
-  TrendUp
+  TrendUp,
+  ShieldCheck,
+  Check
 } from "@phosphor-icons/react";
 import { 
   PieChart, 
   Pie, 
   Cell, 
   ResponsiveContainer,
-  Tooltip,
   AreaChart,
-  Area,
-  XAxis,
-  YAxis
+  Area
 } from "recharts";
+import { ConnectButton, darkTheme, useActiveAccount, useWalletBalance } from "thirdweb/react";
+import { createWallet } from "thirdweb/wallets";
+import { base } from "thirdweb/chains";
+import { client } from "../client";
+import { coingecko } from "@/lib/coingecko";
 
-// --- Mock Data ---
-
-const wallets = [
-  {
-    id: "1",
-    name: "Main Vault",
-    type: "Ledger",
-    address: "0x4d...b29",
-    balance: 84200.50,
-    change: 12.5,
-    color: "#14F195"
-  },
-  {
-    id: "2",
-    name: "Hot Wallet",
-    type: "Metamask",
-    address: "0xac...0ad",
-    balance: 5073.20,
-    change: -2.4,
-    color: "#9945FF"
-  },
-  {
-    id: "3",
-    name: "Solana Degen",
-    type: "Phantom",
-    address: "H7f...9xP",
-    balance: 16404.50,
-    change: 33.7,
-    color: "#F7931A"
-  }
+// Wallets for ThirdWeb
+const thirdwebWallets = [
+  createWallet("io.metamask"),
+  createWallet("com.coinbase.wallet"),
+  createWallet("me.rainbow"),
+  createWallet("io.rabby"),
 ];
 
-const allocationData = [
-  { name: "BTC", value: 45, color: "#F7931A" },
-  { name: "ETH", value: 30, color: "#627EEA" },
-  { name: "SOL", value: 15, color: "#14F195" },
-  { name: "USDT", value: 10, color: "#26A17B" },
+// --- Whale Watch Mock Data (keeping as mock per request) ---
+
+const whaleWallets = [
+  {
+    label: "Smart Money #1",
+    short: "W1",
+    address: "0x7a...9b2",
+    value: "$1.24M",
+    change: "+240%",
+    changeUp: true,
+    winRate: "68%",
+    latestAction: { text: "Swapped", amount: "50 ETH", target: "PEPE", time: "2m ago", color: "#14F195" },
+    gradient: "from-[#9945FF] to-blue-600",
+    accent: "#9945FF",
+  },
+  {
+    label: "Vitalik.eth",
+    short: "W2",
+    address: "0xd8...004",
+    value: "$4.50M",
+    change: "-2.4%",
+    changeUp: false,
+    topHold: "ETH",
+    latestAction: { text: "Bridged", amount: "100 ETH", target: "Base", time: "1d ago", color: "#3B82F6" },
+    gradient: "from-blue-500 to-cyan-500",
+    accent: "#3B82F6",
+  },
 ];
 
-const transactions = [
+const mockTransactions = [
   { id: 1, type: "Receive", asset: "ETH", amount: "1.5", value: "$3,200", from: "0x88...9a", time: "2h ago" },
   { id: 2, type: "Send", asset: "USDT", amount: "500", value: "$500", to: "Binance", time: "5h ago" },
   { id: 3, type: "Swap", asset: "SOL", amount: "200", value: "$18,400", from: "USDC", time: "1d ago" },
 ];
 
-const portfolioHistory = [
-  { name: 'Mon', BTC: 45000, ETH: 30000, SOL: 15000, USDT: 10000 },
-  { name: 'Tue', BTC: 46000, ETH: 31000, SOL: 14500, USDT: 10000 },
-  { name: 'Wed', BTC: 44000, ETH: 32000, SOL: 16000, USDT: 9000 },
-  { name: 'Thu', BTC: 48000, ETH: 31500, SOL: 17000, USDT: 11000 },
-  { name: 'Fri', BTC: 52000, ETH: 33000, SOL: 18000, USDT: 12000 },
-  { name: 'Sat', BTC: 54000, ETH: 35000, SOL: 19000, USDT: 13000 },
-  { name: 'Sun', BTC: 56000, ETH: 36000, SOL: 20000, USDT: 13678 },
-];
+// --- Helpers ---
+
+const fmt = (n: number) => `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 export function WalletsPage() {
-  const [activeIndex, setActiveIndex] = useState(0);
   const [activeAsset, setActiveAsset] = useState<any>(null);
+  const [ethPrice, setEthPrice] = useState(0);
+  const [copied, setCopied] = useState(false);
+  const [chartData, setChartData] = useState<{ v: number }[]>([]);
+  
+  const thirdwebAccount = useActiveAccount();
+  const { data: walletBalanceData } = useWalletBalance({
+    chain: base,
+    address: thirdwebAccount?.address,
+    client,
+  });
 
-  const totalBalance = wallets.reduce((acc, w) => acc + w.balance, 0);
+  const walletBalance = walletBalanceData ? parseFloat(walletBalanceData.displayValue) : 0;
+  const walletBalanceUsd = walletBalance * ethPrice;
+
+  // Allocation — when wallet connected, show real ETH dominance. Otherwise mock.
+  const allocationData = thirdwebAccount?.address
+    ? [
+        { name: "ETH", value: 100, color: "#627EEA" },
+      ]
+    : [
+        { name: "BTC", value: 45, color: "#F7931A" },
+        { name: "ETH", value: 30, color: "#627EEA" },
+        { name: "SOL", value: 15, color: "#14F195" },
+        { name: "USDT", value: 10, color: "#26A17B" },
+      ];
+
+  // Portfolio history chart (7d ETH chart if connected, mock otherwise)
+  const portfolioHistory = chartData.length > 0
+    ? chartData
+    : [40, 45, 42, 48, 44, 52, 50, 55, 53, 60, 58, 62].map(v => ({ v }));
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const markets = await coingecko.getMarkets("usd", 4, 1);
+        const eth = markets?.find((c: any) => c.id === "ethereum");
+        if (eth) setEthPrice(eth.current_price);
+
+        // Get 7d ETH chart for the sparkline
+        const points = await coingecko.getMarketChart("ethereum", "7");
+        if (points?.length) {
+          const step = Math.max(1, Math.floor(points.length / 30));
+          setChartData(
+            points.filter((_: any, i: number) => i % step === 0).map((p: any) => ({ v: p.price }))
+          );
+        }
+      } catch (err) {
+        console.error("Failed to load market data:", err);
+      }
+    };
+    load();
+  }, []);
+
+  const handleCopy = (address: string) => {
+    navigator.clipboard.writeText(address);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const totalNetWorth = thirdwebAccount?.address ? walletBalanceUsd : 0;
 
   return (
     <div className="min-h-screen bg-[#0d0f18] text-white font-sans overflow-x-hidden relative flex flex-col pb-24">
@@ -106,11 +157,22 @@ export function WalletsPage() {
               <p className="text-gray-400">Track your assets across all chains.</p>
            </div>
            
-           <button className="group relative px-6 py-3 rounded-[20px] bg-[#14F195] text-black font-bold flex items-center gap-2 overflow-hidden hover:scale-105 transition-transform shadow-[0_0_20px_rgba(20,241,149,0.2)]">
-               <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-               <Plus size={20} className="relative z-10" />
-               <span className="relative z-10">Connect Wallet</span>
-           </button>
+           <ConnectButton
+             client={client}
+             wallets={thirdwebWallets}
+             theme={darkTheme({ colors: { primaryButtonBg: "#14F195", primaryButtonText: "#000" } })}
+             connectButton={{ 
+               label: "Connect Wallet", 
+               style: { 
+                 borderRadius: "20px", 
+                 fontWeight: "bold", 
+                 fontSize: "14px", 
+                 padding: "12px 24px",
+                 boxShadow: "0 0 20px rgba(20,241,149,0.2)"
+               } 
+             }}
+             connectModal={{ size: "compact", titleIcon: "https://blockai-frontend-v1.vercel.app/blockai.svg", showThirdwebBranding: false }}
+           />
         </div>
 
         {/* --- HERO SECTION: NET WORTH & CHART --- */}
@@ -131,16 +193,31 @@ export function WalletsPage() {
                        <CreditCard size={18} />
                        <span className="text-sm font-medium uppercase tracking-wider">Total Net Worth</span>
                    </div>
-                   <h2 className="text-5xl md:text-6xl font-bold text-white tracking-tight mb-4">
-                       ${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                   </h2>
-                   <div className="flex items-center gap-3">
-                       <div className="px-3 py-1 rounded-full bg-[#14F195]/10 border border-[#14F195]/20 flex items-center gap-1.5">
-                           <TrendUp size={14} className="text-[#14F195]" />
-                           <span className="text-[#14F195] font-bold text-xs">+12.4%</span>
+                   
+                   {thirdwebAccount?.address ? (
+                     <>
+                       <h2 className="text-5xl md:text-6xl font-bold text-white tracking-tight mb-1">
+                         {walletBalance.toFixed(4)} <span className="text-2xl text-gray-500">ETH</span>
+                       </h2>
+                       {ethPrice > 0 && (
+                         <p className="text-xl text-gray-500 mb-4">≈ {fmt(walletBalanceUsd)}</p>
+                       )}
+                       <div className="flex items-center gap-3">
+                           <div className="px-3 py-1 rounded-full bg-[#14F195]/10 border border-[#14F195]/20 flex items-center gap-1.5">
+                               <ShieldCheck size={14} className="text-[#14F195]" weight="bold" />
+                               <span className="text-[#14F195] font-bold text-xs">Connected on Base</span>
+                           </div>
+                           <span className="text-gray-600 text-xs font-mono">
+                             {thirdwebAccount.address.slice(0, 6)}...{thirdwebAccount.address.slice(-4)}
+                           </span>
                        </div>
-                       <span className="text-gray-500 text-sm">vs last month</span>
-                   </div>
+                     </>
+                   ) : (
+                     <>
+                       <h2 className="text-5xl md:text-6xl font-bold text-gray-600 tracking-tight mb-4">—</h2>
+                       <p className="text-gray-500 text-sm">Connect your wallet to see your balance</p>
+                     </>
+                   )}
                </div>
 
                 {/* --- Chart Area --- */}
@@ -148,43 +225,15 @@ export function WalletsPage() {
                     <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={portfolioHistory}>
                              <defs>
-                                <linearGradient id="colorBTC" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#F7931A" stopOpacity={0.8}/>
-                                    <stop offset="95%" stopColor="#F7931A" stopOpacity={0}/>
-                                </linearGradient>
-                                <linearGradient id="colorETH" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#627EEA" stopOpacity={0.8}/>
-                                    <stop offset="95%" stopColor="#627EEA" stopOpacity={0}/>
-                                </linearGradient>
-                                <linearGradient id="colorSOL" x1="0" y1="0" x2="0" y2="1">
+                                <linearGradient id="colorMain" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="5%" stopColor="#14F195" stopOpacity={0.8}/>
                                     <stop offset="95%" stopColor="#14F195" stopOpacity={0}/>
                                 </linearGradient>
                             </defs>
-                            <Area type="monotone" dataKey="BTC" stackId="1" stroke="#F7931A" fill="url(#colorBTC)" strokeWidth={0} />
-                            <Area type="monotone" dataKey="ETH" stackId="1" stroke="#627EEA" fill="url(#colorETH)" strokeWidth={0} />
-                            <Area type="monotone" dataKey="SOL" stackId="1" stroke="#14F195" fill="url(#colorSOL)" strokeWidth={0} />
-                            <Area type="monotone" dataKey="USDT" stackId="1" stroke="#26A17B" fill="#26A17B" fillOpacity={0.5} strokeWidth={0} />
+                            <Area type="monotone" dataKey="v" stroke="#14F195" fill="url(#colorMain)" strokeWidth={2} />
                         </AreaChart>
                     </ResponsiveContainer>
                 </div>
-
-{/* 
-               <div className="flex items-end gap-2 mt-8">
-                   <button className="flex-1 py-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors text-sm font-medium">
-                       Send
-                   </button>
-                   <button className="flex-1 py-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors text-sm font-medium">
-                       Receive
-                   </button>
-                   <button className="flex-1 py-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors text-sm font-medium">
-                       Swap
-                   </button>
-                   <button className="p-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors text-gray-400">
-                       <DotsThree size={20} />
-                   </button>
-               </div>
-               */}
             </motion.div>
 
             {/* Allocation Chart */}
@@ -196,7 +245,6 @@ export function WalletsPage() {
             >
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-white font-bold text-lg">Allocation</h3>
-                    <button className="text-xs text-gray-500 hover:text-white transition-colors">See Details</button>
                 </div>
 
                 <div className="relative flex-1 flex items-center justify-center min-h-[220px]">
@@ -208,7 +256,7 @@ export function WalletsPage() {
                                 cy="50%"
                                 innerRadius={70}
                                 outerRadius={90}
-                                paddingAngle={6}
+                                paddingAngle={allocationData.length > 1 ? 6 : 0}
                                 cornerRadius={8}
                                 dataKey="value"
                                 stroke="none"
@@ -229,13 +277,13 @@ export function WalletsPage() {
 
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                         <span className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-1">
-                            {activeAsset ? activeAsset.name : "Top Asset"}
+                            {activeAsset ? activeAsset.name : allocationData[0]?.name}
                         </span>
                         <h4 className="text-3xl font-bold text-white transition-all">
-                            {activeAsset ? `${activeAsset.value}%` : "45%"}
+                            {activeAsset ? `${activeAsset.value}%` : `${allocationData[0]?.value}%`}
                         </h4>
-                        <span className="text-xs text-gray-500" style={{ color: activeAsset?.color || "#F7931A" }}>
-                             {activeAsset ? "Allocation" : "Bitcoin"}
+                        <span className="text-xs text-gray-500" style={{ color: activeAsset?.color || allocationData[0]?.color }}>
+                             Allocation
                         </span>
                     </div>
                 </div>
@@ -259,20 +307,18 @@ export function WalletsPage() {
             </motion.div>
         </div>
 
-        {/* --- WALLETS GRID --- */}
+        {/* --- CONNECTED WALLET --- */}
         <div className="mb-12">
             <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-white">Connected Wallets</h3>
-                <button className="text-sm text-[#14F195] hover:underline">Manage</button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {wallets.map((wallet, i) => (
+                {thirdwebAccount?.address ? (
                     <motion.div
-                        key={wallet.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 + (i * 0.1) }}
+                        transition={{ delay: 0.2 }}
                         className="group p-6 rounded-[24px] bg-[#16181f] border border-white/5 hover:border-[#14F195]/30 transition-all duration-300 relative overflow-hidden"
                     >
                         {/* Hover Gradient */}
@@ -280,34 +326,54 @@ export function WalletsPage() {
 
                         <div className="flex justify-between items-start mb-6">
                             <div className="w-12 h-12 rounded-2xl bg-black/40 flex items-center justify-center border border-white/5">
-                                <Wallet size={24} className="text-gray-400 group-hover:text-white transition-colors" />
+                                <Wallet size={24} className="text-[#14F195] group-hover:text-white transition-colors" />
                             </div>
-                            <div className={`px-2 py-1 rounded-lg bg-[${wallet.color}]/10 border border-[${wallet.color}]/20`}>
-                                <span className={`text-xs font-bold`} style={{ color: wallet.color }}>
-                                    {wallet.type}
-                                </span>
+                            <div className="px-2 py-1 rounded-lg bg-[#14F195]/10 border border-[#14F195]/20">
+                                <span className="text-xs font-bold text-[#14F195]">Base</span>
                             </div>
                         </div>
 
                         <div className="mb-4">
-                            <p className="text-gray-500 text-sm mb-1">{wallet.name}</p>
-                            <h4 className="text-2xl font-bold text-white">${wallet.balance.toLocaleString()}</h4>
+                            <p className="text-gray-500 text-sm mb-1">Main Wallet</p>
+                            <h4 className="text-2xl font-bold text-white">{walletBalance.toFixed(4)} ETH</h4>
+                            {ethPrice > 0 && (
+                              <p className="text-sm text-gray-500 mt-1">≈ {fmt(walletBalanceUsd)}</p>
+                            )}
                         </div>
 
                         <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                            <div className="flex items-center gap-2 text-gray-500 text-xs font-mono bg-black/20 px-2 py-1 rounded cursor-pointer hover:text-white">
-                                {wallet.address} <Copy size={16} />
+                            <button 
+                              onClick={() => handleCopy(thirdwebAccount.address)}
+                              className="flex items-center gap-2 text-gray-500 text-xs font-mono bg-black/20 px-2 py-1 rounded cursor-pointer hover:text-white transition-colors"
+                            >
+                                {thirdwebAccount.address.slice(0, 6)}...{thirdwebAccount.address.slice(-4)} 
+                                {copied ? <Check size={14} className="text-[#14F195]" /> : <Copy size={14} />}
+                            </button>
+                            <div className="flex items-center gap-1 text-[#14F195]">
+                              <ShieldCheck size={14} weight="bold" />
+                              <span className="text-xs font-bold">Active</span>
                             </div>
-                            <span className={`text-xs font-bold ${wallet.change >= 0 ? "text-[#14F195]" : "text-red-400"}`}>
-                                {wallet.change >= 0 ? "+" : ""}{wallet.change}%
-                            </span>
                         </div>
                     </motion.div>
-                ))}
+                ) : (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="p-6 rounded-[24px] bg-[#13151C] border border-dashed border-white/10 flex flex-col items-center justify-center gap-4 min-h-[200px]"
+                    >
+                        <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center">
+                          <Wallet size={28} className="text-gray-600" />
+                        </div>
+                        <div className="text-center">
+                          <p className="text-gray-400 text-sm font-medium mb-1">No wallet connected</p>
+                          <p className="text-gray-600 text-xs">Use the button above to connect</p>
+                        </div>
+                    </motion.div>
+                )}
             </div>
         </div>
 
-        {/* --- WHALE WATCH (TRACKED WALLETS) --- */}
+        {/* --- WHALE WATCH (TRACKED WALLETS) --- Mock, keeping as-is --- */}
         <div className="mb-12">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
@@ -346,22 +412,23 @@ export function WalletsPage() {
                     </div>
                 </div>
 
-                {/* Tracked Wallet Mock 1 */}
-                <div className="group p-6 rounded-[24px] bg-[#16181f] border border-white/5 hover:border-[#9945FF]/30 transition-all duration-300 relative overflow-hidden flex flex-col justify-between">
+                {/* Tracked Whale Wallets */}
+                {whaleWallets.map((whale, i) => (
+                  <div key={i} className="group p-6 rounded-[24px] bg-[#16181f] border border-white/5 hover:border-opacity-30 transition-all duration-300 relative overflow-hidden flex flex-col justify-between" style={{ ['--hover-color' as any]: whale.accent }}>
                      <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <Wallet size={64} className="text-[#9945FF]" />
+                        <Wallet size={64} style={{ color: whale.accent }} />
                     </div>
                     
                     {/* Header */}
                     <div className="flex justify-between items-start mb-6 relative z-10">
                         <div className="flex items-center gap-3">
-                             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9945FF] to-blue-600 flex items-center justify-center text-sm font-bold text-white border border-white/10 shadow-lg">
-                                W1
+                             <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${whale.gradient} flex items-center justify-center text-sm font-bold text-white border border-white/10 shadow-lg`}>
+                                {whale.short}
                              </div>
                              <div>
-                                 <h4 className="font-bold text-white text-base">Smart Money #1</h4>
+                                 <h4 className="font-bold text-white text-base">{whale.label}</h4>
                                  <div className="flex items-center gap-2 mt-0.5">
-                                     <span className="text-gray-500 text-xs font-mono bg-black/30 px-1.5 py-0.5 rounded">0x7a...9b2</span>
+                                     <span className="text-gray-500 text-xs font-mono bg-black/30 px-1.5 py-0.5 rounded">{whale.address}</span>
                                  </div>
                              </div>
                         </div>
@@ -371,20 +438,24 @@ export function WalletsPage() {
                     <div className="space-y-4 relative z-10 mb-6">
                         <div>
                              <p className="text-gray-500 text-xs uppercase tracking-wider font-bold mb-1">Total Value</p>
-                             <h3 className="text-3xl font-bold text-white tracking-tight">$1.24M</h3>
+                             <h3 className="text-3xl font-bold text-white tracking-tight">{whale.value}</h3>
                         </div>
                         
                         <div className="grid grid-cols-2 gap-3">
                              <div className="p-2 rounded-xl bg-white/5 border border-white/5">
                                  <p className="text-[10px] text-gray-400 uppercase font-bold mb-1">24h Change</p>
-                                 <div className="flex items-center gap-1 text-[#14F195] font-bold text-sm">
-                                    <ArrowUpRight weight="bold" /> +240%
+                                 <div className={`flex items-center gap-1 ${whale.changeUp ? "text-[#14F195]" : "text-red-400"} font-bold text-sm`}>
+                                    {whale.changeUp ? <ArrowUpRight weight="bold" /> : <ArrowDownRight weight="bold" />} {whale.change}
                                 </div>
                              </div>
                              <div className="p-2 rounded-xl bg-white/5 border border-white/5">
-                                 <p className="text-[10px] text-gray-400 uppercase font-bold mb-1">Win Rate</p>
+                                 <p className="text-[10px] text-gray-400 uppercase font-bold mb-1">{whale.winRate ? "Win Rate" : "Top Hold"}</p>
                                  <div className="flex items-center gap-1 text-white font-bold text-sm">
-                                    <TrendUp weight="bold" className="text-[#9945FF]" /> 68%
+                                    {whale.winRate ? (
+                                      <><TrendUp weight="bold" className="text-[#9945FF]" /> {whale.winRate}</>
+                                    ) : (
+                                      <><div className="w-3 h-3 rounded-full bg-[#627EEA]" /> {whale.topHold}</>
+                                    )}
                                 </div>
                              </div>
                         </div>
@@ -394,72 +465,18 @@ export function WalletsPage() {
                     <div className="mt-auto pt-4 border-t border-white/5 relative z-10">
                         <p className="text-[10px] text-gray-500 uppercase font-bold mb-2">Latest Activity</p>
                         <div className="flex items-center gap-2 text-xs text-gray-300">
-                             <span className="w-1.5 h-1.5 rounded-full bg-[#14F195] animate-pulse" />
-                             Swapped <span className="text-white font-bold">50 ETH</span> for <span className="text-[#14F195] font-bold">PEPE</span>
-                             <span className="text-gray-600 ml-auto font-mono">2m ago</span>
+                             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: whale.latestAction.color }} />
+                             {whale.latestAction.text} <span className="text-white font-bold">{whale.latestAction.amount}</span> for <span className="font-bold" style={{ color: whale.latestAction.color }}>{whale.latestAction.target}</span>
+                             <span className="text-gray-600 ml-auto font-mono">{whale.latestAction.time}</span>
                         </div>
                     </div>
-                </div>
-
-                {/* Tracked Wallet Mock 2 */}
-                <div className="group p-6 rounded-[24px] bg-[#16181f] border border-white/5 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden flex flex-col justify-between">
-                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <Wallet size={64} className="text-blue-500" />
-                    </div>
-
-                     {/* Header */}
-                    <div className="flex justify-between items-start mb-6 relative z-10">
-                        <div className="flex items-center gap-3">
-                             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-sm font-bold text-white border border-white/10 shadow-lg">
-                                W2
-                             </div>
-                             <div>
-                                 <h4 className="font-bold text-white text-base">Vitalik.eth</h4>
-                                 <div className="flex items-center gap-2 mt-0.5">
-                                     <span className="text-gray-500 text-xs font-mono bg-black/30 px-1.5 py-0.5 rounded">0xd8...004</span>
-                                 </div>
-                             </div>
-                        </div>
-                    </div>
-
-                    {/* Main Stats */}
-                    <div className="space-y-4 relative z-10 mb-6">
-                        <div>
-                             <p className="text-gray-500 text-xs uppercase tracking-wider font-bold mb-1">Total Value</p>
-                             <h3 className="text-3xl font-bold text-white tracking-tight">$4.50M</h3>
-                        </div>
-
-                         <div className="grid grid-cols-2 gap-3">
-                             <div className="p-2 rounded-xl bg-white/5 border border-white/5">
-                                 <p className="text-[10px] text-gray-400 uppercase font-bold mb-1">24h Change</p>
-                                 <div className="flex items-center gap-1 text-red-400 font-bold text-sm">
-                                    <ArrowDownRight weight="bold" /> -2.4%
-                                </div>
-                             </div>
-                             <div className="p-2 rounded-xl bg-white/5 border border-white/5">
-                                 <p className="text-[10px] text-gray-400 uppercase font-bold mb-1">Top Hold</p>
-                                 <div className="flex items-center gap-1 text-white font-bold text-sm">
-                                     <div className="w-3 h-3 rounded-full bg-[#627EEA]" /> ETH
-                                </div>
-                             </div>
-                        </div>
-                    </div>
-
-                     {/* Latest Activity Footer */}
-                    <div className="mt-auto pt-4 border-t border-white/5 relative z-10">
-                        <p className="text-[10px] text-gray-500 uppercase font-bold mb-2">Latest Activity</p>
-                        <div className="flex items-center gap-2 text-xs text-gray-300">
-                             <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                             Bridged <span className="text-white font-bold">100 ETH</span> to <span className="text-blue-400 font-bold">Base</span>
-                             <span className="text-gray-600 ml-auto font-mono">1d ago</span>
-                        </div>
-                    </div>
-                </div>
+                  </div>
+                ))}
 
             </div>
         </div>
 
-        {/* --- RECENT ACTIVITY --- */}
+        {/* --- RECENT ACTIVITY (Mock) --- */}
         <div>
             <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                 <ClockCounterClockwise size={20} className="text-gray-400" />
@@ -467,7 +484,7 @@ export function WalletsPage() {
             </h3>
             
             <div className="bg-[#13151C] rounded-[32px] border border-white/5 p-2">
-                {transactions.map((tx, i) => (
+                {mockTransactions.map((tx) => (
                     <div 
                         key={tx.id}
                         className="flex items-center justify-between p-4 hover:bg-white/5 rounded-2xl transition-colors group"
