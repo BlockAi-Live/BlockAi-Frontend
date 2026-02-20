@@ -15,11 +15,13 @@ import { ReferralsPage } from "./pages/Referrals";
 import { SignUpPage } from "./pages/SignUp";
 import { SignInPage } from "./pages/SignIn";
 import MarketAnalysisPage from "./pages/MarketAnalysis";
+import SmartContractsPage from "./pages/SmartContracts";
+import NFTGeneratorPage from "./pages/NFTGenerator";
 import { SettingsPage } from "./pages/Settings";
 import GenesisPass from "./pages/GenesisPass";
 import Waitlist from "./pages/Waitlist";
 import AdminWaitlist from "./pages/AdminWaitlist";
-import { AccessGateway } from "./components/access/AccessGateway";
+
 import { Toaster } from "@/components/ui/toaster";
 import AuthSuccess from "./pages/AuthSuccess";
 
@@ -84,9 +86,27 @@ function App() {
           element={
             <ProtectedRoute>
               <MainLayout>
-                <AccessGateway>
-                    <Chat />
-                </AccessGateway>
+                <Chat />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/smart-contracts"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <SmartContractsPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/nft"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <NFTGeneratorPage />
               </MainLayout>
             </ProtectedRoute>
           }

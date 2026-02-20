@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Menu, LogOut, ChevronDown, ArrowRight, BarChart3, MessageSquare, Bell, Wallet, FileText, Map, Coins, BookOpen, Sparkles } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import {
   Sheet,
@@ -173,17 +174,29 @@ export default function Navbar({ launch }: NavbarProps) {
     const acct = wallet.getAccount();
     const address = acct?.address;
     if (address) {
-      const refCode = localStorage.getItem("blockai_ref_code");
-      login("wallet-mock-token-" + address, {
-        id: address,
-        email: `${address.slice(0, 6)}...@wallet.connect`,
-        fullName: "Wallet User",
-        walletAddress: address,
-        avatar: `https://effigy.im/a/${address}.png`,
-        referralCode: refCode,
-      });
-      toast({ title: "Wallet Connected", description: "Successfully logged in with wallet." });
-      if (!window.location.pathname.includes("/genesis")) navigate("/dashboard");
+      try {
+        // Try login first
+        let result = await api.walletLogin(address);
+        
+        // If user doesn't exist, auto-register
+        if (!result) {
+          result = await api.walletRegister(address, `User_${address.slice(0, 6)}`);
+        }
+        
+        if (result?.token && result?.user) {
+          const refCode = localStorage.getItem("blockai_ref_code");
+          login(result.token, {
+            ...result.user,
+            avatar: `https://effigy.im/a/${address}.png`,
+            referralCode: refCode,
+          });
+          toast({ title: "Wallet Connected", description: "Successfully logged in with wallet." });
+          if (!window.location.pathname.includes("/genesis")) navigate("/dashboard");
+        }
+      } catch (error: any) {
+        console.error("Wallet auth error:", error);
+        toast({ title: "Wallet Login Failed", description: error.message || "Could not authenticate wallet.", variant: "destructive" });
+      }
     }
   };
 

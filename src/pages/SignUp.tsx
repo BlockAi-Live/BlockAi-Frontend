@@ -45,18 +45,23 @@ export function SignUpPage() {
     const account = wallet.getAccount();
     const address = account?.address;
     if (address) {
-      login("wallet-mock-token-" + address, {
-        id: address,
-        email: `${address.slice(0,6)}...@wallet.connect`,
-        fullName: "Wallet User",
-        walletAddress: address,
-        avatar: `https://effigy.im/a/${address}.png`
-      });
-      toast({
-        title: "Wallet Connected",
-        description: "Successfully logged in with wallet.",
-      });
-      navigate("/dashboard");
+      try {
+        let result = await api.walletLogin(address);
+        if (!result) {
+          result = await api.walletRegister(address, `User_${address.slice(0, 6)}`);
+        }
+        if (result?.token && result?.user) {
+          login(result.token, {
+            ...result.user,
+            avatar: `https://effigy.im/a/${address}.png`,
+          });
+          toast({ title: "Wallet Connected", description: "Successfully logged in with wallet." });
+          navigate("/dashboard");
+        }
+      } catch (error: any) {
+        console.error("Wallet auth error:", error);
+        toast({ title: "Wallet Login Failed", description: error.message || "Could not authenticate wallet.", variant: "destructive" });
+      }
     }
   };
 

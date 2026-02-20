@@ -1,10 +1,22 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 import ChatEmptyState from "../components/chat/ChatEmptyState";
 import ChatInput from "../components/chat/ChatInput";
 import ChatMessage, { Message } from "../components/chat/ChatMessage";
 import { api } from "@/lib/api";
-import { Lightning, Sparkle } from "@phosphor-icons/react";
+import { Lightning, Sparkle, CaretDown, Check } from "@phosphor-icons/react";
+
+type AIModel = {
+  id: string;
+  label: string;
+  description: string;
+  color: string;
+};
+
+const MODELS: AIModel[] = [
+  { id: "chaingpt", label: "ChainGPT", description: "Crypto-native AI", color: "#14F195" },
+  { id: "blockai3", label: "BlockAI 3.0", description: "Gemini-powered", color: "#9945FF" },
+];
 
 export default function ChatPage() {
   const { user, updateUser } = useAuth();
@@ -12,7 +24,11 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [credits, setCredits] = useState<number | null>(null);
   const [isPaid, setIsPaid] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<AIModel>(MODELS[0]);
+  const [showModelPicker, setShowModelPicker] = useState(false);
+  const modelPickerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const streamingRef = useRef(false);
 
   const fetchBilling = async () => {
       try {
@@ -30,73 +46,62 @@ export default function ChatPage() {
       fetchBilling();
   }, []);
 
+  // Close model picker on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (modelPickerRef.current && !modelPickerRef.current.contains(e.target as Node)) {
+        setShowModelPicker(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
-function syntaxToHTML(text: string): string {
-  const lines = text.split('\n');
-  const htmlBlocks: string[] = [];
-  let isInsideList = false;
 
-
-  const parseInlineFormatting = (str: string): string => {
-    return str
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
-      .trim();
-  };
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
-
-    if (!line) {
-      if (isInsideList) {
-        htmlBlocks.push('</ul>');
-        isInsideList = false;
-      }
-      continue;
-    }
-
-    if (line.startsWith('* ')) {
-      if (!isInsideList) {
-        htmlBlocks.push('<ul>');
-        isInsideList = true;
-      }
-      
-      const content = line.replace(/^\*\s*/, '');
-      htmlBlocks.push(`  <li>${parseInlineFormatting(content)}</li>`);
-    } else {
-      if (isInsideList) {
-        htmlBlocks.push('</ul>');
-        isInsideList = false;
-      }
-      
-      const parsedLine = parseInlineFormatting(line);
-      htmlBlocks.push(`<p>${parsedLine}</p>`);
-    }
-  }
-  if (isInsideList) {
-    htmlBlocks.push('</ul>');
-  }
-
-  return htmlBlocks.join('\n');
-}
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
+  /**
+   * Typewriter streaming: reveals text word-by-word with a natural pace
+   */
+  const streamText = useCallback((fullText: string, messageId: string) => {
+    streamingRef.current = true;
+    const words = fullText.split(/(\s+)/); // split preserving whitespace
+    let currentIndex = 0;
+
+    const tick = () => {
+      if (!streamingRef.current) return;
+      
+      // Reveal 1-3 words per tick for natural pacing
+      const wordsPerTick = Math.ceil(Math.random() * 2) + 1;
+      currentIndex = Math.min(currentIndex + wordsPerTick, words.length);
+      const partialText = words.slice(0, currentIndex).join('');
+      
+      setMessages(prev => prev.map(m => 
+        m.id === messageId 
+          ? { ...m, content: partialText, isStreaming: currentIndex < words.length }
+          : m
+      ));
+
+      if (currentIndex < words.length) {
+        // Variable delay: faster for whitespace, slower for content
+        const delay = 20 + Math.random() * 30;
+        setTimeout(tick, delay);
+      } else {
+        streamingRef.current = false;
+        setIsLoading(false);
+      }
+    };
+
+    tick();
+  }, []);
+
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) return;
-
-    // Optimistic Check
-    if (credits !== null && credits < 1 && !isPaid) {
-         setMessages(prev => [...prev, {
-            id: Date.now().toString(),
-            role: "assistant", 
-            content: "⚠️ **Insufficient Credits**. You need at least 1 credit to send a message. Please upgrade or top up in Settings.",
-            timestamp: new Date()
-         }]);
-         return;
-    }
 
     const newUserMessage: Message = {
       id: Date.now().toString(),
@@ -108,40 +113,38 @@ function syntaxToHTML(text: string): string {
     setMessages((prev) => [...prev, newUserMessage]);
     setIsLoading(true);
 
+    const aiMsgId = (Date.now() + 1).toString();
+
     try {
-      const response = await api.chatQuestion({ content });
+      const response = await api.chatQuestion({ content, provider: selectedModel.id } as any);
       
-      // Deduct credit locally for instant feedback
-      if (!isPaid && credits) setCredits(c => c ? c - 1 : 0);
+      const answerText = response.answer || "No response received.";
 
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
+      // Add empty AI message placeholder
+      setMessages(prev => [...prev, {
+        id: aiMsgId,
         role: "assistant",
-        content: syntaxToHTML(response.answer) ,
+        content: "",
         timestamp: new Date(),
-      };
+        isStreaming: true,
+      }]);
 
-      setMessages((prev) => [...prev, aiMessage]);
+      // Start typewriter streaming
+      streamText(answerText, aiMsgId);
+
     } catch (error: any) {
-      console.error("Gemini AI Error:", error);
-      
-      let errorText = "Sorry, I couldn't process your request.";
-      if (error.message.includes("Payment Required") || error.message.includes("Insufficient Credits")) {
-          errorText = "💳 **Payment Required**: You have run out of free credits. [Upgrade to Pro](/settings) to continue chatting without limits.";
-      }
-
+      console.error("Chat Error:", error);
+      setIsLoading(false);
       const errorMsg: Message = {
         id: (Date.now() + 2).toString(),
         role: "assistant",
-        content: errorText,
+        content: "Sorry, I couldn't process your request. " + (error.message || ""),
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMsg]);
     } finally {
-      setIsLoading(false);
-      // Refresh billing stats (for limits)
-      fetchBilling(); 
-      // Refresh User Points (global state)
+      // Refresh billing & points 
+      fetchBilling();
       try {
           const { user: updatedUser } = await api.getMe(localStorage.getItem('auth_token') || '');
           if (updatedUser) {
@@ -156,23 +159,59 @@ function syntaxToHTML(text: string): string {
   return (
     <div className="flex flex-col h-full min-h-[calc(100vh-4rem)] relative font-sans bg-[#0d0f18]">
       
-      {/* Status Badges */}
-      <div className="absolute top-4 right-6 z-30 pointer-events-none flex flex-col items-end gap-2">
-         
-         {/* Points Badge */}
-         <div className="bg-[#13151C]/80 backdrop-blur-md border border-[#9945FF]/30 rounded-full pl-3 pr-4 py-1.5 flex items-center gap-2 shadow-lg animate-fade-in-up">
-             <Sparkle size={14} weight="fill" className="text-[#9945FF]" />
-             <span className="text-xs font-bold text-white">{user?.points || 0} PTS</span>
-         </div>
+      {/* Top Bar — Model Selector + Badges */}
+      <div className="absolute top-4 left-6 right-6 z-30 pointer-events-none flex items-start justify-between">
+        
+        {/* Model Selector */}
+        <div className="pointer-events-auto relative" ref={modelPickerRef}>
+          <button
+            onClick={() => setShowModelPicker(!showModelPicker)}
+            className="flex items-center gap-2 px-4 py-2 bg-[#13151C]/90 backdrop-blur-md border border-white/10 rounded-full hover:border-white/20 transition-all"
+          >
+            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: selectedModel.color }} />
+            <span className="text-sm font-semibold text-white">{selectedModel.label}</span>
+            <CaretDown size={12} className={`text-neutral-400 transition-transform ${showModelPicker ? 'rotate-180' : ''}`} />
+          </button>
 
-         {/* Credits Badge */}
-         <div className="bg-[#13151C]/80 backdrop-blur-md border border-white/10 rounded-full px-4 py-1.5 flex items-center gap-2 shadow-lg">
-             <Lightning size={14} weight="fill" className={isPaid ? "text-purple-400" : "text-[#14F195]"} />
-             <span className="text-xs font-bold text-white">
-                 {isPaid ? "PRO UNLIMITED" : `${credits ?? '...'} Credits`}
-             </span>
-             {!isPaid && <span className="text-[10px] text-gray-500 border-l border-white/10 pl-2 ml-1">1 Cost/Msg</span>}
-         </div>
+          {showModelPicker && (
+            <div className="absolute top-full mt-2 left-0 w-56 bg-[#13151C] border border-white/10 rounded-2xl overflow-hidden shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200">
+              {MODELS.map((model) => (
+                <button
+                  key={model.id}
+                  onClick={() => { setSelectedModel(model); setShowModelPicker(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/[0.04] transition-colors text-left"
+                >
+                  <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: model.color }} />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-semibold text-white">{model.label}</div>
+                    <div className="text-[11px] text-neutral-500">{model.description}</div>
+                  </div>
+                  {selectedModel.id === model.id && (
+                    <Check size={14} weight="bold" className="text-[#14F195] shrink-0" />
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Right Badges */}
+        <div className="pointer-events-auto flex flex-col items-end gap-2">
+           {/* Points Badge */}
+           <div className="bg-[#13151C]/80 backdrop-blur-md border border-[#9945FF]/30 rounded-full pl-3 pr-4 py-1.5 flex items-center gap-2 shadow-lg">
+               <Sparkle size={14} weight="fill" className="text-[#9945FF]" />
+               <span className="text-xs font-bold text-white">{user?.points || 0} PTS</span>
+           </div>
+
+           {/* Credits Badge */}
+           <div className="bg-[#13151C]/80 backdrop-blur-md border border-white/10 rounded-full px-4 py-1.5 flex items-center gap-2 shadow-lg">
+               <Lightning size={14} weight="fill" className={isPaid ? "text-purple-400" : "text-[#14F195]"} />
+               <span className="text-xs font-bold text-white">
+                   {isPaid ? "PRO UNLIMITED" : `${credits ?? '...'} Credits`}
+               </span>
+               {!isPaid && <span className="text-[10px] text-gray-500 border-l border-white/10 pl-2 ml-1">1 Cost/Msg</span>}
+           </div>
+        </div>
       </div>
 
       {/* Main Content */}
@@ -193,11 +232,11 @@ function syntaxToHTML(text: string): string {
             />
           </div>
         ) : (
-          <div className="w-full max-w-4xl mx-auto p-4 md:p-8 pt-10 pb-0">
+          <div className="w-full max-w-4xl mx-auto p-4 md:p-8 pt-16 pb-0">
             {messages.map((msg) => (
               <ChatMessage key={msg.id} message={msg} />
             ))}
-            {isLoading && (
+            {isLoading && !streamingRef.current && (
               <div className="flex items-start gap-4 mb-6 animate-pulse">
                 <div className="w-8 h-8 rounded-full bg-[#3B3F4E] flex items-center justify-center shrink-0">
                   <img src="/blockai.svg" alt="Thinking" className="w-5 h-5 animate-spin-slow" />

@@ -9,7 +9,9 @@ import {
   Users, 
   Gear, 
   SignOut,
-  CaretRight
+  CaretRight,
+  FileCode,
+  PaintBrush
 } from "@phosphor-icons/react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -25,6 +27,8 @@ import {
 const menuItems = [
   { title: "Dashboard", icon: SquaresFour, path: "/dashboard" },
   { title: "Chat", icon: ChatCircleDots, path: "/chat" },
+  { title: "Smart Contracts", icon: FileCode, path: "/smart-contracts" },
+  { title: "NFT Generator", icon: PaintBrush, path: "/nft" },
   { title: "Wallets", icon: Wallet, path: "/wallets" },
   { title: "Market Analysis", icon: ChartBar, path: "/market" },
   { title: "Network", icon: Users, path: "/referrals" },

@@ -4,13 +4,14 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { 
   TrendUp, TrendDown, Lightning, Wallet, Bell, CaretRight, 
-  Sparkle, ChartLineUp, Clock, ShieldCheck, User, Plus
+  Sparkle, ChartLineUp, Clock, ShieldCheck, User, Plus, ArrowUpRight
 } from "@phosphor-icons/react";
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import { useAuth } from "@/context/AuthContext";
 import { Link } from "react-router-dom";
 import { coingecko } from "@/lib/coingecko";
 import { api } from "@/lib/api";
+import SignalWatchlist from "@/components/dashboard/SignalWatchlist";
 import { ConnectButton, darkTheme, useActiveAccount, useWalletBalance } from "thirdweb/react";
 import { createWallet } from "thirdweb/wallets";
 import { base } from "thirdweb/chains";
@@ -108,6 +109,7 @@ export function DashboardPage() {
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [ethPrice, setEthPrice] = useState<number>(0);
+  const [news, setNews] = useState<any[]>([]);
 
   // Time based greeting
   const hour = new Date().getHours();
@@ -155,6 +157,12 @@ export function DashboardPage() {
           const actData = await api.getActivity();
           setActivity(actData?.activity ?? []);
         } catch { setActivity([]); }
+
+        // ChainGPT News
+        try {
+          const newsData = await api.getNews(4);
+          setNews(newsData?.data ?? newsData ?? []);
+        } catch (e) { console.error("News fetch failed:", e); }
 
       } catch (err) {
         console.error("Dashboard load error:", err);
@@ -281,57 +289,80 @@ export function DashboardPage() {
             {/* MAIN CONTENT (2 Cols) */}
             <div className="lg:col-span-2 space-y-8">
                 
-                {/* AI DAILY BRIEF */}
-                <div className="relative p-1 rounded-[32px] bg-gradient-to-br from-[#14F195]/20 to-[#9945FF]/20">
-                    <div className="bg-[#0d0f18] rounded-[30px] p-8 h-full relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-[#9945FF]/10 blur-[80px] rounded-full pointer-events-none" />
-                        
-                        <div className="flex items-center gap-4 mb-6">
-                             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#14F195] to-[#9945FF] p-[2px]">
-                                 <div className="w-full h-full bg-[#0d0f18] rounded-[14px] flex items-center justify-center">
-                                     <Sparkle weight="fill" className="text-white" size={24} />
-                                 </div>
-                             </div>
-                             <div>
-                                 <div className="flex items-center gap-2">
-                                    <h3 className="text-xl font-bold text-white">Market Intelligence</h3>
-                                    <span className="px-2 py-0.5 rounded-full bg-[#14F195]/10 text-[#14F195] text-[10px] font-bold uppercase tracking-wider border border-[#14F195]/20">Live</span>
-                                 </div>
-                                 <p className="text-xs text-gray-400">AI analysis of your portfolio & trends</p>
-                             </div>
+                {/* AI NEWS FEED — Powered by ChainGPT */}
+                <div className="rounded-[32px] bg-[#13151C] border border-white/5 overflow-hidden">
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-8 pt-7 pb-0">
+                        <div className="flex items-center gap-3">
+                            <div className="w-2 h-2 rounded-full bg-[#14F195] animate-pulse" />
+                            <h3 className="text-lg font-bold text-white tracking-tight">AI News</h3>
+                            <span className="text-[10px] text-neutral-500 font-medium tracking-wider uppercase border border-neutral-800 rounded-full px-2 py-0.5">ChainGPT</span>
                         </div>
+                        <Link to="/market" className="text-xs text-neutral-500 hover:text-[#14F195] transition-colors font-medium">
+                            View all →
+                        </Link>
+                    </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-4">
-                                <div className="space-y-2">
-                                    <p className="text-gray-400 text-xs uppercase font-bold tracking-wider">Market Sentiment</p>
-                                    <div className="flex items-baseline gap-2">
-                                        <span className="text-2xl font-bold text-[#14F195]">Bullish</span>
-                                        <span className="text-sm text-gray-500">Confidence: 87%</span>
-                                    </div>
-                                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                                        <div className="h-full bg-[#14F195] w-[87%]" />
+                    {/* Divider */}
+                    <div className="mx-8 mt-5 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+
+                    {/* Articles */}
+                    <div className="p-4">
+                        {news.length === 0 && loading && (
+                            <div className="space-y-1">
+                              {[1,2,3].map(i => (
+                                <div key={i} className="flex items-center gap-4 px-4 py-4 rounded-2xl">
+                                    <div className="w-6 h-4 rounded bg-white/5 animate-pulse" />
+                                    <div className="flex-1 space-y-2">
+                                        <div className="h-3.5 bg-white/5 rounded-full w-3/4 animate-pulse" />
+                                        <div className="h-2.5 bg-white/5 rounded-full w-1/3 animate-pulse" />
                                     </div>
                                 </div>
-                                
-                                <p className="text-sm text-gray-300 leading-relaxed">
-                                    "Track market trends and analyze wallets using <span className="text-white font-bold">BlockAI Chat</span>. Your <span className="text-[#9945FF] font-bold">AI-powered</span> command center is ready."
-                                </p>
+                              ))}
                             </div>
+                        )}
+                        {news.length === 0 && !loading && (
+                            <p className="text-neutral-600 text-sm text-center py-8">No news available.</p>
+                        )}
+                        {news.slice(0, 4).map((article: any, i: number) => (
+                            <a
+                                key={i}
+                                href={article.url || article.link || "#"}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group flex items-start gap-4 px-4 py-4 rounded-2xl hover:bg-white/[0.03] transition-all duration-200 cursor-pointer"
+                            >
+                                {/* Index number */}
+                                <span className="text-sm font-bold text-transparent bg-clip-text bg-gradient-to-b from-neutral-500 to-neutral-700 tabular-nums shrink-0 pt-0.5 w-5 text-right">
+                                    {String(i + 1).padStart(2, '0')}
+                                </span>
 
-                            <div className="p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col justify-center gap-3">
-                                <div className="flex items-start gap-3">
-                                    <Lightning className="text-[#9945FF] mt-1 shrink-0" size={20} weight="fill" />
-                                    <div>
-                                        <h4 className="text-sm font-bold text-white">Explore Markets</h4>
-                                        <p className="text-xs text-gray-400 mt-1">View live market data, charts, and AI-powered insights.</p>
+                                {/* Content */}
+                                <div className="flex-1 min-w-0">
+                                    <h4 className="text-[13px] font-semibold text-neutral-200 group-hover:text-white transition-colors leading-snug line-clamp-2">
+                                        {article.title}
+                                    </h4>
+                                    <div className="flex items-center gap-2 mt-1.5">
+                                        {article.category && (
+                                            <span className="text-[10px] text-[#14F195]/70 font-medium">
+                                                {article.category?.name || article.category}
+                                            </span>
+                                        )}
+                                        {article.category && article.createdAt && (
+                                            <span className="text-neutral-700">·</span>
+                                        )}
+                                        {article.createdAt && (
+                                            <span className="text-[10px] text-neutral-600">
+                                                {new Date(article.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
-                                <Link to="/market" className="w-full py-2 bg-[#9945FF]/10 text-[#9945FF] text-xs font-bold rounded-lg hover:bg-[#9945FF]/20 transition-colors border border-[#9945FF]/20 text-center block">
-                                    View Detailed Report
-                                </Link>
-                            </div>
-                        </div>
+
+                                {/* Arrow */}
+                                <ArrowUpRight size={14} className="text-neutral-700 group-hover:text-[#14F195] transition-colors shrink-0 mt-0.5" />
+                            </a>
+                        ))}
                     </div>
                 </div>
 
@@ -425,6 +456,9 @@ export function DashboardPage() {
                         ))}
                     </div>
                 </GlassCard>
+
+                {/* AI SIGNALS */}
+                <SignalWatchlist />
 
                 {/* NOTIFICATIONS */}
                 <GlassCard className="p-6 bg-gradient-to-br from-[#13151C] to-[#040404]">
