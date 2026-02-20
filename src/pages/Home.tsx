@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import { ScrollReveal } from "@/components/ScrollReveal";
 
 import {
@@ -19,6 +20,10 @@ import {
 export default function Home() {
   const navigate = useNavigate();
   const launch = () => navigate("/dashboard");
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="min-h-screen w-full bg-[#09090b] text-white font-inter relative overflow-x-hidden">
