@@ -32,14 +32,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const storedUser = localStorage.getItem('auth_user');
 
     if (storedToken && storedUser) {
-      // Validate token against backend
-      validateToken(storedToken, JSON.parse(storedUser));
+      // Trust stored data immediately so user isn't logged out on refresh
+      setToken(storedToken);
+      setUser(JSON.parse(storedUser));
+      setIsLoading(false);
+
+      // Then silently validate in background & refresh user data
+      validateTokenInBackground(storedToken, JSON.parse(storedUser));
     } else {
       setIsLoading(false);
     }
   }, []);
 
-  const validateToken = async (storedToken: string, storedUser: User) => {
+  const validateTokenInBackground = async (storedToken: string, storedUser: User) => {
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       const response = await fetch(`${API_URL}/api/v1/me`, {
@@ -48,50 +53,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (response.ok) {
         const data = await response.json();
-        // Token is valid — use fresh user data from server
-        setToken(storedToken);
         const freshUser = data.user || storedUser;
         setUser(freshUser);
         localStorage.setItem('auth_user', JSON.stringify(freshUser));
-      } else {
-        // Token expired or invalid — clear auth state
-        console.log('[Auth] Token invalid/expired, clearing session');
+      } else if (response.status === 401 || response.status === 403) {
+        // Token truly expired — clear session
+        console.log('[Auth] Token expired, clearing session');
         localStorage.removeItem('auth_token');
         localStorage.removeItem('auth_user');
         setToken(null);
         setUser(null);
       }
-    } catch (error) {
-      // Network error — trust stored data (offline-friendly)
-      console.log('[Auth] Validation failed (network), using stored data');
-      setToken(storedToken);
-      setUser(storedUser);
+      // Other errors (500, network) — keep the session, don't log out
+    } catch {
+      // Network error — keep session (offline-friendly)
     }
-    setIsLoading(false);
   };
 
-  // Global interceptor: auto-logout on 401/403
+  // Global interceptor: auto-logout on 401/403 from API calls
   useEffect(() => {
     const originalFetch = window.fetch;
     window.fetch = async (...args) => {
       const response = await originalFetch(...args);
 
-      // Only intercept API calls (not external URLs)
       const url = typeof args[0] === 'string' ? args[0] : (args[0] as Request)?.url || '';
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       const isApiCall = url.includes(API_URL) || url.startsWith('/api');
-      const isAuthEndpoint = url.includes('/login') || url.includes('/register') || url.includes('/wallet-login') || url.includes('/wallet-register');
+      // Skip auth endpoints AND /me (used for validation above)
+      const isSkipped = url.includes('/login') || url.includes('/register') || url.includes('/wallet-login') || url.includes('/wallet-register') || url.endsWith('/me');
 
-      if (isApiCall && !isAuthEndpoint && (response.status === 401 || response.status === 403)) {
+      if (isApiCall && !isSkipped && (response.status === 401 || response.status === 403)) {
         console.log('[Auth] Received', response.status, '- auto-logging out');
         localStorage.removeItem('auth_token');
         localStorage.removeItem('auth_user');
         setToken(null);
         setUser(null);
-        // Redirect to login
-        if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/signup')) {
-          window.location.href = '/login';
-        }
       }
 
       return response;
