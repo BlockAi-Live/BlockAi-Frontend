@@ -260,4 +260,38 @@ export const api = {
     }
     return response.json();
   },
+
+  analyzeWallet: async (address: string) => {
+    const token = localStorage.getItem('auth_token');
+    const response = await fetch(`${API_URL}/api/v1/wallet-intel`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ address }),
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || "Wallet analysis failed");
+    }
+    return response.json();
+  },
+
+  decodeTx: async (txHash: string) => {
+    const token = localStorage.getItem('auth_token');
+    const response = await fetch(`${API_URL}/api/v1/decode-tx`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ txHash }),
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || "Transaction decoding failed");
+    }
+    return response.json();
+  },
 };

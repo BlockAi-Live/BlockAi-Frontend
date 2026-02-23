@@ -17,6 +17,8 @@ import { SignInPage } from "./pages/SignIn";
 import MarketAnalysisPage from "./pages/MarketAnalysis";
 import SmartContractsPage from "./pages/SmartContracts";
 import NFTGeneratorPage from "./pages/NFTGenerator";
+import WalletIntelPage from "./pages/WalletIntel";
+import SmartAlertsPage from "./pages/SmartAlerts";
 import { SettingsPage } from "./pages/Settings";
 import GenesisPass from "./pages/GenesisPass";
 import Waitlist from "./pages/Waitlist";
@@ -107,6 +109,26 @@ function App() {
             <ProtectedRoute>
               <MainLayout>
                 <NFTGeneratorPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/wallet-intel"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <WalletIntelPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/alerts"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <SmartAlertsPage />
               </MainLayout>
             </ProtectedRoute>
           }
