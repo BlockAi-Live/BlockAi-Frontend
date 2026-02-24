@@ -269,7 +269,7 @@ export default function Navbar({ launch }: NavbarProps) {
 
           <a href="/about" className="px-3 py-1.5 rounded-lg text-neutral-500 hover:text-white hover:bg-white/[0.04] transition-all">About</a>
           <a href="/team" className="px-3 py-1.5 rounded-lg text-neutral-500 hover:text-white hover:bg-white/[0.04] transition-all">Team</a>
-          <a href="/genesis" className="px-3 py-1.5 rounded-lg text-neutral-500 hover:text-white hover:bg-white/[0.04] transition-all">Genesis</a>
+
         </div>
 
         {/* Right side */}
@@ -338,7 +338,7 @@ export default function Navbar({ launch }: NavbarProps) {
                   <div className="h-px bg-neutral-800 my-3" />
                   <a href="/about" className="px-3 py-2 text-sm text-neutral-400 hover:text-white transition-all">About</a>
                   <a href="/team" className="px-3 py-2 text-sm text-neutral-400 hover:text-white transition-all">Team</a>
-                  <a href="/genesis" className="px-3 py-2 text-sm text-neutral-400 hover:text-white transition-all">Genesis</a>
+
                   <div className="h-px bg-neutral-800 my-3" />
                   {account && (
                     <div className="w-full flex justify-center mb-2">
