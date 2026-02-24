@@ -12,7 +12,9 @@ import {
   ClockCounterClockwise,
   TrendUp,
   ShieldCheck,
-  Check
+  Check,
+  Eye,
+  EyeSlash
 } from "@phosphor-icons/react";
 import { 
   PieChart, 
@@ -90,12 +92,25 @@ export function WalletsPage() {
 
   const walletBalance = walletBalanceData ? parseFloat(walletBalanceData.displayValue) : 0;
   const walletBalanceUsd = walletBalance * ethPrice;
+  const [demoMode, setDemoMode] = useState(false);
 
-  // Allocation — when wallet connected, show real ETH dominance. Otherwise mock.
-  const allocationData = thirdwebAccount?.address
-    ? [
-        { name: "ETH", value: 100, color: "#627EEA" },
-      ]
+  // Demo mode overrides
+  const d_connected = demoMode ? true : !!thirdwebAccount?.address;
+  const d_walletBalance = demoMode ? 12.4821 : walletBalance;
+  const d_ethPrice = demoMode ? 3421.87 : ethPrice;
+  const d_walletBalanceUsd = demoMode ? 12.4821 * 3421.87 : walletBalanceUsd;
+  const d_address = demoMode ? "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D" : thirdwebAccount?.address || "";
+
+  // Allocation — when wallet connected or demo, show data
+  const allocationData = d_connected
+    ? (demoMode
+      ? [
+          { name: "BTC", value: 45, color: "#F7931A" },
+          { name: "ETH", value: 30, color: "#627EEA" },
+          { name: "SOL", value: 15, color: "#14F195" },
+          { name: "USDT", value: 10, color: "#26A17B" },
+        ]
+      : [{ name: "ETH", value: 100, color: "#627EEA" }])
     : [
         { name: "BTC", value: 45, color: "#F7931A" },
         { name: "ETH", value: 30, color: "#627EEA" },
@@ -136,7 +151,7 @@ export function WalletsPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const totalNetWorth = thirdwebAccount?.address ? walletBalanceUsd : 0;
+  const totalNetWorth = d_connected ? d_walletBalanceUsd : 0;
 
   return (
     <div className="min-h-screen bg-[#0d0f18] text-white font-sans overflow-x-hidden relative flex flex-col pb-24">
@@ -157,7 +172,20 @@ export function WalletsPage() {
               <p className="text-gray-400">Track your assets across all chains.</p>
            </div>
            
-           <ConnectButton
+           <div className="flex gap-3 items-center">
+             {/* Demo Mode Toggle */}
+             <button
+               onClick={() => setDemoMode(!demoMode)}
+               className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-sm font-bold transition-all ${
+                 demoMode
+                   ? "bg-[#F59E0B]/10 border-[#F59E0B]/30 text-[#F59E0B]"
+                   : "bg-[#13151C] border-white/10 text-neutral-500 hover:text-white hover:border-white/20"
+               }`}
+             >
+               {demoMode ? <EyeSlash size={16} weight="bold" /> : <Eye size={16} />}
+               {demoMode ? "Demo On" : "Demo"}
+             </button>
+             <ConnectButton
              client={client}
              wallets={thirdwebWallets}
              theme={darkTheme({ colors: { primaryButtonBg: "#14F195", primaryButtonText: "#000" } })}
@@ -172,8 +200,9 @@ export function WalletsPage() {
                } 
              }}
              connectModal={{ size: "compact", titleIcon: "https://blockai-frontend-v1.vercel.app/blockai.svg", showThirdwebBranding: false }}
-           />
-        </div>
+            />
+           </div>
+         </div>
 
         {/* --- HERO SECTION: NET WORTH & CHART --- */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
@@ -194,22 +223,22 @@ export function WalletsPage() {
                        <span className="text-sm font-medium uppercase tracking-wider">Total Net Worth</span>
                    </div>
                    
-                   {thirdwebAccount?.address ? (
-                     <>
-                       <h2 className="text-5xl md:text-6xl font-bold text-white tracking-tight mb-1">
-                         {walletBalance.toFixed(4)} <span className="text-2xl text-gray-500">ETH</span>
-                       </h2>
-                       {ethPrice > 0 && (
-                         <p className="text-xl text-gray-500 mb-4">≈ {fmt(walletBalanceUsd)}</p>
+                   {d_connected ? (
+                      <>
+                        <h2 className="text-5xl md:text-6xl font-bold text-white tracking-tight mb-1">
+                          {d_walletBalance.toFixed(4)} <span className="text-2xl text-gray-500">ETH</span>
+                        </h2>
+                        {d_ethPrice > 0 && (
+                          <p className="text-xl text-gray-500 mb-4">≈ {fmt(d_walletBalanceUsd)}</p>
                        )}
                        <div className="flex items-center gap-3">
                            <div className="px-3 py-1 rounded-full bg-[#14F195]/10 border border-[#14F195]/20 flex items-center gap-1.5">
                                <ShieldCheck size={14} className="text-[#14F195]" weight="bold" />
                                <span className="text-[#14F195] font-bold text-xs">Connected on Base</span>
                            </div>
-                           <span className="text-gray-600 text-xs font-mono">
-                             {thirdwebAccount.address.slice(0, 6)}...{thirdwebAccount.address.slice(-4)}
-                           </span>
+                            <span className="text-gray-600 text-xs font-mono">
+                              {d_address.slice(0, 6)}...{d_address.slice(-4)}
+                            </span>
                        </div>
                      </>
                    ) : (

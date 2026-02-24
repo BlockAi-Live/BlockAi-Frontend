@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { 
   TrendUp, TrendDown, Lightning, Wallet, Bell, CaretRight, 
-  Sparkle, ChartLineUp, Clock, ShieldCheck, User, Plus, ArrowUpRight
+  Sparkle, ChartLineUp, Clock, ShieldCheck, User, Plus, ArrowUpRight, Eye, EyeSlash
 } from "@phosphor-icons/react";
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import { useAuth } from "@/context/AuthContext";
@@ -91,6 +91,36 @@ const activityMeta = (action: string) => {
   }
 };
 
+// --- DEMO MODE MOCK DATA ---
+const DEMO_WATCHLIST: CoinData[] = [
+  { id: "bitcoin", symbol: "btc", name: "Bitcoin", current_price: 97842.31, price_change_percentage_24h: 2.4, image: "https://assets.coingecko.com/coins/images/1/small/bitcoin.png" },
+  { id: "ethereum", symbol: "eth", name: "Ethereum", current_price: 3421.87, price_change_percentage_24h: -1.2, image: "https://assets.coingecko.com/coins/images/279/small/ethereum.png" },
+  { id: "solana", symbol: "sol", name: "Solana", current_price: 189.45, price_change_percentage_24h: 5.8, image: "https://assets.coingecko.com/coins/images/4128/small/solana.png" },
+  { id: "chainlink", symbol: "link", name: "Chainlink", current_price: 18.92, price_change_percentage_24h: 3.1, image: "https://assets.coingecko.com/coins/images/877/small/chainlink-new-logo.png" },
+];
+
+const DEMO_CHARTS: Record<string, ChartPoint[]> = {
+  bitcoin: [42,44,43,46,48,45,47,50,49,52,51,54,53,55,57,56,58,60,59,61].map(v => ({ v: v * 1000 })),
+  ethereum: [30,32,31,33,35,34,32,33,35,36,34,35,37,36,38,39,37,38,40,39].map(v => ({ v: v * 100 })),
+  solana: [15,16,15,17,18,17,19,20,19,21,22,21,23,22,24,25,24,26,25,27].map(v => ({ v: v * 10 })),
+  chainlink: [14,15,14,16,15,17,16,18,17,19,18,19,20,19,18,19,20,19,18,19].map(v => ({ v })),
+};
+
+const DEMO_ACTIVITY: ActivityItem[] = [
+  { id: "1", action: "AI_MESSAGE", cost: 1, timestamp: new Date(Date.now() - 300000).toISOString() },
+  { id: "2", action: "WALLET_SCAN", cost: 2, timestamp: new Date(Date.now() - 1800000).toISOString() },
+  { id: "3", action: "CONTRACT_GEN", cost: 3, timestamp: new Date(Date.now() - 7200000).toISOString() },
+  { id: "4", action: "TX_DECODE", cost: 1, timestamp: new Date(Date.now() - 14400000).toISOString() },
+  { id: "5", action: "AI_MESSAGE", cost: 1, timestamp: new Date(Date.now() - 28800000).toISOString() },
+];
+
+const DEMO_NEWS = [
+  { title: "Ethereum Foundation Announces Major L2 Scaling Roadmap for 2026", url: "#", source: { title: "CoinDesk" }, createdAt: new Date().toISOString() },
+  { title: "Bitcoin ETF Inflows Hit $2.1B Weekly Record as Institutions Pile In", url: "#", source: { title: "The Block" }, createdAt: new Date().toISOString() },
+  { title: "Solana DeFi TVL Surpasses $15B Following Major Protocol Upgrades", url: "#", source: { title: "Decrypt" }, createdAt: new Date().toISOString() },
+  { title: "ChainGPT Partners with Leading DEXs for AI-Powered Trading Intelligence", url: "#", source: { title: "CryptoSlate" }, createdAt: new Date().toISOString() },
+];
+
 export function DashboardPage() {
   const { user } = useAuth();
   const thirdwebAccount = useActiveAccount();
@@ -110,6 +140,17 @@ export function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [ethPrice, setEthPrice] = useState<number>(0);
   const [news, setNews] = useState<any[]>([]);
+  const [demoMode, setDemoMode] = useState(false);
+
+  // Demo mode overrides
+  const d_watchlist = demoMode ? DEMO_WATCHLIST : watchlist;
+  const d_charts = demoMode ? DEMO_CHARTS : charts;
+  const d_credits = demoMode ? 45 : credits;
+  const d_activity = demoMode ? DEMO_ACTIVITY : activity;
+  const d_news = demoMode ? DEMO_NEWS : news;
+  const d_ethPrice = demoMode ? 3421.87 : ethPrice;
+  const d_walletBalance = demoMode ? "12.4821" : (walletBalanceData ? parseFloat(walletBalanceData.displayValue).toFixed(4) : null);
+  const d_walletConnected = demoMode ? true : !!thirdwebAccount?.address;
 
   // Time based greeting
   const hour = new Date().getHours();
@@ -174,7 +215,7 @@ export function DashboardPage() {
   }, []);
 
   // Derive notifications from activity
-  const notifications = activity.slice(0, 3).map(a => {
+  const notifications = d_activity.slice(0, 3).map(a => {
     const meta = activityMeta(a.action);
     return {
       text: `${meta.title} — ${a.cost} credit${a.cost !== 1 ? "s" : ""} used`,
@@ -184,9 +225,7 @@ export function DashboardPage() {
   });
 
   // Wallet balance formatted
-  const walletBalance = walletBalanceData
-    ? parseFloat(walletBalanceData.displayValue).toFixed(4)
-    : null;
+  const walletBalance = d_walletBalance;
 
   return (
     <div className="min-h-screen bg-[#0d0f18] text-white font-sans overflow-x-hidden relative pb-24">
@@ -213,6 +252,18 @@ export function DashboardPage() {
             </div>
             
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex gap-3 items-center">
+                {/* Demo Mode Toggle */}
+                <button
+                  onClick={() => setDemoMode(!demoMode)}
+                  className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-sm font-bold transition-all ${
+                    demoMode
+                      ? "bg-[#F59E0B]/10 border-[#F59E0B]/30 text-[#F59E0B]"
+                      : "bg-[#13151C] border-white/10 text-neutral-500 hover:text-white hover:border-white/20"
+                  }`}
+                >
+                  {demoMode ? <EyeSlash size={16} weight="bold" /> : <Eye size={16} />}
+                  {demoMode ? "Demo On" : "Demo"}
+                </button>
                 <Link to="/chat" className="px-6 py-3 bg-[#14F195] text-black font-bold rounded-xl hover:bg-[#14F195]/90 transition-all shadow-[0_0_20px_rgba(20,241,149,0.3)] flex items-center gap-2">
                     <Sparkle weight="fill" /> New Chat
                 </Link>
@@ -234,13 +285,13 @@ export function DashboardPage() {
                     <Wallet size={48} color="#14F195" />
                 </div>
                 <p className="text-gray-400 text-sm font-medium uppercase tracking-wider mb-2">Wallet Balance</p>
-                {thirdwebAccount?.address ? (
+                {d_walletConnected ? (
                   <>
                     <h3 className="text-3xl font-bold text-white mb-1">
                       {walletBalance ?? "0.0000"} <span className="text-lg text-gray-500">ETH</span>
                     </h3>
-                    {ethPrice > 0 && (
-                      <p className="text-sm text-gray-500 mb-2">≈ ${(parseFloat(walletBalance ?? "0") * ethPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</p>
+                    {d_ethPrice > 0 && (
+                      <p className="text-sm text-gray-500 mb-2">≈ ${(parseFloat(walletBalance ?? "0") * d_ethPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</p>
                     )}
                     <div className="flex items-center gap-2 text-[#14F195] text-sm font-bold bg-[#14F195]/10 w-fit px-2 py-1 rounded-lg">
                         <ShieldCheck weight="bold" /> Connected
@@ -262,7 +313,7 @@ export function DashboardPage() {
                 </div>
                 <p className="text-gray-400 text-sm font-medium uppercase tracking-wider mb-2">AI Credits</p>
                 <h3 className="text-3xl font-bold text-white mb-2">
-                  {credits !== null ? credits : <span className="text-gray-600">—</span>} <span className="text-lg text-[#9945FF]">credits</span>
+                  {d_credits !== null ? d_credits : <span className="text-gray-600">—</span>} <span className="text-lg text-[#9945FF]">credits</span>
                 </h3>
                 <Link to="/settings" className="flex items-center gap-2 text-gray-400 text-sm font-medium bg-white/5 w-fit px-2 py-1 rounded-lg cursor-pointer hover:bg-white/10 transition-colors">
                     Manage <CaretRight weight="bold" />
@@ -276,7 +327,7 @@ export function DashboardPage() {
                     <ChartLineUp size={48} color="#3B82F6" />
                 </div>
                 <p className="text-gray-400 text-sm font-medium uppercase tracking-wider mb-2">Total Actions</p>
-                <h3 className="text-3xl font-bold text-white mb-2">{activity.length}</h3>
+                <h3 className="text-3xl font-bold text-white mb-2">{d_activity.length}</h3>
                  <div className="flex items-center gap-2 text-gray-400 text-sm font-medium w-fit px-2 py-1 rounded-lg">
                    AI chats & API calls
                 </div>
@@ -308,7 +359,7 @@ export function DashboardPage() {
 
                     {/* Articles */}
                     <div className="p-4">
-                        {news.length === 0 && loading && (
+                        {d_news.length === 0 && loading && (
                             <div className="space-y-1">
                               {[1,2,3].map(i => (
                                 <div key={i} className="flex items-center gap-4 px-4 py-4 rounded-2xl">
@@ -321,10 +372,10 @@ export function DashboardPage() {
                               ))}
                             </div>
                         )}
-                        {news.length === 0 && !loading && (
+                        {d_news.length === 0 && !loading && (
                             <p className="text-neutral-600 text-sm text-center py-8">No news available.</p>
                         )}
-                        {news.slice(0, 4).map((article: any, i: number) => (
+                        {d_news.slice(0, 4).map((article: any, i: number) => (
                             <a
                                 key={i}
                                 href={article.url || article.link || "#"}
@@ -413,7 +464,7 @@ export function DashboardPage() {
                         <Link to="/market" className="text-xs font-bold text-[#14F195] hover:underline">View All</Link>
                     </div>
                     <div className="space-y-6">
-                        {loading && watchlist.length === 0 && (
+                        {loading && d_watchlist.length === 0 && (
                           <div className="space-y-4">
                             {[1,2,3,4].map(i => (
                               <div key={i} className="flex items-center justify-between animate-pulse">
@@ -429,7 +480,7 @@ export function DashboardPage() {
                             ))}
                           </div>
                         )}
-                        {watchlist.map(coin => (
+                        {d_watchlist.map(coin => (
                              <div key={coin.symbol} className="flex items-center justify-between">
                                  <div className="flex items-center gap-3">
                                     <img src={coin.image} alt={coin.symbol} className="w-8 h-8 rounded-full" />
@@ -439,9 +490,9 @@ export function DashboardPage() {
                                     </div>
                                  </div>
                                  <div className="flex items-center gap-3">
-                                    {charts[coin.id] && (
+                                    {d_charts[coin.id] && (
                                       <MiniChart 
-                                        data={charts[coin.id]} 
+                                        data={d_charts[coin.id]} 
                                         color={coin.price_change_percentage_24h >= 0 ? "#14F195" : "#EF4444"} 
                                       />
                                     )}
