@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { AccessGateway } from "../components/access/AccessGateway";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { 
@@ -127,6 +128,7 @@ export default function MarketAnalysisPage() {
   }
 
   return (
+    <AccessGateway>
     <div className="min-h-screen bg-[#0d0f18] text-white font-sans overflow-x-hidden relative flex flex-col">
       {/* Global Background Ambience */}
       <div 
@@ -574,5 +576,6 @@ export default function MarketAnalysisPage() {
       </div>
       )}
     </div>
+    </AccessGateway>
   );
 }

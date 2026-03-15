@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
+import { AccessGateway } from "../components/access/AccessGateway";
 import ChatEmptyState from "../components/chat/ChatEmptyState";
 import ChatInput from "../components/chat/ChatInput";
 import ChatMessage, { Message } from "../components/chat/ChatMessage";
@@ -157,6 +158,7 @@ export default function ChatPage() {
   };
 
   return (
+    <AccessGateway>
     <div className="flex flex-col h-full min-h-[calc(100vh-4rem)] relative font-sans bg-[#0d0f18]">
       
       {/* Top Bar — Model Selector + Badges */}
@@ -254,5 +256,6 @@ export default function ChatPage() {
         <ChatInput onSend={handleSendMessage} isLoading={isLoading} />
       </div>
     </div>
+    </AccessGateway>
   );
 }
