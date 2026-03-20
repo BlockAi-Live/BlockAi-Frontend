@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/gitbook",
+      "destination": "https://proxy.gitbook.site/sites/site_myC6S"
+    },
+    {
+      "source": "/gitbook/:path*",
+      "destination": "https://proxy.gitbook.site/sites/site_myC6S/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
