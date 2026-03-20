@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Confetti from "react-confetti";
 import { 
-  TrendUp, TrendDown, Lightning, Wallet, Bell, CaretRight, 
-  Sparkle, ChartLineUp, Clock, ShieldCheck, User, Plus, ArrowUpRight, Eye, EyeSlash
+  TrendUp, TrendDown, Lightning, Wallet, Bell, CaretRight, CaretDown,
+  Sparkle, ChartLineUp, Clock, ShieldCheck, User, Plus, ArrowUpRight, Eye, EyeSlash,
+  Fire, Gift, Check, Lock
 } from "@phosphor-icons/react";
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import { useAuth } from "@/context/AuthContext";
@@ -16,6 +18,57 @@ import { ConnectButton, darkTheme, useActiveAccount, useWalletBalance } from "th
 import { createWallet } from "thirdweb/wallets";
 import { base } from "thirdweb/chains";
 import { client } from "../client";
+
+// --- DAILY REWARDS ---
+const DAILY_REWARDS = [5, 10, 15, 20, 30, 40, 50];
+const STORAGE_KEY = "blockai_daily_rewards";
+
+interface DailyRewardsState {
+  lastClaimDate: string | null; // ISO date string (YYYY-MM-DD)
+  streakCount: number; // 0-6 (index into DAILY_REWARDS)
+}
+
+const getTodayDate = () => new Date().toISOString().split("T")[0];
+
+const loadRewardsState = (): DailyRewardsState => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return { lastClaimDate: null, streakCount: 0 };
+};
+
+const saveRewardsState = (state: DailyRewardsState) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+};
+
+const getStreakInfo = (state: DailyRewardsState) => {
+  const today = getTodayDate();
+  const claimedToday = state.lastClaimDate === today;
+
+  if (!state.lastClaimDate) {
+    // Never claimed — start fresh
+    return { currentDay: 0, claimedToday: false, nextReward: DAILY_REWARDS[0] };
+  }
+
+  if (claimedToday) {
+    return { currentDay: state.streakCount, claimedToday: true, nextReward: DAILY_REWARDS[Math.min(state.streakCount, 6)] };
+  }
+
+  // Check if yesterday
+  const lastDate = new Date(state.lastClaimDate + "T00:00:00");
+  const todayDate = new Date(today + "T00:00:00");
+  const diffDays = Math.floor((todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 1) {
+    // Streak continues
+    const nextDay = (state.streakCount + 1) % 7;
+    return { currentDay: nextDay, claimedToday: false, nextReward: DAILY_REWARDS[nextDay] };
+  } else {
+    // Streak broken — reset
+    return { currentDay: 0, claimedToday: false, nextReward: DAILY_REWARDS[0] };
+  }
+};
 
 const wallets = [
   createWallet("io.metamask"),
@@ -122,7 +175,7 @@ const DEMO_NEWS = [
 ];
 
 export function DashboardPage() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const thirdwebAccount = useActiveAccount();
   
   // Wallet balance via ThirdWeb
@@ -141,6 +194,35 @@ export function DashboardPage() {
   const [ethPrice, setEthPrice] = useState<number>(0);
   const [news, setNews] = useState<any[]>([]);
   const [demoMode, setDemoMode] = useState(false);
+  const [isActivityOpen, setIsActivityOpen] = useState(false);
+
+  // Daily Rewards
+  const [rewardsState, setRewardsState] = useState<DailyRewardsState>(loadRewardsState);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [claimAnimation, setClaimAnimation] = useState(false);
+  const streakInfo = getStreakInfo(rewardsState);
+
+  const handleClaim = useCallback(() => {
+    if (streakInfo.claimedToday) return;
+
+    const today = getTodayDate();
+    const newState: DailyRewardsState = {
+      lastClaimDate: today,
+      streakCount: streakInfo.currentDay,
+    };
+    saveRewardsState(newState);
+    setRewardsState(newState);
+
+    // Update user points
+    const reward = streakInfo.nextReward;
+    updateUser({ points: (user?.points || 0) + reward });
+
+    // Confetti!
+    setShowConfetti(true);
+    setClaimAnimation(true);
+    setTimeout(() => setShowConfetti(false), 4000);
+    setTimeout(() => setClaimAnimation(false), 1500);
+  }, [streakInfo, user, updateUser]);
 
   // Demo mode overrides
   const d_watchlist = demoMode ? DEMO_WATCHLIST : watchlist;
@@ -417,46 +499,183 @@ export function DashboardPage() {
                     </div>
                 </div>
 
+                {/* AI SIGNALS */}
+                <div className="h-[400px]">
+                    <SignalWatchlist />
+                </div>
+
                 {/* RECENT ACTIVITY */}
                 <div>
-                     <h3 className="text-xl font-bold text-white mb-6">Recent Activity</h3>
-                     <div className="space-y-4">
-                        {activity.length === 0 && !loading && (
-                          <div className="p-6 rounded-2xl bg-[#13151C] border border-white/5 text-center">
-                            <p className="text-gray-500 text-sm">No activity yet. Start a chat to see your history here.</p>
-                          </div>
-                        )}
-                        {activity.slice(0, 5).map((item, i) => {
-                            const meta = activityMeta(item.action);
-                            return (
-                              <motion.div 
-                                  initial={{ opacity: 0, x: -20 }}
-                                  whileInView={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: i * 0.1 }}
-                                  key={item.id} 
-                                  className="p-4 rounded-2xl bg-[#13151C] border border-white/5 hover:bg-white/[0.02] transition-colors flex items-center justify-between group"
-                              >
-                                  <div className="flex items-center gap-4">
-                                      <div className="w-10 h-10 rounded-full flex items-center justify-center border border-white/5" style={{ backgroundColor: `${meta.color}15`, color: meta.color }}>
-                                          <meta.icon size={20} weight="fill" />
-                                      </div>
-                                      <div>
-                                          <h4 className="font-bold text-white text-sm group-hover:text-[#14F195] transition-colors">{meta.title}</h4>
-                                          <p className="text-xs text-gray-500">{timeAgo(item.timestamp)} · {item.cost} credit{item.cost !== 1 ? "s" : ""}</p>
-                                      </div>
+                     <button 
+                        onClick={() => setIsActivityOpen(!isActivityOpen)} 
+                        className="w-full flex items-center justify-between mb-6 group outline-none"
+                     >
+                         <h3 className="text-xl font-bold text-white group-hover:text-[#14F195] transition-colors">Recent Activity</h3>
+                         <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#14F195]/10 group-hover:text-[#14F195] transition-colors">
+                            <CaretDown size={16} className={`transition-transform duration-300 ${isActivityOpen ? 'rotate-180' : ''}`} />
+                         </div>
+                     </button>
+                     <AnimatePresence>
+                        {isActivityOpen && (
+                          <motion.div 
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              className="overflow-hidden"
+                          >
+                             <div className="space-y-4 pb-4">
+                                {activity.length === 0 && !loading && (
+                                  <div className="p-6 rounded-2xl bg-[#13151C] border border-white/5 text-center">
+                                    <p className="text-gray-500 text-sm">No activity yet. Start a chat to see your history here.</p>
                                   </div>
-                                  <CaretRight className="text-gray-600 group-hover:text-white transition-colors" />
-                              </motion.div>
-                            );
-                        })}
-                     </div>
+                                )}
+                                {activity.slice(0, 5).map((item, i) => {
+                                    const meta = activityMeta(item.action);
+                                    return (
+                                      <motion.div 
+                                          initial={{ opacity: 0, x: -20 }}
+                                          whileInView={{ opacity: 1, x: 0 }}
+                                          transition={{ delay: i * 0.1 }}
+                                          key={item.id} 
+                                          className="p-4 rounded-2xl bg-[#13151C] border border-white/5 hover:bg-white/[0.02] transition-colors flex items-center justify-between group"
+                                      >
+                                          <div className="flex items-center gap-4">
+                                              <div className="w-10 h-10 rounded-full flex items-center justify-center border border-white/5" style={{ backgroundColor: `${meta.color}15`, color: meta.color }}>
+                                                  <meta.icon size={20} weight="fill" />
+                                              </div>
+                                              <div>
+                                                  <h4 className="font-bold text-white text-sm group-hover:text-[#14F195] transition-colors">{meta.title}</h4>
+                                                  <p className="text-xs text-gray-500">{timeAgo(item.timestamp)} · {item.cost} credit{item.cost !== 1 ? "s" : ""}</p>
+                                              </div>
+                                          </div>
+                                          <CaretRight className="text-gray-600 group-hover:text-white transition-colors" />
+                                      </motion.div>
+                                    );
+                                })}
+                             </div>
+                          </motion.div>
+                        )}
+                     </AnimatePresence>
                 </div>
 
             </div>
 
             {/* SIDE PANEL (Right) */}
             <div className="space-y-8">
-                
+
+                {/* DAILY REWARDS */}
+                <GlassCard className="p-6 relative overflow-hidden">
+                  {/* Confetti overlay */}
+                  {showConfetti && (
+                    <div className="fixed inset-0 z-[100] pointer-events-none">
+                      <Confetti
+                        width={window.innerWidth}
+                        height={window.innerHeight}
+                        recycle={false}
+                        numberOfPieces={200}
+                        gravity={0.3}
+                        colors={['#14F195', '#9945FF', '#FFD700', '#3B82F6', '#ffffff']}
+                      />
+                    </div>
+                  )}
+
+                  {/* Header */}
+                  <div className="flex items-center justify-between mb-5">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-[#FFD700]/10 flex items-center justify-center">
+                        <Gift size={18} weight="fill" className="text-[#FFD700]" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-white text-sm">Daily Rewards</h3>
+                        {rewardsState.lastClaimDate && (
+                          <div className="flex items-center gap-1">
+                            <Fire size={11} weight="fill" className="text-orange-400" />
+                            <span className="text-[10px] text-orange-400 font-bold">{streakInfo.currentDay + (streakInfo.claimedToday ? 1 : 0)}-day streak</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-neutral-600 font-medium">Cycle resets after Day 7</span>
+                  </div>
+
+                  {/* 7-Day Tracker */}
+                  <div className="flex items-center justify-between gap-1.5 mb-5">
+                    {DAILY_REWARDS.map((pts, i) => {
+                      const isPast = streakInfo.claimedToday ? i < streakInfo.currentDay : i < streakInfo.currentDay;
+                      const isCurrent = i === streakInfo.currentDay;
+                      const isClaimed = streakInfo.claimedToday && i === streakInfo.currentDay;
+                      const isClaimedPast = streakInfo.claimedToday ? i <= streakInfo.currentDay : i < streakInfo.currentDay;
+                      const isFuture = !isPast && !isCurrent;
+
+                      return (
+                        <div key={i} className="flex flex-col items-center gap-1.5 flex-1">
+                          <motion.div
+                            animate={isCurrent && !streakInfo.claimedToday ? { scale: [1, 1.1, 1] } : {}}
+                            transition={{ repeat: Infinity, duration: 2 }}
+                            className={`
+                              w-9 h-9 rounded-full flex items-center justify-center text-[10px] font-bold transition-all relative
+                              ${isClaimedPast
+                                ? 'bg-[#14F195] text-black shadow-[0_0_12px_rgba(20,241,149,0.3)]'
+                                : isCurrent && !streakInfo.claimedToday
+                                  ? 'bg-[#14F195]/10 text-[#14F195] border-2 border-[#14F195] shadow-[0_0_15px_rgba(20,241,149,0.2)]'
+                                  : 'bg-white/[0.03] text-neutral-700 border border-white/[0.06]'
+                              }
+                            `}
+                          >
+                            {isClaimedPast ? (
+                              <Check size={14} weight="bold" />
+                            ) : isFuture ? (
+                              <Lock size={10} weight="bold" />
+                            ) : (
+                              <span>+{pts}</span>
+                            )}
+                          </motion.div>
+                          <span className={`text-[9px] font-medium ${
+                            isClaimedPast ? 'text-[#14F195]' 
+                            : isCurrent ? 'text-white' 
+                            : 'text-neutral-700'
+                          }`}>
+                            D{i + 1}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Claim Button */}
+                  <AnimatePresence mode="wait">
+                    {streakInfo.claimedToday ? (
+                      <motion.div
+                        key="claimed"
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="w-full py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-center"
+                      >
+                        <span className="text-xs text-neutral-500 font-medium flex items-center justify-center gap-1.5">
+                          <Check size={13} weight="bold" className="text-[#14F195]" />
+                          Claimed today — come back tomorrow!
+                        </span>
+                      </motion.div>
+                    ) : (
+                      <motion.button
+                        key="claim"
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={handleClaim}
+                        className="w-full py-2.5 rounded-xl bg-[#14F195] text-black font-bold text-sm hover:bg-[#14F195]/90 transition-all flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(20,241,149,0.2)]"
+                      >
+                        <Gift size={16} weight="fill" />
+                        Claim +{streakInfo.nextReward} PTS
+                      </motion.button>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Bottom accent */}
+                  <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#FFD700]/30 to-transparent" />
+                </GlassCard>
+
                 {/* WATCHLIST */}
                 <GlassCard className="p-6">
                     <div className="flex justify-between items-center mb-6">
@@ -507,9 +726,6 @@ export function DashboardPage() {
                         ))}
                     </div>
                 </GlassCard>
-
-                {/* AI SIGNALS */}
-                <SignalWatchlist />
 
                 {/* NOTIFICATIONS */}
                 <GlassCard className="p-6 bg-gradient-to-br from-[#13151C] to-[#040404]">

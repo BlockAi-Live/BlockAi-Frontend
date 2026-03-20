@@ -13,6 +13,7 @@ export default function SignalWatchlist() {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [hasRevealed, setHasRevealed] = useState(false);
 
   const streamText = useCallback((fullText: string) => {
     const words = fullText.split(/(\s+)/);
@@ -50,9 +51,29 @@ export default function SignalWatchlist() {
     }
   };
 
-  useEffect(() => {
+  const handleReveal = () => {
+    setHasRevealed(true);
     fetchSignals();
-  }, []);
+  };
+
+  if (!hasRevealed) {
+    return (
+      <div className="bg-[#13151C]/60 border border-white/[0.06] rounded-2xl overflow-hidden h-full flex flex-col justify-center items-center p-6 min-h-[200px]">
+         <div className="w-12 h-12 rounded-full bg-[#14F195]/10 flex items-center justify-center mb-4">
+             <Lightning size={24} weight="fill" className="text-[#14F195]" />
+         </div>
+         <h3 className="font-bold text-white text-sm mb-2">AI Market Signals</h3>
+         <p className="text-xs text-neutral-500 mb-4 text-center">Get intelligent analysis on current market movements.</p>
+         <button 
+            onClick={handleReveal} 
+            className="bg-[#14F195] text-black text-xs font-bold px-5 py-2.5 rounded-xl hover:opacity-90 transition-opacity flex items-center gap-2 shadow-[0_0_15px_rgba(20,241,149,0.2)]"
+         >
+            <TrendUp size={16} weight="bold" />
+            Reveal Signals
+         </button>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#13151C]/60 border border-white/[0.06] rounded-2xl overflow-hidden h-full flex flex-col">
