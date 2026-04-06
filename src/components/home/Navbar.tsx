@@ -32,7 +32,7 @@ const productsItems = [
 
 const resourcesItems = [
   { icon: Map, label: "Roadmap", desc: "Development milestones", href: "/Roadmap.pdf", accent: "#14F195" },
-  { icon: Coins, label: "Tokenomics", desc: "Distribution & utility model", href: "/Tokenomics.pdf", accent: "#9945FF" },
+  { icon: Coins, label: "Tokenomics", desc: "Distribution & utility model", href: "/Tokenomics.pdf?v=2", accent: "#9945FF" },
   { icon: FileText, label: "Whitepaper", desc: "Technical architecture", href: "/Whitepaper.pdf", accent: "#14F195" },
   { icon: BookOpen, label: "Documentation", desc: "Guides & API reference", href: "#", accent: "#9945FF" },
 ];

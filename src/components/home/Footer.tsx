@@ -46,7 +46,7 @@ export default function Footer() {
               <div className="flex flex-col gap-3 text-sm text-neutral-600">
                 <a href="/Roadmap.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-300 transition-colors">Roadmap</a>
                 <a href="/Whitepaper.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-300 transition-colors">Whitepaper</a>
-                <a href="/Tokenomics.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-300 transition-colors">Tokenomics</a>
+                <a href="/Tokenomics.pdf?v=2" target="_blank" rel="noopener noreferrer" className="hover:text-neutral-300 transition-colors">Tokenomics</a>
               </div>
             </div>
 
