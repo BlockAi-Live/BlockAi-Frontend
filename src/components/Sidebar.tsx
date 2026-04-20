@@ -15,6 +15,7 @@ import {
   Bell,
   Sparkle,
   Lightning,
+  Trophy,
 } from "@phosphor-icons/react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -46,6 +47,7 @@ const navSections: NavSection[] = [
     items: [
       { title: "Dashboard", icon: SquaresFour, path: "/dashboard" },
       { title: "Market", icon: ChartBar, path: "/market" },
+      { title: "Leaderboard", icon: Trophy, path: "/leaderboard" },
     ],
   },
   {

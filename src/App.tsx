@@ -23,6 +23,7 @@ import { SettingsPage } from "./pages/Settings";
 import GenesisPass from "./pages/GenesisPass";
 import Waitlist from "./pages/Waitlist";
 import AdminWaitlist from "./pages/AdminWaitlist";
+import { LeaderboardPage } from "./pages/Leaderboard";
 
 import { Toaster } from "@/components/ui/toaster";
 import AuthSuccess from "./pages/AuthSuccess";
@@ -149,6 +150,16 @@ function App() {
             <ProtectedRoute>
               <MainLayout>
                 <ReferralsPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/leaderboard"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <LeaderboardPage />
               </MainLayout>
             </ProtectedRoute>
           }
