@@ -62,12 +62,13 @@ export function CampaignPage() {
   const token = localStorage.getItem("auth_token");
   const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
 
-  // Load feedback data + refresh campaign data
-  const loadFeedback = async () => {
+  // Single combined refresh — updates both context state AND local feedback data
+  const refreshAll = async () => {
     try {
       const res = await fetch(`${API_URL}/api/campaign/progress`, { headers });
       if (res.ok) {
         const data = await res.json();
+        // Update feedback data locally
         const fbData: Record<string, { status: string; url: string; id: string }> = {};
         data.feedbacks?.forEach((f: any) => {
           if (f.platform === "twitter" && !fbData[f.section]) {
@@ -79,24 +80,22 @@ export function CampaignPage() {
     } catch (e) { console.error(e); }
   };
 
-  // Refresh campaign progress + feedback on mount, on window focus, and every 15s
+  // Refresh on mount + poll every 60s + on window focus (debounced)
   useEffect(() => {
-    campaign.refresh();
-    loadFeedback();
+    refreshAll();
 
-    const interval = setInterval(() => {
-      campaign.refresh();
-      loadFeedback();
-    }, 15000);
+    const interval = setInterval(refreshAll, 60000);
 
+    let focusTimeout: ReturnType<typeof setTimeout>;
     const onFocus = () => {
-      campaign.refresh();
-      loadFeedback();
+      clearTimeout(focusTimeout);
+      focusTimeout = setTimeout(refreshAll, 1000);
     };
     window.addEventListener("focus", onFocus);
 
     return () => {
       clearInterval(interval);
+      clearTimeout(focusTimeout);
       window.removeEventListener("focus", onFocus);
     };
   }, []);
