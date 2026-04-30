@@ -70,7 +70,7 @@ export const AccessGateway: React.FC<AccessGatewayProps> = ({ children }) => {
 
             <div className="mt-6 pt-6 border-t border-white/5">
                 <p className="text-sm text-gray-500">
-                    Don't have a code? <a href="/waitlist" className="text-[#14F195] hover:underline">Join the Waitlist</a>
+                    Don't have a code? <a href="/campaign" className="text-[#14F195] hover:underline">Join the Campaign</a>
                 </p>
             </div>
         </div>

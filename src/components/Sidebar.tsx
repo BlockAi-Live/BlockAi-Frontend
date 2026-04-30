@@ -16,9 +16,12 @@ import {
   Sparkle,
   Lightning,
   Trophy,
+  Megaphone,
+  Lock,
 } from "@phosphor-icons/react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { useCampaign } from "@/context/CampaignContext";
 import {
   Sidebar,
   SidebarContent,
@@ -46,6 +49,7 @@ const navSections: NavSection[] = [
     label: "Overview",
     items: [
       { title: "Dashboard", icon: SquaresFour, path: "/dashboard" },
+      { title: "Campaign", icon: Megaphone, path: "/campaign", badge: "Live", badgeColor: "#14F195" },
       { title: "Market", icon: ChartBar, path: "/market" },
       { title: "Leaderboard", icon: Trophy, path: "/leaderboard" },
     ],
@@ -75,7 +79,19 @@ export default function AppSidebar() {
   const navigate = useNavigate();
   const { state, isMobile, setOpenMobile } = useSidebar();
   const location = useLocation();
+  const campaign = useCampaign();
   const isCollapsed = state === "collapsed" && !isMobile;
+
+  // Map paths to required campaign stages
+  const gatedPaths: Record<string, number> = {
+    '/chat': 1, '/market': 2, '/smart-contracts': 3, '/nft': 4, '/wallet-intel': 5,
+  };
+  const isLocked = (path: string) => {
+    const stage = gatedPaths[path];
+    if (!stage) return false;
+    if (campaign.isInvestor) return false;
+    return campaign.unlockedStage < stage;
+  };
 
   const handleLogout = () => {
     logout();
@@ -163,8 +179,10 @@ export default function AppSidebar() {
                           </span>
                         )}
 
-                        {/* Badge */}
-                        {!isCollapsed && item.badge && (
+                        {/* Badge or Lock */}
+                        {!isCollapsed && isLocked(item.path) ? (
+                          <Lock size={12} weight="bold" className="text-neutral-700 shrink-0" />
+                        ) : !isCollapsed && item.badge ? (
                           <span 
                             className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-[1px] rounded-md"
                             style={{ 
@@ -174,7 +192,7 @@ export default function AppSidebar() {
                           >
                             {item.badge}
                           </span>
-                        )}
+                        ) : null}
                     </NavLink>
                   );
                 })}

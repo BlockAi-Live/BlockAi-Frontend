@@ -294,4 +294,80 @@ export const api = {
     }
     return response.json();
   },
+
+  // --- Campaign System ---
+
+  getCampaignProgress: async () => {
+    const token = localStorage.getItem('auth_token');
+    const response = await fetch(`${API_URL}/api/campaign/progress`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error('Failed to fetch campaign progress');
+    return response.json();
+  },
+
+  completeSocialTask: async (taskKey: string) => {
+    const token = localStorage.getItem('auth_token');
+    const response = await fetch(`${API_URL}/api/campaign/social-task`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ taskKey }),
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || 'Failed to complete task');
+    }
+    return response.json();
+  },
+
+  generateEarlyAccessCode: async () => {
+    const token = localStorage.getItem('auth_token');
+    const response = await fetch(`${API_URL}/api/campaign/generate-code`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || 'Failed to generate code');
+    }
+    return response.json();
+  },
+
+  redeemEarlyAccessCode: async (code: string) => {
+    const token = localStorage.getItem('auth_token');
+    const response = await fetch(`${API_URL}/api/campaign/redeem-code`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ code }),
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || 'Failed to redeem code');
+    }
+    return response.json();
+  },
+
+  submitFeedback: async (section: string, platform: string, tweetUrl: string) => {
+    const token = localStorage.getItem('auth_token');
+    const response = await fetch(`${API_URL}/api/campaign/submit-feedback`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ section, platform, tweetUrl }),
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || 'Failed to submit feedback');
+    }
+    return response.json();
+  },
+
+  getUserFeedbacks: async () => {
+    const token = localStorage.getItem('auth_token');
+    const response = await fetch(`${API_URL}/api/campaign/feedbacks`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error('Failed to fetch feedbacks');
+    return response.json();
+  },
 };
+

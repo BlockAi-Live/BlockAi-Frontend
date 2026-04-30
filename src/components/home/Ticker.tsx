@@ -13,7 +13,7 @@ export default function Ticker() {
 
   return (
     <div className="w-full bg-[#09090b] border-b border-neutral-800/50 py-2.5 relative z-50 overflow-hidden group cursor-pointer">
-      <Link to="/waitlist" className="block">
+      <Link to="/campaign" className="block">
         <div className="flex whitespace-nowrap">
           <motion.div
             className="flex gap-10 items-center"
