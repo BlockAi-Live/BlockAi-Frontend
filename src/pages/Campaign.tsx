@@ -31,17 +31,12 @@ const SOCIAL_TASKS = [
 ];
 
 const REWARDS = [
-  { rank: "🥇 1st", prize: "$300 (Token/USDT) + Free Mint: Block AI NFT + Genesis NFT" },
-  { rank: "🥈 2nd", prize: "$200 (Token/USDT) + Free Mint: Block AI NFT + Genesis NFT" },
-  { rank: "🥉 3rd", prize: "$100 (Token/USDT) + Free Mint: Block AI NFT + Genesis NFT" },
-  { rank: "4th", prize: "$80 (Token/USDT) + Free Mint: Genesis NFT" },
-  { rank: "5th", prize: "$70 (Token/USDT) + Free Mint: Genesis NFT" },
-  { rank: "6th", prize: "$60 (Token/USDT) + Free Mint: Genesis NFT" },
-  { rank: "7th", prize: "$30 (Token/USDT) + Free Mint: Genesis NFT" },
-  { rank: "8th", prize: "$25 (Token/USDT) + Free Mint: Genesis NFT" },
-  { rank: "9th", prize: "$20 (Token/USDT) + Free Mint: Genesis NFT" },
-  { rank: "10th", prize: "$15 (Token/USDT) + Free Mint: Genesis NFT" },
-  { rank: "11–30", prize: "Free Mint: Genesis NFT" },
+  { rank: "🥇 1st", prize: "$300 (Token/USDT) + Block AI NFT + Genesis NFT" },
+  { rank: "🥈 2nd", prize: "$200 (Token/USDT) + Block AI NFT + Genesis NFT" },
+  { rank: "🥉 3rd", prize: "$100 (Token/USDT) + Block AI NFT + Genesis NFT" },
+  { rank: "4th – 5th", prize: "$80–$70 (Token/USDT) + Genesis NFT" },
+  { rank: "6th – 10th", prize: "$60–$15 (Token/USDT) + Genesis NFT" },
+  { rank: "11th – 30th", prize: "Free Mint: Genesis NFT" },
 ];
 
 const ACCESS_CODE_COST = 500;
@@ -56,6 +51,8 @@ export function CampaignPage() {
   const [feedbackUrls, setFeedbackUrls] = useState<Record<string, string>>({});
   const [feedbackData, setFeedbackData] = useState<Record<string, { status: string; url: string; id: string }>>({});
   const [editingSection, setEditingSection] = useState<string | null>(null);
+  const [campaignWeek, setCampaignWeek] = useState(0);
+  const [weeklyLimit, setWeeklyLimit] = useState(0);
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -76,6 +73,9 @@ export function CampaignPage() {
           }
         });
         setFeedbackData(fbData);
+        // Weekly info
+        if (data.campaignWeek !== undefined) setCampaignWeek(data.campaignWeek);
+        if (data.weeklyLimit !== undefined) setWeeklyLimit(data.weeklyLimit);
       }
     } catch (e) { console.error(e); }
   };
@@ -228,7 +228,7 @@ export function CampaignPage() {
           </div>
         </div>
         <div className="flex items-center gap-4 mt-4 text-xs text-neutral-600">
-          <span>📅 Start: April 24, 2026</span>
+        <span>📅 Start: May 3, 2026 · 13:00 UTC</span>
           <span>⏱ Duration: 6 weeks</span>
           <span>🏆 Top 30 win prizes</span>
         </div>
@@ -288,6 +288,14 @@ export function CampaignPage() {
               </div>
             );
           })}
+        </div>
+
+        {/* ⚠ Unfollow penalty warning */}
+        <div className="mt-4 p-4 rounded-xl bg-[#F59E0B]/[0.04] border border-[#F59E0B]/10">
+          <p className="text-xs text-[#F59E0B] font-medium leading-relaxed">
+            ⚠ <span className="font-bold">Important:</span> You must keep following all accounts until the campaign ends.
+            For every account you unfollow, <span className="font-bold">100 PTS will be deducted</span> from your final score.
+          </p>
         </div>
       </motion.div>
 
@@ -352,7 +360,15 @@ export function CampaignPage() {
 
       {/* ── STEP 3: FEEDBACK & SECTION PROGRESS ── */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-8">
-        <h2 className="text-lg font-bold text-white mb-4">Step 3 — Test & Submit Feedback</h2>
+        <h2 className="text-lg font-bold text-white mb-2">Step 3 — Test & Submit Feedback</h2>
+        <div className="flex flex-wrap items-center gap-3 mb-3">
+          <span className="text-xs text-neutral-500">100 PTS per approved tweet · Max 1000 PTS</span>
+          {campaignWeek > 0 && (
+            <span className="px-2 py-0.5 rounded-md bg-[#9945FF]/10 border border-[#9945FF]/20 text-[10px] font-bold text-[#9945FF]">
+              Week {campaignWeek}: {weeklyLimit} submission{weeklyLimit > 1 ? 's' : ''}/week
+            </span>
+          )}
+        </div>
         <p className="text-xs text-neutral-500 mb-4">
           Share your honest experience on X. Tag <span className="text-white">@BlockAI_Live</span> and include <span className="text-[#1DA1F2]">#BlockAIEarlyAccess</span>. Paste the tweet link below.
         </p>
