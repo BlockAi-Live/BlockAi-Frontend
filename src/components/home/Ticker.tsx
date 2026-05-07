@@ -8,7 +8,7 @@ export default function Ticker() {
     "PUBLIC BETA",
     "BLOCK AI",
     "EARLY ACCESS",
-    "JOIN NOW ↗"
+    "JOIN THE CAMPAIGN ↗"
   ];
 
   return (
@@ -23,7 +23,7 @@ export default function Ticker() {
             {[...tickerItems, ...tickerItems, ...tickerItems, ...tickerItems, ...tickerItems, ...tickerItems].map((item, index) => (
               <div key={index} className="flex items-center gap-10">
                 <span className={`font-medium tracking-[0.15em] text-xs transition-colors uppercase ${
-                  item === "JOIN NOW ↗" 
+                  item === "JOIN THE CAMPAIGN ↗" 
                     ? "text-[#14F195]" 
                     : "text-neutral-600 group-hover:text-neutral-400"
                 }`}>
