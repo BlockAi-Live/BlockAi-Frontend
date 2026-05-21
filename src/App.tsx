@@ -21,11 +21,17 @@ import WalletIntelPage from "./pages/WalletIntel";
 import SmartAlertsPage from "./pages/SmartAlerts";
 import { SettingsPage } from "./pages/Settings";
 import GenesisPass from "./pages/GenesisPass";
-import AdminCampaign from "./pages/AdminCampaign";
 import { LeaderboardPage } from "./pages/Leaderboard";
-import { CampaignPage } from "./pages/Campaign";
 import { CampaignProvider } from "./context/CampaignContext";
-import CampaignGate from "./components/CampaignGate";
+// Campaign (disabled — kept for later)
+// import AdminCampaign from "./pages/AdminCampaign";
+// import { CampaignPage } from "./pages/Campaign";
+// import CampaignGate from "./components/CampaignGate";
+
+// Waitlist (active)
+import Waitlist from "./pages/Waitlist";
+import AdminWaitlist from "./pages/AdminWaitlist";
+import { AccessGateway } from "./components/access/AccessGateway";
 
 import { Toaster } from "@/components/ui/toaster";
 import AuthSuccess from "./pages/AuthSuccess";
@@ -67,7 +73,10 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/team" element={<Team />} />
         <Route path="/genesis" element={<GenesisPass />} />
-        <Route path="/admin/campaign" element={<AdminCampaign />} />
+        {/* Campaign admin disabled */}
+        {/* <Route path="/admin/campaign" element={<AdminCampaign />} /> */}
+        <Route path="/admin/waitlist" element={<AdminWaitlist />} />
+        <Route path="/waitlist" element={<Waitlist />} />
 
         {/* Auth Pages */}
         <Route path="/signup" element={<SignUpPage />} />
@@ -91,9 +100,9 @@ function App() {
           element={
             <ProtectedRoute>
               <MainLayout>
-                <CampaignGate section="chat">
+                <AccessGateway>
                   <Chat />
-                </CampaignGate>
+                </AccessGateway>
               </MainLayout>
             </ProtectedRoute>
           }
@@ -103,9 +112,7 @@ function App() {
           element={
             <ProtectedRoute>
               <MainLayout>
-                <CampaignGate section="smart-contracts">
-                  <SmartContractsPage />
-                </CampaignGate>
+                <SmartContractsPage />
               </MainLayout>
             </ProtectedRoute>
           }
@@ -115,9 +122,7 @@ function App() {
           element={
             <ProtectedRoute>
               <MainLayout>
-                <CampaignGate section="nft">
-                  <NFTGeneratorPage />
-                </CampaignGate>
+                <NFTGeneratorPage />
               </MainLayout>
             </ProtectedRoute>
           }
@@ -127,9 +132,7 @@ function App() {
           element={
             <ProtectedRoute>
               <MainLayout>
-                <CampaignGate section="wallet-intel">
-                  <WalletIntelPage />
-                </CampaignGate>
+                <WalletIntelPage />
               </MainLayout>
             </ProtectedRoute>
           }
@@ -174,7 +177,8 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
+        {/* Campaign route disabled */}
+        {/* <Route
           path="/campaign"
           element={
             <ProtectedRoute>
@@ -183,15 +187,15 @@ function App() {
               </MainLayout>
             </ProtectedRoute>
           }
-        />
+        /> */}
         <Route
           path="/market"
           element={
             <ProtectedRoute>
               <MainLayout>
-                <CampaignGate section="market">
+                <AccessGateway>
                   <MarketAnalysisPage />
-                </CampaignGate>
+                </AccessGateway>
               </MainLayout>
             </ProtectedRoute>
           }

@@ -8,12 +8,12 @@ export default function Ticker() {
     "PUBLIC BETA",
     "BLOCK AI",
     "EARLY ACCESS",
-    "JOIN THE CAMPAIGN ↗"
+    "JOIN THE WAITLIST ↗"
   ];
 
   return (
     <div className="w-full bg-[#09090b] border-b border-neutral-800/50 py-2.5 relative z-50 overflow-hidden group cursor-pointer">
-      <Link to="/campaign" className="block">
+      <Link to="/waitlist" className="block">
         <div className="flex whitespace-nowrap">
           <motion.div
             className="flex gap-10 items-center"
@@ -23,7 +23,7 @@ export default function Ticker() {
             {[...tickerItems, ...tickerItems, ...tickerItems, ...tickerItems, ...tickerItems, ...tickerItems].map((item, index) => (
               <div key={index} className="flex items-center gap-10">
                 <span className={`font-medium tracking-[0.15em] text-xs transition-colors uppercase ${
-                  item === "JOIN THE CAMPAIGN ↗" 
+                  item === "JOIN THE WAITLIST ↗" 
                     ? "text-[#14F195]" 
                     : "text-neutral-600 group-hover:text-neutral-400"
                 }`}>

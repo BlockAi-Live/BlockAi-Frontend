@@ -49,7 +49,7 @@ const navSections: NavSection[] = [
     label: "Overview",
     items: [
       { title: "Dashboard", icon: SquaresFour, path: "/dashboard" },
-      { title: "Campaign", icon: Megaphone, path: "/campaign", badge: "Live", badgeColor: "#14F195" },
+      { title: "Waitlist", icon: Megaphone, path: "/waitlist" },
       { title: "Market", icon: ChartBar, path: "/market" },
       { title: "Leaderboard", icon: Trophy, path: "/leaderboard" },
     ],
@@ -79,19 +79,14 @@ export default function AppSidebar() {
   const navigate = useNavigate();
   const { state, isMobile, setOpenMobile } = useSidebar();
   const location = useLocation();
-  const campaign = useCampaign();
+  // const campaign = useCampaign();
   const isCollapsed = state === "collapsed" && !isMobile;
 
-  // Map paths to required campaign stages
-  const gatedPaths: Record<string, number> = {
-    '/chat': 1, '/market': 2, '/smart-contracts': 3, '/nft': 4, '/wallet-intel': 5,
-  };
-  const isLocked = (path: string) => {
-    const stage = gatedPaths[path];
-    if (!stage) return false;
-    if (campaign.isInvestor) return false;
-    return campaign.unlockedStage < stage;
-  };
+  // Campaign lock logic disabled — all items open
+  // const gatedPaths: Record<string, number> = {
+  //   '/chat': 1, '/market': 2, '/smart-contracts': 3, '/nft': 4, '/wallet-intel': 5,
+  // };
+  const isLocked = (_path: string) => false;
 
   const handleLogout = () => {
     logout();
